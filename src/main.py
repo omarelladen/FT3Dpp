@@ -128,56 +128,55 @@ class App:
         self.icon_save_as = create_icon("save_as.png", 6)
 
 
-        # Top buttons
+        # Buttons
 
-        icons_top = [
-            self.icon_open,
-            self.icon_save,
-            self.icon_plane,
-            "FT",
-            self.icon_plane_top,
-            "S",
-            "Z",
-            self.icon_freq,
-            self.icon_freq_db,
-            self.icon_phase,
-            self.icon_imp,
-            self.icon_deg,
-            self.icon_3d,
-        ]
+        self.dict_bt = {
+            self.icon_open: ("Abrir Arquivo", -1, False),
+            self.icon_save: ("Salvar Arquivo", -1, False),
+            self.icon_plane: ("Entrada via Plano Complexo", 0, True),
+            "FT": ("Entrada via Função de Transferência", 0, False),
+            self.icon_plane_top: ("Topografia do Plano", -1, False),
+            "S": ("Plano s", 1, False),
+            "Z": ("Plano z", 1, True),
+            self.icon_freq: ("Resposta em Frequência", 2, True),
+            self.icon_freq_db: ("Resposta em Frequência em dB", 2, False),
+            self.icon_phase: ("Fase", -1, False),
+            self.icon_imp: ("Resposta ao Impulso", -1, False),
+            self.icon_deg: ("Resposta ao Degrau Unitário", -1, False),
+            self.icon_3d: ("Gráfico 3D", -1, False),
 
-        self.bt_states_top = {}
-        for i, icon in enumerate(icons_top):
-            if isinstance(icon, str):
-                img_icon = None
-                text = icon
-            else:
-                img_icon = icon
-                text = None
+            self.icon_pole: ("Editar Pólos", 3, True),
+            self.icon_zero: ("Editar Zeros", 3, False),
+            self.icon_kb: ("Inserir Raízes via Teclado", -1, False),
+            # self.icon_zoom: ("Zoom no Plano", -1, False),
+            # self.icon_hand: ("Movimentar o Plano", -1, False),
+            # self.icon_dim: ("Restaurar Dimensões do Plano", -1, False),
+            self.icon_clear: ("Limpar", -1, False),
+            self.icon_info: ("Maiores Informações", -1, False),
 
-            var = tk.BooleanVar(value=False)
-            self.bt_states_top[f"bt_{i}"] = var
+            # self.icon_exit: ("Sair", -1, False),
+            # self.icon_graphic: ("Salvar Gráfico", -1, False),
+            # self.icon_save_as: ("Salvar como", -1, False),
+        }
 
-            bt = tk.Checkbutton(
-                self.toolbar,
-                image=img_icon,
-                text=text,
-                variable=var,
-                indicatoron=False,
-                selectcolor=color_bt_selected,
-                relief="flat",
-                bg=color_bg,
-                padx=5,
-                pady=2,
-                command=lambda i=icon, v=var: print(f"{i} {'ON' if v.get() else 'OFF'}")
-            )
+        self.bt_states = {}  # {key: tk.BooleanVar}
+        self.bt_groups = {}  # {key: group_id}
 
-            bt.pack(side="left", padx=2, pady=2)
+
+        # Top Buttons
+        self._create_bts(list(self.dict_bt.items())[:13], "top")
         self.toolbar.pack(side="top", fill="x")
-
 
         self.frame_top = tk.Frame(self.window, bg=color_bg, pady=5)
         self.frame_top.pack(side="top", fill="x", padx=10)
+
+        self.main_container = tk.Frame(self.window, bg=color_bg)
+        self.main_container.pack(side="top", fill=tk.BOTH, expand=True, padx=10, pady=5)
+
+        # Left Buttons
+        self.frame_bt_left = tk.Frame(self.main_container, bg=color_bg)
+        self.frame_bt_left.pack(side="left", fill="y", padx=5, pady=5)
+        self._create_bts(list(self.dict_bt.items())[13:], "left")
 
 
         def create_label_frame(master, text, padx=10):
@@ -187,7 +186,7 @@ class App:
                 fg=color_fg_text,
                 bg=color_bg,
                 bd=1,
-                relief="solid",
+                relief="raised",
                 padx=padx,
                 pady=5
             )
@@ -236,10 +235,6 @@ class App:
         self.spin_d = create_spin_top(1, 3, 2, "a")
 
 
-        self.main_container = tk.Frame(self.window, bg=color_bg)
-        self.main_container.pack(side="top", fill=tk.BOTH, expand=True, padx=10, pady=5)
-
-
 #         entry = tk.Entry(
 #             self.frame_bottom,
 #             width=20,
@@ -256,57 +251,6 @@ class App:
         label_funct = create_label_frame(self.frame_bottom, "Função de transferência")
 
         create_label_frame_text(label_funct, "H(z)=1+0.604z^(-1)")
-
-
-        # Left Buttons
-
-        self.frame_bt_left = tk.Frame(self.main_container, bg=color_bg)
-        self.frame_bt_left.pack(side="left", fill="y", padx=5, pady=5)
-
-        icons_left = [
-            self.icon_pole,
-            self.icon_zero,
-            self.icon_kb,
-            # self.icon_zoom,
-            # self.icon_hand,
-            # self.icon_dim,
-            self.icon_clear,
-            self.icon_info,
-        ]
-
-        self.bt_states_left = {}
-        for i, icon in enumerate(icons_left):
-            if isinstance(icon, str):
-                img_icon = None
-                text = icon
-            else:
-                img_icon = icon
-                text = None
-
-            if icon == self.icon_pole:
-                var = tk.BooleanVar(value=True)
-            else:
-                var = tk.BooleanVar(value=False)
-            self.bt_states_left[f"bt_v_{i}"] = var
-
-            bt_v = tk.Checkbutton(
-                self.frame_bt_left,
-                image=img_icon,
-                text=text,
-                variable=var,
-                indicatoron=False,
-                selectcolor=color_bt_selected,
-                relief="raised",
-                bg=color_bg,
-                padx=6, pady=6,
-                command=lambda i=icon, v=var: print(f"Plane: {i} {'ON' if v.get() else 'OFF'}")
-            )
-            if i == 0:
-                pady = (60, 3)
-            else:
-                pady = 3
-            bt_v.pack(side="top", fill="x", pady=pady)
-
 
 
         self.frame_plane = tk.Frame(self.main_container, width=500, height=600, bg=color_bg)
@@ -469,6 +413,69 @@ class App:
             fg=color_fg_text,
             bg=color_bg
         ).pack(side="left", padx=5)
+
+
+    def _create_bts(self, list_bt, side):
+        if side == "top":
+            padx, pady = 5, 2
+            pack_side = "left"
+            pack_pady = 2
+            container = self.toolbar
+        else:  # left
+            padx, pady = 6, 6
+            pack_side = "top"
+            container = self.frame_bt_left
+
+        for i, (key, (hint, group, starts_active)) in enumerate(list_bt):
+            if isinstance(key, str):
+                img_icon = None
+                text = key
+            else:
+                img_icon = key
+                text = None
+
+            var = tk.BooleanVar(value=starts_active)
+
+            self.bt_states[key] = var
+            self.bt_groups[key] = group
+
+            if side == "left":
+                pack_pady = (60, 3) if i == 0 else 3
+
+            bt = tk.Checkbutton(
+                container,
+                image=img_icon,
+                text=text,
+                variable=var,
+                indicatoron=False,
+                selectcolor=color_bt_selected,
+                relief="flat",
+                bg=color_bg,
+                padx=padx,
+                pady=pady,
+                command=lambda k=key: self._on_button_click(k)
+            )
+
+            if side == "top":
+                bt.pack(side=pack_side, padx=2, pady=pack_pady)
+            else:  # left
+                bt.pack(side=pack_side, fill="x", pady=pack_pady)
+
+    def _on_button_click(self, clicked_key):
+        v_clicked = self.bt_states[clicked_key]
+        group_clicked = self.bt_groups[clicked_key]
+
+        if group_clicked != -1:
+            if not v_clicked.get():
+                v_clicked.set(True)
+                return
+
+            for key, group in self.bt_groups.items():
+                if key != clicked_key and group == group_clicked:
+                    self.bt_states[key].set(False)
+
+        hint = self.dict_bt[clicked_key][0]
+        print(f"'{hint}' -> {'ON' if v_clicked.get() else 'OFF'}")
 
     def _center_toplevel(self, tl):
         # Center Toplevel acording to the Main Window
