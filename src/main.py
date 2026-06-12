@@ -230,15 +230,15 @@ class App:
         self._update_labels_text()
 
 
-        self.frame_limits = self._create_label_frame(
-            self.frame_top,
-            "Limites do Plano"
-        )
-
-        self.spin_a = self._create_spin_top(0, 1, 0, "Eixo X")
-        self.spin_b = self._create_spin_top(0, 3, 2, "a")
-        self.spin_c = self._create_spin_top(1, 1, 0, "Eixo Y")
-        self.spin_d = self._create_spin_top(1, 3, 2, "a")
+#         self.frame_limits = self._create_label_frame(
+#             self.frame_top,
+#             "Limites do Plano"
+#         )
+# 
+#         self.spin_a = self._create_spin_top(0, 1, 0, "Eixo X")
+#         self.spin_b = self._create_spin_top(0, 3, 2, "a")
+#         self.spin_c = self._create_spin_top(1, 1, 0, "Eixo Y")
+#         self.spin_d = self._create_spin_top(1, 3, 2, "a")
 
 
 #         entry = tk.Entry(
@@ -416,13 +416,15 @@ class App:
 
         self.theta_max = tk.Spinbox(
             self.frame_input_r,
-            from_=1.0, to=20.0,
-            increment=0.5,
+            from_=1, to=4,
+            increment=1,
             width=12,
+            state="readonly",  # block kb
             bg=color_bg_spin,
             fg=color_text,
             insertbackground=color_text,
-            buttonbackground=color_bg
+            buttonbackground=color_bg,
+            command=self._update_freq_resp
         )
         self.theta_max.pack(side="left", padx=5)
 
@@ -434,11 +436,15 @@ class App:
         ).pack(side="left", padx=5)
 
     def _update_freq_resp(self):
-        H_z = self.math_utils.get_H(self.list_zeros, self.list_poles)
+        H_z = self.math_utils.calc_H(self.list_zeros, self.list_poles)
+        abs_H = self.math_utils.calc_abs_H(H_z)
         w = self.math_utils.get_w()
-        mag_H = self.math_utils.get_mag_H(H_z)
 
-        self.line_r.set_data(w, mag_H)
+        self.line_r.set_data(w, abs_H)
+
+        theta_val = int(self.theta_max.get())
+        x_max = theta_val * np.pi
+        self.ax_r.set_xlim(0, x_max)
 
         # Auto scale
         self.ax_r.set_ylim(auto=True)
