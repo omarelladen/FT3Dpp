@@ -315,7 +315,7 @@ class App:
         self.poles_sel = True
 
 
-        self.points_plot, = self.ax_p.plot(
+        self.points_plot_poles, = self.ax_p.plot(
             [],
             [],
             color=color_poles,
@@ -325,6 +325,18 @@ class App:
             markeredgewidth=2,
             zorder=2
         )
+        self.points_plot_zeros, = self.ax_p.plot(
+            [],
+            [],
+            color=color_poles,
+            marker='o',
+            markerfacecolor='none',
+            linestyle='none',
+            markersize=8,
+            markeredgewidth=2,
+            zorder=2
+        )
+
         self.idx_sel_point = None
 
         self.canvas_p = FigureCanvasTkAgg(self.fig_p, master=self.frame_plane)
@@ -414,6 +426,12 @@ class App:
             bg=color_bg
         ).pack(side="left", padx=5)
 
+    def _get_list_sel(self):
+        if self.bt_states[self.icon_pole].get():
+            list_sel = self.list_poles
+        elif self.bt_states[self.icon_zero].get():
+            list_sel = self.list_zeros
+        return list_sel
 
     def _create_bts(self, list_bt, side):
         if side == "top":
@@ -557,10 +575,12 @@ class App:
         if self.toolbar_p.mode != "" or event.inaxes != self.ax_p:
             return
 
+        list_poles_zeros = self.list_poles + self.list_zeros
+
         # Calculate distance to prevent duplicated
         dist = np.array([])
-        if len(self.list_poles) > 0:
-            coords = np.array(self.list_poles)
+        if len(list_poles_zeros) > 0:
+            coords = np.array(list_poles_zeros)
             click = np.array([event.xdata, event.ydata])
             dist = np.sqrt(np.sum((coords - click) ** 2, axis=1))
 
@@ -570,33 +590,67 @@ class App:
         if event.button == R_BUTTON:
             if next:
                 idx = np.argmin(dist)
-                self.list_poles.pop(idx)
+                len_poles = len(self.list_poles)
+
+                if idx < len_poles:
+                    self.list_poles.pop(idx)
+                else:
+                    self.list_zeros.pop(idx - len_poles)
+
                 self.update_graphic()
             return
 
         # Left button
         if event.button == L_BUTTON:
+            list_sel = self._get_list_sel()
+
             if next:
-                self.idx_sel_point = np.argmin(dist)
+                idx = np.argmin(dist)
+                len_poles = len(self.list_poles)
+
+                if list_sel == self.list_poles and idx < len_poles:
+                    self.idx_sel_point = idx
+                    self.type_sel_point = "pole"
+                elif list_sel == self.list_zeros and idx >= len_poles:
+                    self.idx_sel_point = idx - len_poles
+                    self.type_sel_point = "zero"
+                else:
+                    self.idx_sel_point = None
+                    self.type_sel_point = None
             else:
-                self.list_poles.append((event.xdata, event.ydata))
-                self.idx_sel_point = len(self.list_poles) - 1
+                list_sel.append((event.xdata, event.ydata))
+                self.idx_sel_point = len(list_sel) - 1
+
+                if list_sel == self.list_poles:
+                    self.type_sel_point = "pole"
+                elif list_sel == self.list_zeros:
+                    self.type_sel_point = "zero"
                 self.update_graphic()
 
     def _on_move(self, event):
         if self.idx_sel_point is not None and event.inaxes == self.ax_p:
-            self.list_poles[self.idx_sel_point] = (event.xdata, event.ydata)
+            if self.type_sel_point == "pole":
+                self.list_poles[self.idx_sel_point] = (event.xdata, event.ydata)
+            elif self.type_sel_point == "zero":
+                self.list_zeros[self.idx_sel_point] = (event.xdata, event.ydata)
             self.update_graphic()
 
     def _on_drop(self, event):
         self.idx_sel_point = None
+        self.type_sel_point = None
 
     def update_graphic(self):
         if self.list_poles:
-            x_data, y_data = zip(*self.list_poles)
-            self.points_plot.set_data(x_data, y_data)
+            x_poles, y_poles = zip(*self.list_poles)
+            self.points_plot_poles.set_data(x_poles, y_poles)
         else:
-            self.points_plot.set_data([], [])
+            self.points_plot_poles.set_data([], [])
+
+        if self.list_zeros:
+            x_zeros, y_zeros = zip(*self.list_zeros)
+            self.points_plot_zeros.set_data(x_zeros, y_zeros)
+        else:
+            self.points_plot_zeros.set_data([], [])
 
         self.canvas_p.draw_idle()
 
