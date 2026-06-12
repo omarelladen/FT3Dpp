@@ -593,9 +593,16 @@ class App:
                 len_poles = len(self.list_poles)
 
                 if idx < len_poles:
-                    self.list_poles.pop(idx)
+                    idx_start = idx if (idx % 2 == 0) else (idx - 1)
+
+                    self.list_poles.pop(idx_start + 1)
+                    self.list_poles.pop(idx_start)
                 else:
-                    self.list_zeros.pop(idx - len_poles)
+                    idx_rel = idx - len_poles
+                    idx_start = idx_rel if (idx_rel % 2 == 0) else (idx_rel - 1)
+
+                    self.list_zeros.pop(idx_start + 1)
+                    self.list_zeros.pop(idx_start)
 
                 self.update_graphic()
             return
@@ -619,6 +626,8 @@ class App:
                     self.type_sel_point = None
             else:
                 list_sel.append((event.xdata, event.ydata))
+                list_sel.append((event.xdata, -event.ydata))
+
                 self.idx_sel_point = len(list_sel) - 1
 
                 if list_sel == self.list_poles:
@@ -631,8 +640,10 @@ class App:
         if self.idx_sel_point is not None and event.inaxes == self.ax_p:
             if self.type_sel_point == "pole":
                 self.list_poles[self.idx_sel_point] = (event.xdata, event.ydata)
+                self.list_poles[self.idx_sel_point-1] = (event.xdata, -event.ydata)
             elif self.type_sel_point == "zero":
                 self.list_zeros[self.idx_sel_point] = (event.xdata, event.ydata)
+                self.list_zeros[self.idx_sel_point-1] = (event.xdata, -event.ydata)
             self.update_graphic()
 
     def _on_drop(self, event):
