@@ -180,50 +180,13 @@ class App:
         self._create_bts(list(self.dict_bt.items())[13:], "left")
 
 
-        def create_label_frame(master, text, padx=10):
-            frame = tk.LabelFrame(
-                master=master,
-                text=text,
-                fg=color_fg_text,
-                bg=color_bg,
-                bd=1,
-                relief="raised",
-                padx=padx,
-                pady=5
-            )
-            frame.pack(side="left", padx=10, fill="y")
-            return frame
-
-        def create_spin_top(row, col, col_text, text):
-            tk.Label(
-                frame_limits,
-                text=text,
-                fg=color_fg_text,
-                bg=color_bg
-            ).grid(row=row, column=col_text, padx=2, pady=2)
-
-            spin = tk.Spinbox(
-                frame_limits,
-                from_=-1.5, to=1.5,
-                increment=0.1,
-                width=6,
-                bg=color_bg_spin,
-                fg=color_fg_text,
-                insertbackground=color_fg_text,
-                buttonbackground=color_bg
-            )
-            spin.grid(row=row, column=col, padx=5, pady=2)
-
-            return spin
-
         # Poles and zeros
         self.list_poles = []
         self.list_zeros = []
 
-        # self.frame_poles  = create_label_frame(self.frame_top, "Pólos")
-        # self.frame_zeros  = create_label_frame(self.frame_top, "Zeros")
-        box_poles = create_label_frame(self.frame_top, "Pólos")
-        box_zeros = create_label_frame(self.frame_top, "Zeros")
+
+        box_poles = self._create_label_frame(self.frame_top, "Pólos")
+        box_zeros = self._create_label_frame(self.frame_top, "Zeros")
 
         frame_poles_outer, self.frame_poles, self.canvas_poles = self._create_scrollable_frame(
             box_poles, width=200, height=100, bg_color=color_bg
@@ -244,13 +207,13 @@ class App:
 
         self._update_labels_text()
 
-        frame_limits = create_label_frame(self.frame_top, "Limites do Plano")
 
+        self.frame_limits = self._create_label_frame(self.frame_top, "Limites do Plano")
 
-        self.spin_a = create_spin_top(0, 1, 0, "Eixo X")
-        self.spin_b = create_spin_top(0, 3, 2, "a")
-        self.spin_c = create_spin_top(1, 1, 0, "Eixo Y")
-        self.spin_d = create_spin_top(1, 3, 2, "a")
+        self.spin_a = self._create_spin_top(0, 1, 0, "Eixo X")
+        self.spin_b = self._create_spin_top(0, 3, 2, "a")
+        self.spin_c = self._create_spin_top(1, 1, 0, "Eixo Y")
+        self.spin_d = self._create_spin_top(1, 3, 2, "a")
 
 
 #         entry = tk.Entry(
@@ -266,7 +229,7 @@ class App:
         self.frame_bottom = tk.Frame(self.window, bg=color_bg, pady=5)
         self.frame_bottom.pack(side="bottom", fill="x", padx=10)
 
-        label_funct = create_label_frame(self.frame_bottom, "Função de transferência")
+        label_funct = self._create_label_frame(self.frame_bottom, "Função de transferência")
 
         self._create_label_frame_text(label_funct, "H(z)=1+0.604z^(-1)")
 
@@ -288,7 +251,13 @@ class App:
         self.ax_p.set_xlim(-lim, lim)
         self.ax_p.set_ylim(-lim, lim)
         self.ax_p.set_aspect('equal')
-        self.ax_p.set_title("Plano z", color=color_fg_text, fontsize=12, pad=10, loc="left")
+        self.ax_p.set_title(
+            "Plano z",
+            color=color_fg_text,
+            fontsize=12,
+            pad=10,
+            loc="left"
+        )
 
         self.ax_p.text(
             0.5, 1.05,
@@ -371,7 +340,13 @@ class App:
 
         self.ax_r.plot(t, sinal, color=color_resp, linewidth=2)
 
-        self.ax_r.set_title("Resposta em Frequência", color=color_fg_text, fontsize=12, pad=10, loc="left")
+        self.ax_r.set_title(
+            "Resposta em Frequência",
+            color=color_fg_text,
+            fontsize=12,
+            pad=10,
+            loc="left"
+        )
         self.ax_r.grid(True, color=color_grid, linestyle="--")
         self.ax_r.tick_params(colors=color_fg_text)
         self.ax_r.set_ylim(-1.2, 1.2)
@@ -418,6 +393,42 @@ class App:
             bg=color_bg
         ).pack(side="left", padx=5)
 
+
+    def _create_label_frame(self, master, text, padx=10):
+        frame = tk.LabelFrame(
+            master=master,
+            text=text,
+            fg=color_fg_text,
+            bg=color_bg,
+            bd=1,
+            relief="raised",
+            padx=padx,
+            pady=5
+        )
+        frame.pack(side="left", padx=10, fill="y")
+        return frame
+
+    def _create_spin_top(self, row, col, col_text, text):
+        tk.Label(
+            self.frame_limits,
+            text=text,
+            fg=color_fg_text,
+            bg=color_bg
+        ).grid(row=row, column=col_text, padx=2, pady=2)
+
+        spin = tk.Spinbox(
+            self.frame_limits,
+            from_=-1.5, to=1.5,
+            increment=0.1,
+            width=6,
+            bg=color_bg_spin,
+            fg=color_fg_text,
+            insertbackground=color_fg_text,
+            buttonbackground=color_bg
+        )
+        spin.grid(row=row, column=col, padx=5, pady=2)
+
+        return spin
 
     def _create_scrollable_frame(self, parent, width, height, bg_color):
         outer_frame = tk.Frame(parent, width=width, height=height, bg=bg_color)
@@ -686,6 +697,7 @@ class App:
 
         # Right button
         if event.button == R_BUTTON:
+            # TODO: fix bug that sometimes rm the wrong conjugate
             if next:
                 idx = np.argmin(dist)
                 len_poles = len(self.list_poles)
@@ -697,7 +709,10 @@ class App:
                     self.list_poles.pop(idx_start)
                 else:
                     idx_rel = idx - len_poles
-                    idx_start = idx_rel if (idx_rel % 2 == 0) else (idx_rel - 1)
+                    if (idx_rel % 2 == 0):
+                        idx_start = idx_rel
+                    else:
+                        idx_start = idx_rel-1
 
                     self.list_zeros.pop(idx_start + 1)
                     self.list_zeros.pop(idx_start)
