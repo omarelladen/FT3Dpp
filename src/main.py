@@ -146,7 +146,7 @@ class App:
             self.icon_3d,
         ]
 
-        self.btn_states_top = {}
+        self.bt_states_top = {}
         for i, icon in enumerate(icons_top):
             if isinstance(icon, str):
                 img_icon = None
@@ -156,9 +156,9 @@ class App:
                 text = None
 
             var = tk.BooleanVar(value=False)
-            self.btn_states_top[f"btn_{i}"] = var
+            self.bt_states_top[f"bt_{i}"] = var
 
-            btn = tk.Checkbutton(
+            bt = tk.Checkbutton(
                 self.toolbar,
                 image=img_icon,
                 text=text,
@@ -172,7 +172,7 @@ class App:
                 command=lambda i=icon, v=var: print(f"{i} {'ON' if v.get() else 'OFF'}")
             )
 
-            btn.pack(side="left", padx=2, pady=2)
+            bt.pack(side="left", padx=2, pady=2)
         self.toolbar.pack(side="top", fill="x")
 
 
@@ -267,14 +267,14 @@ class App:
             self.icon_pole,
             self.icon_zero,
             self.icon_kb,
-            self.icon_zoom,
-            self.icon_hand,
-            self.icon_dim,
+            # self.icon_zoom,
+            # self.icon_hand,
+            # self.icon_dim,
             self.icon_clear,
             self.icon_info,
         ]
 
-        self.btn_states_left = {}
+        self.bt_states_left = {}
         for i, icon in enumerate(icons_left):
             if isinstance(icon, str):
                 img_icon = None
@@ -283,10 +283,13 @@ class App:
                 img_icon = icon
                 text = None
 
-            var = tk.BooleanVar(value=False)
-            self.btn_states_left[f"btn_v_{i}"] = var
+            if icon == self.icon_pole:
+                var = tk.BooleanVar(value=True)
+            else:
+                var = tk.BooleanVar(value=False)
+            self.bt_states_left[f"bt_v_{i}"] = var
 
-            btn_v = tk.Checkbutton(
+            bt_v = tk.Checkbutton(
                 self.frame_bt_left,
                 image=img_icon,
                 text=text,
@@ -302,7 +305,7 @@ class App:
                 pady = (60, 3)
             else:
                 pady = 3
-            btn_v.pack(side="top", fill="x", pady=pady)
+            bt_v.pack(side="top", fill="x", pady=pady)
 
 
 
@@ -362,8 +365,12 @@ class App:
         self.ax_p.add_patch(circle)
 
         # Poles and zeros
-        self.x_data = []
-        self.y_data = []
+        self.list_poles = []
+        self.list_zeros = []
+
+        self.poles_sel = True
+
+
         self.points_plot, = self.ax_p.plot(
             [],
             [],
@@ -545,11 +552,10 @@ class App:
 
         # Calculate distance to prevent duplicated
         dist = np.array([])
-        if len(self.x_data) > 0:
-            dist = np.sqrt(
-                (np.array(self.x_data) - event.xdata)**2 +
-                (np.array(self.y_data) - event.ydata)**2
-            )
+        if len(self.list_poles) > 0:
+            coords = np.array(self.list_poles)
+            click = np.array([event.xdata, event.ydata])
+            dist = np.sqrt(np.sum((coords - click) ** 2, axis=1))
 
         next = (len(dist) > 0 and np.min(dist) < 0.05)
 
@@ -557,9 +563,7 @@ class App:
         if event.button == R_BUTTON:
             if next:
                 idx = np.argmin(dist)
-                self.x_data.pop(idx)
-                self.y_data.pop(idx)
-                # self.status_str.set(f"Point {idx} removed")
+                self.list_poles.pop(idx)
                 self.update_graphic()
             return
 
@@ -568,22 +572,25 @@ class App:
             if next:
                 self.idx_sel_point = np.argmin(dist)
             else:
-                self.x_data.append(event.xdata)
-                self.y_data.append(event.ydata)
-                self.idx_sel_point = len(self.x_data) - 1
+                self.list_poles.append((event.xdata, event.ydata))
+                self.idx_sel_point = len(self.list_poles) - 1
                 self.update_graphic()
 
     def _on_move(self, event):
         if self.idx_sel_point is not None and event.inaxes == self.ax_p:
-            self.x_data[self.idx_sel_point] = event.xdata
-            self.y_data[self.idx_sel_point] = event.ydata
+            self.list_poles[self.idx_sel_point] = (event.xdata, event.ydata)
             self.update_graphic()
 
     def _on_drop(self, event):
         self.idx_sel_point = None
 
     def update_graphic(self):
-        self.points_plot.set_data(self.x_data, self.y_data)
+        if self.list_poles:
+            x_data, y_data = zip(*self.list_poles)
+            self.points_plot.set_data(x_data, y_data)
+        else:
+            self.points_plot.set_data([], [])
+
         self.canvas_p.draw_idle()
 
     def run(self):
