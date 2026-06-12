@@ -29,6 +29,7 @@ color_grid = "#008000"
 color_bg_spin = "#FFFFFF"
 color_bt_selected = "#d1d1d1"
 color_poles = "white"
+color_zeros = "yellow"
 color_resp = "white"
 
 R_BUTTON = 3
@@ -193,13 +194,6 @@ class App:
             frame.pack(side="left", padx=10, fill="y")
             return frame
 
-        def create_label_frame_text(master, text):
-            label = tk.Label(
-                master, text=text,
-                fg=color_fg_text, bg=color_bg, font=("Segoe UI", 9)  # , "bold")
-            )
-            label.pack(expand=True)
-
         def create_spin_top(row, col, col_text, text):
             tk.Label(
                 frame_limits,
@@ -210,7 +204,7 @@ class App:
 
             spin = tk.Spinbox(
                 frame_limits,
-                from_=-10.0, to=10.0,
+                from_=-1.5, to=1.5,
                 increment=0.1,
                 width=6,
                 bg=color_bg_spin,
@@ -222,12 +216,23 @@ class App:
 
             return spin
 
-        frame_poles  = create_label_frame(self.frame_top, "Pólos")
-        frame_zeros  = create_label_frame(self.frame_top, "Zeros")
+        # Poles and zeros
+        self.list_poles = []
+        self.list_zeros = []
+
+        self.frame_poles  = create_label_frame(self.frame_top, "Pólos")
+        self.frame_zeros  = create_label_frame(self.frame_top, "Zeros")
         frame_limits = create_label_frame(self.frame_top, "Limites do Plano")
 
-        create_label_frame_text(frame_poles, "(0,535 + j0,490) e (0,535 - j0,490)\n(0,354 + j0,867) e (0,354 - j0,867)")
-        create_label_frame_text(frame_zeros, "(0,143 + j0,972) e (0,143 - j0,972)\n(-0,445 + j0,912) e (-0,445 - j0,912)")
+
+        self.text_poles_var = tk.StringVar()
+        self.text_zeros_var = tk.StringVar()
+
+        self._create_label_coords(self.frame_poles, self.text_poles_var)
+        self._create_label_coords(self.frame_zeros, self.text_zeros_var)
+
+        self._update_labels_text()
+
 
         self.spin_a = create_spin_top(0, 1, 0, "Eixo X")
         self.spin_b = create_spin_top(0, 3, 2, "a")
@@ -250,7 +255,7 @@ class App:
 
         label_funct = create_label_frame(self.frame_bottom, "Função de transferência")
 
-        create_label_frame_text(label_funct, "H(z)=1+0.604z^(-1)")
+        self._create_label_frame_text(label_funct, "H(z)=1+0.604z^(-1)")
 
 
         self.frame_plane = tk.Frame(self.main_container, width=500, height=600, bg=color_bg)
@@ -308,34 +313,8 @@ class App:
         )
         self.ax_p.add_patch(circle)
 
-        # Poles and zeros
-        self.list_poles = []
-        self.list_zeros = []
-
-        self.poles_sel = True
-
-
-        self.points_plot_poles, = self.ax_p.plot(
-            [],
-            [],
-            color=color_poles,
-            marker='x',
-            linestyle='none',
-            markersize=8,
-            markeredgewidth=2,
-            zorder=2
-        )
-        self.points_plot_zeros, = self.ax_p.plot(
-            [],
-            [],
-            color=color_poles,
-            marker='o',
-            markerfacecolor='none',
-            linestyle='none',
-            markersize=8,
-            markeredgewidth=2,
-            zorder=2
-        )
+        self.points_plot_poles = self._setup_point_plotter("x", color_poles)
+        self.points_plot_zeros = self._setup_point_plotter("o", color_zeros)
 
         self.idx_sel_point = None
 
@@ -425,6 +404,64 @@ class App:
             fg=color_fg_text,
             bg=color_bg
         ).pack(side="left", padx=5)
+
+
+    def _create_label_coords(self, frame, var):
+        tk.Label(
+            frame,
+            textvariable=var,
+            bg=color_bg,
+            font=("Arial", 8)
+        ).pack(padx=2, pady=2)
+
+    def _setup_point_plotter(self, marker, color):
+        points_plot, = self.ax_p.plot(
+            [],
+            [],
+            color=color,
+            marker=marker,
+            markerfacecolor="none",
+            linestyle="none",
+            markersize=8,
+            markeredgewidth=2,
+            zorder=2
+        )
+        return points_plot
+
+    def _create_label_frame_text(self, master, text):
+        label = tk.Label(
+            master, text=text,
+            fg=color_fg_text, bg=color_bg, font=("Segoe UI", 9)  # , "bold")
+        )
+        label.pack(expand=True)
+
+    def _update_labels_text(self):
+        poles_text = ""
+        for i in range(0, len(self.list_poles), 2):
+            if i + 1 < len(self.list_poles):
+                p1 = self.list_poles[i]
+                p2 = self.list_poles[i+1]
+                poles_text += f"({p1[0]:.3f} + j{abs(p1[1]):.3f}) e " \
+                              f"({p2[0]:.3f} - j{abs(p2[1]):.3f})\n"
+
+        zeros_text = ""
+        for i in range(0, len(self.list_zeros), 2):
+            if i + 1 < len(self.list_zeros):
+                z1 = self.list_zeros[i]
+                z2 = self.list_zeros[i+1]
+                zeros_text += f"({z1[0]:.3f} + j{abs(z1[1]):.3f}) e " \
+                              f"({z2[0]:.3f} - j{abs(z2[1]):.3f})\n"
+
+        poles_text = poles_text.strip()
+        zeros_text = zeros_text.strip()
+
+        if not poles_text:
+            poles_text = 54*" "
+        if not zeros_text:
+            zeros_text = 54*" "
+
+        self.text_poles_var.set(poles_text)
+        self.text_zeros_var.set(zeros_text)
 
     def _get_list_sel(self):
         if self.bt_states[self.icon_pole].get():
@@ -604,7 +641,7 @@ class App:
                     self.list_zeros.pop(idx_start + 1)
                     self.list_zeros.pop(idx_start)
 
-                self.update_graphic()
+                self._update_graphic()
             return
 
         # Left button
@@ -634,7 +671,7 @@ class App:
                     self.type_sel_point = "pole"
                 elif list_sel == self.list_zeros:
                     self.type_sel_point = "zero"
-                self.update_graphic()
+                self._update_graphic()
 
     def _on_move(self, event):
         if self.idx_sel_point is not None and event.inaxes == self.ax_p:
@@ -644,13 +681,13 @@ class App:
             elif self.type_sel_point == "zero":
                 self.list_zeros[self.idx_sel_point] = (event.xdata, event.ydata)
                 self.list_zeros[self.idx_sel_point-1] = (event.xdata, -event.ydata)
-            self.update_graphic()
+            self._update_graphic()
 
     def _on_drop(self, event):
         self.idx_sel_point = None
         self.type_sel_point = None
 
-    def update_graphic(self):
+    def _update_graphic(self):
         if self.list_poles:
             x_poles, y_poles = zip(*self.list_poles)
             self.points_plot_poles.set_data(x_poles, y_poles)
@@ -664,6 +701,7 @@ class App:
             self.points_plot_zeros.set_data([], [])
 
         self.canvas_p.draw_idle()
+        self._update_labels_text()
 
     def run(self):
         self.window.mainloop()
