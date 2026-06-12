@@ -2,14 +2,15 @@ import os
 import subprocess
 
 import tkinter as tk
-from tkinter import messagebox
 
 import numpy as np
 
 import matplotlib.patches as patches
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-from matplotlib.backend_bases import key_press_handler
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg,
+    NavigationToolbar2Tk
+)
 
 from configs import *
 
@@ -24,7 +25,7 @@ win_size = "1200x800"
 color_ln = "#00FF00"
 color_bg = "#F0F0F0"  # "#212121"
 color_z_bg = "#000000"
-color_fg_text = "#000000"
+color_text = "#000000"
 color_grid = "#008000"
 color_bg_spin = "#FFFFFF"
 color_bt_selected = "#d1d1d1"
@@ -39,40 +40,52 @@ L_BUTTON = 1
 class App:
     def __init__(self):
         # Main Window
-        self.window = tk.Tk()
-        self.window.title(app_name)
+        self.win = tk.Tk()
+        self.win.title(app_name)
 
         # Layout
-        self.window.geometry(win_size)
+        self.win.geometry(win_size)
 
         # Color
-        self.window.configure(bg=color_bg)
+        self.win.configure(bg=color_bg)
 
         # Icon
         if os.name == "nt":  # Windows
             if os.path.isfile(icon_logo_path):
                 try:
-                    self.window.iconphoto(True, tk.PhotoImage(file=icon_logo_path))
+                    self.win.iconphoto(
+                        True,
+                        tk.PhotoImage(file=icon_logo_path)
+                    )
                 except Exception as e:
                     print(f"Error loading icon {icon_logo_path}: {e}")
 
 
         # Menu Bar
         small_font = ("Segoe UI", 8)
-        self.menubar = tk.Menu(self.window, font=small_font)
+        self.menubar = tk.Menu(self.win, font=small_font)
 
-        self.menu_file     = tk.Menu(self.menubar, tearoff=0)
-        self.menu_edit     = tk.Menu(self.menubar, tearoff=0)
-        self.menu_entry    = tk.Menu(self.menubar, tearoff=0)
-        self.menu_plane    = tk.Menu(self.menubar, tearoff=0)
-        self.menu_system   = tk.Menu(self.menubar, tearoff=0)
-        self.menu_graphics = tk.Menu(self.menubar, tearoff=0)
-        self.menu_windows  = tk.Menu(self.menubar, tearoff=0)
+        self.menu_file     = self._create_menu()
+        self.menu_edit     = self._create_menu()
+        self.menu_entry    = self._create_menu()
+        self.menu_plane    = self._create_menu()
+        self.menu_system   = self._create_menu()
+        self.menu_graphics = self._create_menu()
+        self.menu_windows  = self._create_menu()
 
         # Help Menu
-        self.menu_help = tk.Menu(self.menubar, tearoff=0)
+        self.menu_help = self._create_menu()
 
-        self.menu_help.add_command(label="Ajuda", command=lambda: self._show_info(dict_help, "Help",  "950x650", wraplength=900))
+
+        self.menu_help.add_command(
+            label="Ajuda",
+            command=lambda: self._show_info(
+                dict_help,
+                "Help",
+                "950x650",
+                wraplength=900
+            )
+        )
         self.menu_help.add_command(label="Sobre", command=self._show_about)
 
 
@@ -88,16 +101,17 @@ class App:
 
 
         # Show Menu Bar
-        self.window.config(menu=self.menubar)
+        self.win.config(menu=self.menubar)
 
 
-        self.toolbar = tk.Frame(self.window, bd=1, relief="raised", bg=color_bg)
+        self.toolbar = tk.Frame(self.win, bd=1, relief="raised", bg=color_bg)
 
         def create_icon(filename, reduction=18):
             file_path = os.path.join("icons", filename)
             if os.path.isfile(file_path):
                 try:
-                    img = tk.PhotoImage(file=file_path).subsample(reduction, reduction)
+                    img = tk.PhotoImage(file=file_path)
+                    img = img.subsample(reduction, reduction)
                     return img
                 except Exception as e:
                     print(f"Error loading image '{file_path}': {e}")
@@ -146,18 +160,11 @@ class App:
             self.icon_deg: ("Resposta ao Degrau Unitário", -1, False),
             self.icon_3d: ("Gráfico 3D", -1, False),
 
-            self.icon_pole: ("Editar Pólos", 3, True),
+            self.icon_pole: ("Editar Polos", 3, True),
             self.icon_zero: ("Editar Zeros", 3, False),
             self.icon_kb: ("Inserir Raízes via Teclado", -1, False),
-            # self.icon_zoom: ("Zoom no Plano", -1, False),
-            # self.icon_hand: ("Movimentar o Plano", -1, False),
-            # self.icon_dim: ("Restaurar Dimensões do Plano", -1, False),
             self.icon_clear: ("Limpar", -1, False),
             self.icon_info: ("Maiores Informações", -1, False),
-
-            # self.icon_exit: ("Sair", -1, False),
-            # self.icon_graphic: ("Salvar Gráfico", -1, False),
-            # self.icon_save_as: ("Salvar como", -1, False),
         }
 
         self.bt_states = {}  # {key: tk.BooleanVar}
@@ -168,11 +175,17 @@ class App:
         self._create_bts(list(self.dict_bt.items())[:13], "top")
         self.toolbar.pack(side="top", fill="x")
 
-        self.frame_top = tk.Frame(self.window, bg=color_bg, pady=5)
+        self.frame_top = tk.Frame(self.win, bg=color_bg, pady=5)
         self.frame_top.pack(side="top", fill="x", padx=10)
 
-        self.main_container = tk.Frame(self.window, bg=color_bg)
-        self.main_container.pack(side="top", fill=tk.BOTH, expand=True, padx=10, pady=5)
+        self.main_container = tk.Frame(self.win, bg=color_bg)
+        self.main_container.pack(
+            side="top",
+            fill=tk.BOTH,
+            expand=True,
+            padx=10,
+            pady=5
+        )
 
         # Left Buttons
         self.frame_bt_left = tk.Frame(self.main_container, bg=color_bg)
@@ -185,16 +198,22 @@ class App:
         self.list_zeros = []
 
 
-        box_poles = self._create_label_frame(self.frame_top, "Pólos")
+        box_poles = self._create_label_frame(self.frame_top, "Polos")
         box_zeros = self._create_label_frame(self.frame_top, "Zeros")
 
-        frame_poles_outer, self.frame_poles, self.canvas_poles = self._create_scrollable_frame(
-            box_poles, width=200, height=100, bg_color=color_bg
+        frame_poles_outer, self.frame_poles = self._create_scrollable_frame(
+            box_poles,
+            width=200,
+            height=100,
+            bg_color=color_bg
         )
         frame_poles_outer.pack(side="left", padx=5, pady=5)
 
-        frame_zeros_outer, self.frame_zeros, self.canvas_zeros = self._create_scrollable_frame(
-            box_zeros, width=200, height=100, bg_color=color_bg
+        frame_zeros_outer, self.frame_zeros = self._create_scrollable_frame(
+            box_zeros,
+            width=200,
+            height=100,
+            bg_color=color_bg
         )
         frame_zeros_outer.pack(side="left", padx=5, pady=5)
 
@@ -208,7 +227,10 @@ class App:
         self._update_labels_text()
 
 
-        self.frame_limits = self._create_label_frame(self.frame_top, "Limites do Plano")
+        self.frame_limits = self._create_label_frame(
+            self.frame_top,
+            "Limites do Plano"
+        )
 
         self.spin_a = self._create_spin_top(0, 1, 0, "Eixo X")
         self.spin_b = self._create_spin_top(0, 3, 2, "a")
@@ -223,24 +245,23 @@ class App:
 #             fg="white",
 #             insertbackground="white"
 #         )
-#         color_fg_text.pack(side="left")
+#         color_text.pack(side="left")
 
 
-        self.frame_bottom = tk.Frame(self.window, bg=color_bg, pady=5)
+        self.frame_bottom = tk.Frame(self.win, bg=color_bg, pady=5)
         self.frame_bottom.pack(side="bottom", fill="x", padx=10)
 
-        label_funct = self._create_label_frame(self.frame_bottom, "Função de transferência")
+        label_funct = self._create_label_frame(
+            self.frame_bottom,
+            "Função de transferência"
+        )
 
         self._create_label_frame_text(label_funct, "H(z)=1+0.604z^(-1)")
 
 
-        self.frame_plane = tk.Frame(self.main_container, width=500, height=600, bg=color_bg)
-        self.frame_plane.pack(side="left", padx=10, pady=5)
-        self.frame_plane.pack_propagate(False)
+        self.frame_plane = self._create_frame_fig()
 
-        self.frame_resp = tk.Frame(self.main_container, width=500, height=550, bg=color_bg)
-        self.frame_resp.pack(side="left", padx=10, pady=5)
-        self.frame_resp.pack_propagate(False)
+        self.frame_resp = self._create_frame_fig()
 
 
         # Plane Figure
@@ -253,7 +274,7 @@ class App:
         self.ax_p.set_aspect('equal')
         self.ax_p.set_title(
             "Plano z",
-            color=color_fg_text,
+            color=color_text,
             fontsize=12,
             pad=10,
             loc="left"
@@ -262,7 +283,7 @@ class App:
         self.ax_p.text(
             0.5, 1.05,
             "Im",
-            color=color_fg_text,
+            color=color_text,
             fontsize=10,
             fontweight="bold",
             ha="center",
@@ -274,7 +295,7 @@ class App:
         self.ax_p.text(
             1.05, 0.5,
             "Re",
-            color=color_fg_text,
+            color=color_text,
             fontsize=10,
             fontweight="bold",
             ha="left",
@@ -304,17 +325,25 @@ class App:
         self.canvas_p.draw()
 
         # Matplotlib toolbar
-        self.toolbar_p = NavigationToolbar2Tk(self.canvas_p, window=self.frame_plane, pack_toolbar=False)
+        self.toolbar_p = NavigationToolbar2Tk(
+            self.canvas_p,
+            window=self.frame_plane,
+            pack_toolbar=False
+        )
         self.toolbar_p.update()
 
-        self.canvas_p.get_tk_widget().pack(side="top", fill=tk.BOTH, expand=True)
+        self.canvas_p.get_tk_widget().pack(
+            side="top",
+            fill=tk.BOTH,
+            expand=True
+        )
         self.toolbar_p.pack(side="top", fill=tk.X)
 
 
         self.label_system = tk.Label(
             self.frame_plane,
             text="Sistema Realizável e Estável",
-            fg=color_fg_text,
+            fg=color_text,
             bg=color_bg,
             font=("Segoe UI", 10),  # , "bold"),
             anchor="w",
@@ -342,23 +371,31 @@ class App:
 
         self.ax_r.set_title(
             "Resposta em Frequência",
-            color=color_fg_text,
+            color=color_text,
             fontsize=12,
             pad=10,
             loc="left"
         )
         self.ax_r.grid(True, color=color_grid, linestyle="--")
-        self.ax_r.tick_params(colors=color_fg_text)
+        self.ax_r.tick_params(colors=color_text)
         self.ax_r.set_ylim(-1.2, 1.2)
 
         self.canvas_r = FigureCanvasTkAgg(self.fig_r, master=self.frame_resp)
         self.canvas_r.draw()
 
         # Matplotlib toolbar
-        self.toolbar_r = NavigationToolbar2Tk(self.canvas_r, window=self.frame_resp, pack_toolbar=False)
+        self.toolbar_r = NavigationToolbar2Tk(
+            self.canvas_r,
+            window=self.frame_resp,
+            pack_toolbar=False
+        )
         self.toolbar_r.update()
 
-        self.canvas_r.get_tk_widget().pack(side="top", fill=tk.BOTH, expand=True)
+        self.canvas_r.get_tk_widget().pack(
+            side="top",
+            fill=tk.BOTH,
+            expand=True
+        )
         self.toolbar_r.pack(side="top", fill=tk.X)
 
 
@@ -370,7 +407,7 @@ class App:
         tk.Label(
             self.frame_input_r,
             text="θₘₐₓ = ",
-            fg=color_fg_text,
+            fg=color_text,
             bg=color_bg
         ).pack(side="left", padx=5)
 
@@ -380,8 +417,8 @@ class App:
             increment=0.5,
             width=12,
             bg=color_bg_spin,
-            fg=color_fg_text,
-            insertbackground=color_fg_text,
+            fg=color_text,
+            insertbackground=color_text,
             buttonbackground=color_bg
         )
         self.theta_max.pack(side="left", padx=5)
@@ -389,16 +426,29 @@ class App:
         tk.Label(
             self.frame_input_r,
             text="π",
-            fg=color_fg_text,
+            fg=color_text,
             bg=color_bg
         ).pack(side="left", padx=5)
 
+    def _create_frame_fig(self):
+        frame = tk.Frame(
+            self.main_container,
+            width=500,
+            height=600,
+            bg=color_bg
+        )
+        frame.pack(side="left", padx=10, pady=5)
+        frame.pack_propagate(False)
+        return frame
+
+    def _create_menu(self):
+        return tk.Menu(master=self.menubar, tearoff=False)
 
     def _create_label_frame(self, master, text, padx=10):
         frame = tk.LabelFrame(
             master=master,
             text=text,
-            fg=color_fg_text,
+            fg=color_text,
             bg=color_bg,
             bd=1,
             relief="raised",
@@ -412,7 +462,7 @@ class App:
         tk.Label(
             self.frame_limits,
             text=text,
-            fg=color_fg_text,
+            fg=color_text,
             bg=color_bg
         ).grid(row=row, column=col_text, padx=2, pady=2)
 
@@ -422,8 +472,8 @@ class App:
             increment=0.1,
             width=6,
             bg=color_bg_spin,
-            fg=color_fg_text,
-            insertbackground=color_fg_text,
+            fg=color_text,
+            insertbackground=color_text,
             buttonbackground=color_bg
         )
         spin.grid(row=row, column=col, padx=5, pady=2)
@@ -436,9 +486,13 @@ class App:
 
         canvas = tk.Canvas(outer_frame, bg=bg_color, highlightthickness=0)
 
-        scrollbar = tk.Scrollbar(outer_frame, orient="vertical", command=canvas.yview)
-        scrollable_frame = tk.Frame(canvas, bg=bg_color)
+        scrollbar = tk.Scrollbar(
+            outer_frame,
+            orient="vertical",
+            command=canvas.yview
+        )
 
+        scrollable_frame = tk.Frame(canvas, bg=bg_color)
         scrollable_frame.bind(
             "<Configure>",
             lambda e: canvas.configure(
@@ -469,7 +523,7 @@ class App:
             self._scroll_refs = []
         self._scroll_refs.extend([canvas, scrollbar, scrollable_frame])
 
-        return outer_frame, scrollable_frame, canvas
+        return outer_frame, scrollable_frame
 
     def _create_label_coords(self, frame, text_var):
         tk.Label(
@@ -496,7 +550,7 @@ class App:
     def _create_label_frame_text(self, master, text):
         label = tk.Label(
             master, text=text,
-            fg=color_fg_text, bg=color_bg, font=("Segoe UI", 9)  # , "bold")
+            fg=color_text, bg=color_bg, font=("Segoe UI", 9)
         )
         label.pack(expand=True)
 
@@ -530,10 +584,6 @@ class App:
 
         self.frame_poles.update_idletasks()
         self.frame_zeros.update_idletasks()
-
-        self.canvas_poles.configure(scrollregion=self.canvas_poles.bbox("all"))
-        self.canvas_zeros.configure(scrollregion=self.canvas_zeros.bbox("all"))
-
 
     def _get_list_sel(self):
         if self.bt_states[self.icon_pole].get():
@@ -606,40 +656,55 @@ class App:
 
     def _center_toplevel(self, tl):
         # Center Toplevel acording to the Main Window
-        self.window.update_idletasks()
-        x = self.window.winfo_x() + (self.window.winfo_width()  // 2) - (tl.winfo_width()  // 2)
-        y = self.window.winfo_y() + (self.window.winfo_height() // 2) - (tl.winfo_height() // 2)
+        self.win.update_idletasks()
+
+        win_x = self.win.winfo_x()
+        win_y = self.win.winfo_y()
+
+        win_w = self.win.winfo_width()
+        win_h = self.win.winfo_height()
+
+        popup_w = tl.winfo_width()
+        popup_h = tl.winfo_height()
+
+        x = win_x + (win_w // 2) - (popup_w // 2)
+        y = win_y + (win_h // 2) - (popup_h // 2)
+
         tl.geometry(f"+{x}+{y}")
 
     def _show_about(self):
         # Toplevel
-        tl = tk.Toplevel(self.window)
+        tl = tk.Toplevel(self.win)
         tl.title("Sobre")
         tl.geometry("400x200")
         tl.configure(bg=color_bg)
         tl.resizable(False, False)
-        tl.transient(self.window)
+        tl.transient(self.win)
         tl.grab_set()
 
         self._center_toplevel(tl)
 
         # Text
-        tk.Label(tl, text=app_name,        fg=color_fg_text, bg=color_bg, font=("Arial", 12, "bold")).pack(pady=10)
-        tk.Label(tl, text=app_version,     fg="gray",  bg=color_bg).pack()
-        tk.Label(tl, text=app_description, fg="gray",  bg=color_bg).pack()
-        tk.Label(tl, text=app_copyright,   fg=color_fg_text, bg=color_bg).pack(pady=10)
-        tk.Label(tl, text=app_license,     fg=color_fg_text, bg=color_bg).pack()
+        tk.Label(
+            tl,text=app_name,
+            fg=color_text,
+            bg=color_bg,
+            font=("Arial", 12, "bold")
+        ).pack(pady=10)
+        tk.Label(tl, text=app_version,     fg="gray", bg=color_bg).pack()
+        tk.Label(tl, text=app_description, fg="gray", bg=color_bg).pack()
+        tk.Label(tl, text=app_copyright, fg=color_text, bg=color_bg).pack(pady=10)
+        tk.Label(tl, text=app_license,   fg=color_text, bg=color_bg).pack()
 
         tk.Button(tl, text="Close", command=tl.destroy, width=10).pack(pady=10)
 
-
     def _show_info(self, dict_info, title, size, wraplength):
         # Toplevel
-        tl = tk.Toplevel(master=self.window)
+        tl = tk.Toplevel(master=self.win)
         tl.title(title)
         tl.geometry(size)
         tl.configure(bg=color_bg)
-        tl.transient(self.window)
+        tl.transient(self.win)
         tl.grab_set()
 
         canvas = tk.Canvas(tl, bg=color_bg, highlightthickness=0)
@@ -664,8 +729,23 @@ class App:
 
         # Add info
         for name, desc in dict_info.items():
-            label_name = tk.Label(master=fr, text=f"{name}:", fg=color_fg_text, bg=color_bg, anchor="w", font=("Arial", 12, "bold"))
-            label_desc = tk.Label(master=fr, text=desc,       fg=color_fg_text, bg=color_bg, anchor="w", justify="left", wraplength=wraplength)
+            label_name = tk.Label(
+                master=fr,
+                text=f"{name}:",
+                fg=color_text,
+                bg=color_bg,
+                anchor="w",
+                font=("Arial", 12, "bold")
+            )
+            label_desc = tk.Label(
+                master=fr,
+                text=desc,
+                fg=color_text,
+                bg=color_bg,
+                anchor="w",
+                justify="left",
+                wraplength=wraplength
+            )
 
             label_name.pack(fill="x")
             label_desc.pack(fill="x", pady=(0, 10))
@@ -751,12 +831,16 @@ class App:
 
     def _on_move(self, event):
         if self.idx_sel_point is not None and event.inaxes == self.ax_p:
+            event_x = event.xdata
+            event_y = event.ydata
+
             if self.type_sel_point == "pole":
-                self.list_poles[self.idx_sel_point] = (event.xdata, event.ydata)
-                self.list_poles[self.idx_sel_point-1] = (event.xdata, -event.ydata)
+                self.list_poles[self.idx_sel_point] = (event_x, event_y)
+                self.list_poles[self.idx_sel_point-1] = (event_x, -event_y)
             elif self.type_sel_point == "zero":
-                self.list_zeros[self.idx_sel_point] = (event.xdata, event.ydata)
-                self.list_zeros[self.idx_sel_point-1] = (event.xdata, -event.ydata)
+                self.list_zeros[self.idx_sel_point] = (event_x, event_y)
+                self.list_zeros[self.idx_sel_point-1] = (event_x, -event_y)
+
             self._update_graphic()
 
     def _on_drop(self, event):
@@ -780,7 +864,7 @@ class App:
         self._update_labels_text()
 
     def run(self):
-        self.window.mainloop()
+        self.win.mainloop()
 
 
 if __name__ == "__main__":
