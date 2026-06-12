@@ -220,9 +220,20 @@ class App:
         self.list_poles = []
         self.list_zeros = []
 
-        self.frame_poles  = create_label_frame(self.frame_top, "Pólos")
-        self.frame_zeros  = create_label_frame(self.frame_top, "Zeros")
-        frame_limits = create_label_frame(self.frame_top, "Limites do Plano")
+        # self.frame_poles  = create_label_frame(self.frame_top, "Pólos")
+        # self.frame_zeros  = create_label_frame(self.frame_top, "Zeros")
+        box_poles = create_label_frame(self.frame_top, "Pólos")
+        box_zeros = create_label_frame(self.frame_top, "Zeros")
+
+        frame_poles_outer, self.frame_poles, self.canvas_poles = self._create_scrollable_frame(
+            box_poles, width=200, height=100, bg_color=color_bg
+        )
+        frame_poles_outer.pack(side="left", padx=5, pady=5)
+
+        frame_zeros_outer, self.frame_zeros, self.canvas_zeros = self._create_scrollable_frame(
+            box_zeros, width=200, height=100, bg_color=color_bg
+        )
+        frame_zeros_outer.pack(side="left", padx=5, pady=5)
 
 
         self.text_poles_var = tk.StringVar()
@@ -232,6 +243,8 @@ class App:
         self._create_label_coords(self.frame_zeros, self.text_zeros_var)
 
         self._update_labels_text()
+
+        frame_limits = create_label_frame(self.frame_top, "Limites do Plano")
 
 
         self.spin_a = create_spin_top(0, 1, 0, "Eixo X")
@@ -406,10 +419,51 @@ class App:
         ).pack(side="left", padx=5)
 
 
-    def _create_label_coords(self, frame, var):
+    def _create_scrollable_frame(self, parent, width, height, bg_color):
+        outer_frame = tk.Frame(parent, width=width, height=height, bg=bg_color)
+        outer_frame.grid_propagate(False)
+
+        canvas = tk.Canvas(outer_frame, bg=bg_color, highlightthickness=0)
+
+        scrollbar = tk.Scrollbar(outer_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas, bg=bg_color)
+
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(
+                scrollregion=(
+                    0, 0,
+                    scrollable_frame.winfo_reqwidth(),
+                    scrollable_frame.winfo_reqheight())
+                )
+        )
+
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        outer_frame.grid_rowconfigure(0, weight=1)
+        outer_frame.grid_columnconfigure(0, weight=1)
+        outer_frame.grid_columnconfigure(1, weight=0)
+
+        canvas.grid(row=0, column=0, sticky="nsew")
+        scrollbar.grid(row=0, column=1, sticky="ns")
+
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+        canvas.bind("<MouseWheel>", _on_mousewheel)
+        scrollable_frame.bind("<MouseWheel>", _on_mousewheel)
+
+        if not hasattr(self, '_scroll_refs'):
+            self._scroll_refs = []
+        self._scroll_refs.extend([canvas, scrollbar, scrollable_frame])
+
+        return outer_frame, scrollable_frame, canvas
+
+    def _create_label_coords(self, frame, text_var):
         tk.Label(
             frame,
-            textvariable=var,
+            textvariable=text_var,
             bg=color_bg,
             font=("Arial", 8)
         ).pack(padx=2, pady=2)
@@ -462,6 +516,13 @@ class App:
 
         self.text_poles_var.set(poles_text)
         self.text_zeros_var.set(zeros_text)
+
+        self.frame_poles.update_idletasks()
+        self.frame_zeros.update_idletasks()
+
+        self.canvas_poles.configure(scrollregion=self.canvas_poles.bbox("all"))
+        self.canvas_zeros.configure(scrollregion=self.canvas_zeros.bbox("all"))
+
 
     def _get_list_sel(self):
         if self.bt_states[self.icon_pole].get():
@@ -587,8 +648,8 @@ class App:
         canvas.configure(yscrollcommand=scrollbar.set)
 
         # Layout
-        canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
 
         # Add info
         for name, desc in dict_info.items():

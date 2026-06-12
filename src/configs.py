@@ -1,4 +1,3 @@
-
 app_name = "FT3D++"
 app_description = "FT3D rewrite"
 app_version = "0.1.0"
