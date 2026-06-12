@@ -13,6 +13,7 @@ from matplotlib.backends.backend_tkagg import (
 )
 
 from configs import *
+from math_utils import MathUtils
 
 
 icon_logo_path = os.path.join("icons", "logo.png")
@@ -39,6 +40,8 @@ L_BUTTON = 1
 
 class App:
     def __init__(self):
+        self.math_utils = MathUtils()
+
         # Main Window
         self.win = tk.Tk()
         self.win.title(app_name)
@@ -363,11 +366,11 @@ class App:
         self.ax_r = self.fig_r.add_subplot()
         self.ax_r.set_facecolor(color_z_bg)
 
-        t = np.linspace(0, 1.0, 500)  # 1s
-        freq = 2
-        sinal = np.sin(2*np.pi*freq*t)
+        # t = np.linspace(0, 1.0, 500)  # 1s
+        # freq = 2
+        # signal = np.sin(2*np.pi*freq*t)
 
-        self.ax_r.plot(t, sinal, color=color_resp, linewidth=2)
+        self.line_r, = self.ax_r.plot([], [], color=color_resp, linewidth=2)
 
         self.ax_r.set_title(
             "Resposta em Frequência",
@@ -429,6 +432,20 @@ class App:
             fg=color_text,
             bg=color_bg
         ).pack(side="left", padx=5)
+
+    def _update_freq_resp(self):
+        H_z = self.math_utils.get_H(self.list_zeros, self.list_poles)
+        w = self.math_utils.get_w()
+        mag_H = self.math_utils.get_mag_H(H_z)
+
+        self.line_r.set_data(w, mag_H)
+
+        # Auto scale
+        self.ax_r.set_ylim(auto=True)
+        self.ax_r.relim()
+        self.ax_r.autoscale_view()
+
+        self.canvas_r.draw_idle()
 
     def _create_frame_fig(self):
         frame = tk.Frame(
@@ -558,18 +575,16 @@ class App:
         poles_text = ""
         for i in range(0, len(self.list_poles), 2):
             if i + 1 < len(self.list_poles):
-                p1 = self.list_poles[i]
-                p2 = self.list_poles[i+1]
-                poles_text += f"({p1[0]:.3f} + j{abs(p1[1]):.3f}) e " \
-                              f"({p2[0]:.3f} - j{abs(p2[1]):.3f})\n"
+                pole = self.list_poles[i]
+                pole_text = f"({pole[0]:.3f} + j{abs(pole[1]):.3f})"
+                poles_text += f"{pole_text} e {pole_text.replace('+', '-')}\n"
 
         zeros_text = ""
         for i in range(0, len(self.list_zeros), 2):
             if i + 1 < len(self.list_zeros):
-                z1 = self.list_zeros[i]
-                z2 = self.list_zeros[i+1]
-                zeros_text += f"({z1[0]:.3f} + j{abs(z1[1]):.3f}) e " \
-                              f"({z2[0]:.3f} - j{abs(z2[1]):.3f})\n"
+                zero = self.list_zeros[i]
+                zero_text = f"({zero[0]:.3f} + j{abs(zero[1]):.3f})"
+                zeros_text += f"{zero_text} e {zero_text.replace('+', '-')}\n"
 
         poles_text = poles_text.strip()
         zeros_text = zeros_text.strip()
@@ -777,7 +792,6 @@ class App:
 
         # Right button
         if event.button == R_BUTTON:
-            # TODO: fix bug that sometimes rm the wrong conjugate
             if next:
                 idx = np.argmin(dist)
                 len_poles = len(self.list_poles)
@@ -797,11 +811,11 @@ class App:
                     self.list_zeros.pop(idx_start + 1)
                     self.list_zeros.pop(idx_start)
 
-                self._update_graphic()
-            return
+                self._update_plane()
+                self._update_freq_resp()
 
         # Left button
-        if event.button == L_BUTTON:
+        elif event.button == L_BUTTON:
             list_sel = self._get_list_sel()
 
             if next:
@@ -827,27 +841,36 @@ class App:
                     self.type_sel_point = "pole"
                 elif list_sel == self.list_zeros:
                     self.type_sel_point = "zero"
-                self._update_graphic()
+
+                self._update_plane()
+                self._update_freq_resp()
+
 
     def _on_move(self, event):
         if self.idx_sel_point is not None and event.inaxes == self.ax_p:
             event_x = event.xdata
             event_y = event.ydata
 
-            if self.type_sel_point == "pole":
-                self.list_poles[self.idx_sel_point] = (event_x, event_y)
-                self.list_poles[self.idx_sel_point-1] = (event_x, -event_y)
-            elif self.type_sel_point == "zero":
-                self.list_zeros[self.idx_sel_point] = (event_x, event_y)
-                self.list_zeros[self.idx_sel_point-1] = (event_x, -event_y)
+            target_list = self.list_poles if self.type_sel_point == "pole" else self.list_zeros
 
-            self._update_graphic()
+            target_list[self.idx_sel_point] = (event_x, event_y)
+
+            if self.idx_sel_point % 2 == 0:
+                conj_idx = self.idx_sel_point + 1
+            else:
+                conj_idx = self.idx_sel_point - 1
+
+            if conj_idx < len(target_list):
+                target_list[conj_idx] = (event_x, -event_y)
+
+            self._update_plane()
+            self._update_freq_resp()
 
     def _on_drop(self, event):
         self.idx_sel_point = None
         self.type_sel_point = None
 
-    def _update_graphic(self):
+    def _update_plane(self):
         if self.list_poles:
             x_poles, y_poles = zip(*self.list_poles)
             self.points_plot_poles.set_data(x_poles, y_poles)
