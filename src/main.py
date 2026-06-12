@@ -245,7 +245,7 @@ class App:
 
         # Plane Figure
 
-        self.fig_p = Figure(figsize=(5, 5), dpi=100)
+        self.fig_p = Figure(figsize=(5, 5), dpi=100, facecolor=color_bg)
         self.ax_p = self.fig_p.add_subplot()
         self.ax_p.set_facecolor(color_z_bg)
         self.ax_p.set_xlim(-lim, lim)
