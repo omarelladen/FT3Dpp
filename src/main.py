@@ -18,8 +18,13 @@ from math_utils import MathUtils
 
 icon_logo_path = os.path.join("icons", "logo.png")
 
+init_resolution = 500
+max_resolution = 1000
+
+dpi = 100
+
 ax_text_pos = 1.6
-lim = 1.5
+lim_plane = 1.5
 lw = 1.5
 win_size = "1200x800"
 
@@ -40,7 +45,7 @@ L_BUTTON = 1
 
 class App:
     def __init__(self):
-        self.math_utils = MathUtils()
+        self.math_utils = MathUtils(init_resolution)
 
         # Main Window
         self.win = tk.Tk()
@@ -269,11 +274,11 @@ class App:
 
         # Plane Figure
 
-        self.fig_p = Figure(figsize=(5, 5), dpi=100, facecolor=color_bg)
+        self.fig_p = Figure(dpi=dpi, facecolor=color_bg)
         self.ax_p = self.fig_p.add_subplot()
         self.ax_p.set_facecolor(color_z_bg)
-        self.ax_p.set_xlim(-lim, lim)
-        self.ax_p.set_ylim(-lim, lim)
+        self.ax_p.set_xlim(-lim_plane, lim_plane)
+        self.ax_p.set_ylim(-lim_plane, lim_plane)
         self.ax_p.set_aspect('equal')
         self.ax_p.set_title(
             "Plano z",
@@ -361,7 +366,7 @@ class App:
 
         # Frequency Response Figure
 
-        self.fig_r = Figure(figsize=(5, 4), dpi=100, facecolor=color_bg)
+        self.fig_r = Figure(dpi=dpi, facecolor=color_bg)
         self.ax_r = self.fig_r.add_subplot()
         self.ax_r.set_facecolor(color_z_bg)
 
@@ -414,23 +419,26 @@ class App:
         self.toolbar_r.pack(side="top", fill=tk.X)
 
 
-        # Theta Spin
 
         self.frame_input_r = tk.Frame(self.frame_resp, bg=color_bg, pady=5)
         self.frame_input_r.pack(side="top", fill="x")
 
+        frame_r_padx = 2
+
+        # Theta Spin
+
         tk.Label(
             self.frame_input_r,
-            text="θₘₐₓ = ",
+            text="θₘₐₓ =",
             fg=color_text,
             bg=color_bg
-        ).pack(side="left", padx=5)
+        ).pack(side="left", padx=frame_r_padx)
 
         self.theta_max = tk.Spinbox(
             self.frame_input_r,
             from_=1, to=4,
             increment=1,
-            width=12,
+            width=2,
             state="readonly",  # block kb
             bg=color_bg_spin,
             fg=color_text,
@@ -438,14 +446,59 @@ class App:
             buttonbackground=color_bg,
             command=self._update_freq_resp
         )
-        self.theta_max.pack(side="left", padx=5)
+        self.theta_max.pack(side="left", padx=frame_r_padx)
 
         tk.Label(
             self.frame_input_r,
             text="π",
             fg=color_text,
             bg=color_bg
-        ).pack(side="left", padx=5)
+        ).pack(side="left", padx=frame_r_padx)
+
+
+        # Resolution spin
+
+        tk.Label(
+            self.frame_input_r,
+            text="pts",
+            fg=color_text,
+            bg=color_bg
+        ).pack(side="right", padx=frame_r_padx)
+
+        self.resolution = tk.Spinbox(
+            self.frame_input_r,
+            from_=10, to=1000,
+            increment=10,
+            width=4,
+            # state="readonly",  # block kb
+            textvariable=tk.DoubleVar(value=init_resolution),
+            bg=color_bg_spin,
+            fg=color_text,
+            insertbackground=color_text,
+            buttonbackground=color_bg,
+            command=self._update_resolution
+        )
+        self.resolution.pack(side="right", padx=frame_r_padx)
+
+        tk.Label(
+            self.frame_input_r,
+            text="Res =",
+            fg=color_text,
+            bg=color_bg
+        ).pack(side="right", padx=frame_r_padx)
+
+        self.resolution.bind("<Return>", lambda event: self._update_resolution())
+        self.resolution.bind("<FocusOut>", lambda event: self._update_resolution())
+
+
+    def _update_resolution(self):
+        resolution = self.resolution.get()
+        if resolution.isdigit() and int(resolution) <= max_resolution:
+            self.math_utils.resolution = int(self.resolution.get())
+            self._update_freq_resp()
+        else:
+            self.resolution.delete(0, "end")
+            self.resolution.insert(0, str(self.math_utils.resolution))
 
     def _update_freq_resp(self):
         H_z = self.math_utils.calc_H(self.list_zeros, self.list_poles)
@@ -870,7 +923,10 @@ class App:
             event_x = event.xdata
             event_y = event.ydata
 
-            target_list = self.list_poles if self.type_sel_point == "pole" else self.list_zeros
+            if self.type_sel_point == "pole":
+                target_list = self.list_poles
+            else:
+                target_list = self.list_zeros
 
             target_list[self.idx_sel_point] = (event_x, event_y)
 

@@ -3,17 +3,17 @@ import numpy as np
 
 
 class MathUtils():
-    def __init__(self):
-        self.res = 400
+    def __init__(self, resolution):
+        self.resolution = resolution
 
     def get_w(self):
-        return np.linspace(0, 4*np.pi, self.res)
+        return np.linspace(0, 4*np.pi, self.resolution)
 
     def calc_H(self, list_zeros, list_poles):
         w = self.get_w()
 
-        num = np.ones(self.res, dtype=complex)
-        den = np.ones(self.res, dtype=complex)
+        num = np.ones(self.resolution, dtype=complex)
+        den = np.ones(self.resolution, dtype=complex)
 
         for tuple_zero in list_zeros:
             zero = tuple_zero[0] + 1j*tuple_zero[1]
