@@ -511,7 +511,9 @@ class App:
         H_z = self.math_utils.calc_H(self.list_zeros, self.list_poles)
 
         if self.bt_states[self.icon_freq_db].get():
-            line = None
+            abs_H = self.math_utils.calc_abs_H(H_z)
+            abs_H_db = 20 * np.log10(abs_H)
+            line = abs_H_db
             self._set_freq_resp_title("Resposta em Frequência em dB")
         elif self.bt_states[self.icon_phase].get():
             ang_H = self.math_utils.calc_angle_H(H_z)
