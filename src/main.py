@@ -19,6 +19,8 @@ from math_utils import MathUtils
 
 icon_logo_path = os.path.join("icons", "logo.png")
 
+max_pi = 6
+
 init_resolution = 500
 max_resolution = 1000
 
@@ -46,7 +48,7 @@ L_BUTTON = 1
 
 class App:
     def __init__(self):
-        self.math_utils = MathUtils(init_resolution)
+        self.math_utils = MathUtils(init_resolution, max_pi)
 
         # Main Window
         self.win = tk.Tk()
@@ -386,7 +388,7 @@ class App:
 
         # Set x ticks as multiples of pi
         step = 0.5 * np.pi
-        intervals = np.arange(0, 4*np.pi + step, step)
+        intervals = np.arange(0, max_pi*np.pi + step, step)
         self.ax_r.set_xticks(intervals)
 
         # Format x axis label
@@ -442,7 +444,7 @@ class App:
 
         self.theta_max = tk.Spinbox(
             self.frame_input_r,
-            from_=1, to=4,
+            from_=1, to=max_pi,
             increment=1,
             width=2,
             state="readonly",  # block kb

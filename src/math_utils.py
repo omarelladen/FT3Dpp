@@ -3,11 +3,12 @@ import numpy as np
 
 
 class MathUtils():
-    def __init__(self, resolution):
+    def __init__(self, resolution, max_pi):
         self.resolution = resolution
+        self.max_pi = max_pi
 
     def get_w(self):
-        return np.linspace(0, 4*np.pi, self.resolution)
+        return np.linspace(0, self.max_pi*np.pi, self.resolution)
 
     def calc_H(self, list_zeros, list_poles):
         w = self.get_w()
