@@ -794,11 +794,17 @@ class App:
         print(f"'{clicked_key}-{hint}' -> {'ON' if v_clicked.get() else 'OFF'}")
 
         # Update frequency response
-        if (self.bt_states[self.icon_freq].get() or
-            self.bt_states[self.icon_freq_db].get() or
-            self.bt_states[self.icon_phase].get()
-        ):
+        if clicked_key in (self.icon_freq, self.icon_freq_db, self.icon_phase):
             self._update_freq_resp()
+        if self.bt_states[self.icon_clear].get():
+            self._clear_poles_zeros()
+            self._update_plane()
+            self._update_freq_resp()
+            v_clicked.set(False)
+
+    def _clear_poles_zeros(self):
+        self.list_poles = []
+        self.list_zeros = []
 
     def _center_toplevel(self, tl):
         # Center Toplevel acording to the Main Window
