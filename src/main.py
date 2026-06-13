@@ -264,6 +264,24 @@ class App:
         self.frame_bottom = tk.Frame(self.win, bg=color_bg, pady=5)
         self.frame_bottom.pack(side="bottom", fill="x", padx=10)
 
+
+        # z inv checkbox
+        self.var_z_inv = tk.BooleanVar(value=True)
+        self.check_z_inv = tk.Checkbutton(
+            self.frame_bottom,
+            text="z inv",
+            variable=self.var_z_inv,
+            bg=color_bg,
+            fg=color_text,
+            selectcolor=color_bg_spin,
+            activebackground=color_bg,
+            activeforeground=color_text,
+            command=self._update_labels_text
+        )
+        self.check_z_inv.pack(side="left", padx=10)
+
+        # Transfer Function equation
+
         label_funct = self._create_label_frame(
             self.frame_bottom,
             "Função de transferência"
@@ -463,13 +481,11 @@ class App:
         ).pack(side="left", padx=frame_r_padx)
 
         # Normalized checkbox
-
-        self.normalize_var = tk.BooleanVar(value=True)
-
+        self.var_normalize = tk.BooleanVar(value=True)
         self.check_normalize = tk.Checkbutton(
             self.frame_input_r,
             text="Normalizado",
-            variable=self.normalize_var,
+            variable=self.var_normalize,
             bg=color_bg,
             fg=color_text,
             selectcolor=color_bg_spin,
@@ -529,7 +545,7 @@ class App:
 
         # Select what to plot
         if self.bt_states[self.icon_freq_db].get():
-            if self.normalize_var.get():
+            if self.var_normalize.get():
                 abs_H_db = self.math_utils.calc_abs_H_db_norm(H_z)
             else:
                 abs_H_db = self.math_utils.calc_abs_H_db(H_z)
@@ -540,7 +556,7 @@ class App:
             line = ang_H
             self._set_freq_resp_title("Fase")
         else:
-            if self.normalize_var.get():
+            if self.var_normalize.get():
                 abs_H = self.math_utils.calc_abs_H_norm(H_z)
             else:
                 abs_H = self.math_utils.calc_abs_H(H_z)
@@ -722,7 +738,10 @@ class App:
         self.text_zeros_var.set(zeros_text)
 
 
-        eq = self.math_utils.format_H_z_inv_eq(self.list_zeros, self.list_poles)
+        if self.var_z_inv.get():
+            eq = self.math_utils.format_H_z_inv(self.list_zeros, self.list_poles)
+        else:
+            eq = self.math_utils.format_H_z(self.list_zeros, self.list_poles)
         self.label_hz.config(text=eq)
 
 

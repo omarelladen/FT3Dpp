@@ -108,7 +108,7 @@ class MathUtils():
 
         return num, den
 
-    def format_H_z_inv_eq(self, list_zeros, list_poles):
+    def format_H_z_inv(self, list_zeros, list_poles):
         num, den = self._calc_H_z_inv_eq(list_zeros, list_poles)
 
         if num == 1 and den == 1:
@@ -130,7 +130,7 @@ class MathUtils():
         eq = self._create_eq(num, den)
         return eq
 
-    def format_H_z_eq(self, list_zeros, list_poles):
+    def format_H_z(self, list_zeros, list_poles):
         num, den = self._calc_H_z_eq(list_zeros, list_poles)
 
         if num == 1 and den == 1:
