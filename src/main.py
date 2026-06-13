@@ -233,14 +233,12 @@ class App:
         )
         frame_zeros_outer.pack(side="left", padx=5, pady=5)
 
-
         self.text_poles_var = tk.StringVar()
         self.text_zeros_var = tk.StringVar()
 
         self._create_label_coords(self.frame_poles, self.text_poles_var)
         self._create_label_coords(self.frame_zeros, self.text_zeros_var)
 
-        self._update_labels_text()
 
 
 #         self.frame_limits = self._create_label_frame(
@@ -271,8 +269,11 @@ class App:
             "Função de transferência"
         )
 
-        self._create_label_frame_text(label_funct, "H(z)=1+0.604z^(-1)")
+        self.label_hz = self._create_label_frame_text(label_funct, "H(z) = 1")
+        self.label_hz.config(font=("Consolas", 12), justify="left")
 
+
+        self._update_labels_text()
 
         self.frame_plane = self._create_frame_fig()
         self.frame_resp  = self._create_frame_fig()
@@ -692,6 +693,7 @@ class App:
             fg=color_text, bg=color_bg, font=("Segoe UI", 9)
         )
         label.pack(expand=True)
+        return label
 
     def _update_labels_text(self):
         poles_text = ""
@@ -718,6 +720,11 @@ class App:
 
         self.text_poles_var.set(poles_text)
         self.text_zeros_var.set(zeros_text)
+
+
+        eq = self.math_utils.format_H_z_inv_eq(self.list_zeros, self.list_poles)
+        self.label_hz.config(text=eq)
+
 
         self.frame_poles.update_idletasks()
         self.frame_zeros.update_idletasks()
