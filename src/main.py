@@ -6,6 +6,7 @@ import tkinter as tk
 import numpy as np
 
 import matplotlib.patches as patches
+import matplotlib.ticker as ticker
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg,
@@ -239,7 +240,6 @@ class App:
 #             self.frame_top,
 #             "Limites do Plano"
 #         )
-# 
 #         self.spin_a = self._create_spin_top(0, 1, 0, "Eixo X")
 #         self.spin_b = self._create_spin_top(0, 3, 2, "a")
 #         self.spin_c = self._create_spin_top(1, 1, 0, "Eixo Y")
@@ -268,8 +268,7 @@ class App:
 
 
         self.frame_plane = self._create_frame_fig()
-
-        self.frame_resp = self._create_frame_fig()
+        self.frame_resp  = self._create_frame_fig()
 
 
         # Plane Figure
@@ -383,22 +382,26 @@ class App:
         self.ax_r.tick_params(colors=color_text)
         self.ax_r.set_ylim(-1, 1)
 
+        # Set x ticks as multiples of pi
         step = 0.5 * np.pi
         intervals = np.arange(0, 4*np.pi + step, step)
         self.ax_r.set_xticks(intervals)
 
-        labels = []
-        for v in intervals:
+        # Format x axis label
+
+        def formatter_pi(v, pos):
             mult = round(v / np.pi, 2)
             if mult == 0:
-                labels.append("0")
+                return "0"
             elif mult == 1:
-                labels.append("π")
+                return "π"
             elif mult.is_integer():
-                labels.append(f"{int(mult)}π")
+                return f"{int(mult)}π"
             else:
-                labels.append(f"{mult}π")
-        self.ax_r.set_xticklabels(labels)
+                return f"{mult}π"
+
+        self.ax_r.xaxis.set_major_formatter(ticker.FuncFormatter(formatter_pi))
+        self.ax_r.format_coord = lambda x, y: f"(x, y) = ({x:.3f}, {y:.3f})"
 
         self.canvas_r = FigureCanvasTkAgg(self.fig_r, master=self.frame_resp)
         self.canvas_r.draw()
@@ -419,6 +422,7 @@ class App:
         self.toolbar_r.pack(side="top", fill=tk.X)
 
 
+        # Frquency response bottom Frame
 
         self.frame_input_r = tk.Frame(self.frame_resp, bg=color_bg, pady=5)
         self.frame_input_r.pack(side="top", fill="x")
@@ -456,7 +460,7 @@ class App:
         ).pack(side="left", padx=frame_r_padx)
 
 
-        # Resolution spin
+        # Resolution Spin
 
         tk.Label(
             self.frame_input_r,
@@ -487,7 +491,7 @@ class App:
             bg=color_bg
         ).pack(side="right", padx=frame_r_padx)
 
-        self.resolution.bind("<Return>", lambda event: self._update_resolution())
+        self.resolution.bind("<Return>",   lambda event: self._update_resolution())
         self.resolution.bind("<FocusOut>", lambda event: self._update_resolution())
 
 
