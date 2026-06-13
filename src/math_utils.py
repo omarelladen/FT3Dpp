@@ -32,7 +32,27 @@ class MathUtils():
         return H_z
 
     def calc_abs_H(self, H_z):
-        return np.abs(H_z)
+        abs_H = np.abs(H_z)
+        abs_H = np.clip(abs_H, a_min=1e-12, a_max=None)
+        return abs_H
+
+    def calc_abs_H_db(self, H_z):
+        abs_H = self.calc_abs_H(H_z)
+        abs_H_db = 20 * np.log10(abs_H)
+        return abs_H_db
+
+    def calc_abs_H_norm(self, H_z):
+        abs_H = self.calc_abs_H(H_z)
+        peak = np.max(abs_H)
+        if peak > 0:
+            abs_H = abs_H / peak
+        return abs_H
+
+    def calc_abs_H_db_norm(self, H_z):
+        abs_H_db = self.calc_abs_H_db(H_z)
+        peak = np.max(abs_H_db)
+        abs_H_db = abs_H_db - peak
+        return abs_H_db
 
     def calc_angle_H(self, H_z):
         return np.angle(H_z)

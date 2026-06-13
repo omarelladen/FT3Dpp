@@ -461,6 +461,22 @@ class App:
             bg=color_bg
         ).pack(side="left", padx=frame_r_padx)
 
+        # Normalized checkbox
+
+        self.normalize_var = tk.BooleanVar(value=True)
+
+        self.check_normalize = tk.Checkbutton(
+            self.frame_input_r,
+            text="Normalizado",
+            variable=self.normalize_var,
+            bg=color_bg,
+            fg=color_text,
+            selectcolor=color_bg_spin,
+            activebackground=color_bg,
+            activeforeground=color_text,
+            command=self._update_freq_resp
+        )
+        self.check_normalize.pack(side="left", padx=50)
 
         # Resolution Spin
 
@@ -488,7 +504,7 @@ class App:
 
         tk.Label(
             self.frame_input_r,
-            text="Res =",
+            text="Resolução =",
             fg=color_text,
             bg=color_bg
         ).pack(side="right", padx=frame_r_padx)
@@ -510,9 +526,12 @@ class App:
         w = self.math_utils.get_w()
         H_z = self.math_utils.calc_H(self.list_zeros, self.list_poles)
 
+        # Select what to plot
         if self.bt_states[self.icon_freq_db].get():
-            abs_H = self.math_utils.calc_abs_H(H_z)
-            abs_H_db = 20 * np.log10(abs_H)
+            if self.normalize_var.get():
+                abs_H_db = self.math_utils.calc_abs_H_db_norm(H_z)
+            else:
+                abs_H_db = self.math_utils.calc_abs_H_db(H_z)
             line = abs_H_db
             self._set_freq_resp_title("Resposta em Frequência em dB")
         elif self.bt_states[self.icon_phase].get():
@@ -520,7 +539,10 @@ class App:
             line = ang_H
             self._set_freq_resp_title("Fase")
         else:
-            abs_H = self.math_utils.calc_abs_H(H_z)
+            if self.normalize_var.get():
+                abs_H = self.math_utils.calc_abs_H_norm(H_z)
+            else:
+                abs_H = self.math_utils.calc_abs_H(H_z)
             line = abs_H
             self._set_freq_resp_title("Resposta em Frequência")
 
