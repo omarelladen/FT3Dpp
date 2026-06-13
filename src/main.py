@@ -283,6 +283,7 @@ class App:
             loc="left"
         )
 
+        # Axis
         self.ax_p.text(
             0.5, 1.05,
             "Im",
@@ -293,8 +294,6 @@ class App:
             va="bottom",
             transform=self.ax_p.transAxes
         )
-
-        # Axis
         self.ax_p.text(
             1.05, 0.5,
             "Re",
@@ -366,10 +365,6 @@ class App:
         self.ax_r = self.fig_r.add_subplot()
         self.ax_r.set_facecolor(color_z_bg)
 
-        # t = np.linspace(0, 1.0, 500)  # 1s
-        # freq = 2
-        # signal = np.sin(2*np.pi*freq*t)
-
         self.line_r, = self.ax_r.plot([], [], color=color_resp, linewidth=2)
 
         self.ax_r.set_title(
@@ -381,7 +376,24 @@ class App:
         )
         self.ax_r.grid(True, color=color_grid, linestyle="--")
         self.ax_r.tick_params(colors=color_text)
-        self.ax_r.set_ylim(-1.2, 1.2)
+        self.ax_r.set_ylim(-1, 1)
+
+        step = 0.5 * np.pi
+        intervals = np.arange(0, 4*np.pi + step, step)
+        self.ax_r.set_xticks(intervals)
+
+        labels = []
+        for v in intervals:
+            mult = round(v / np.pi, 2)
+            if mult == 0:
+                labels.append("0")
+            elif mult == 1:
+                labels.append("π")
+            elif mult.is_integer():
+                labels.append(f"{int(mult)}π")
+            else:
+                labels.append(f"{mult}π")
+        self.ax_r.set_xticklabels(labels)
 
         self.canvas_r = FigureCanvasTkAgg(self.fig_r, master=self.frame_resp)
         self.canvas_r.draw()
@@ -442,6 +454,7 @@ class App:
 
         self.line_r.set_data(w, abs_H)
 
+        # X limit
         theta_val = int(self.theta_max.get())
         x_max = theta_val * np.pi
         self.ax_r.set_xlim(0, x_max)
