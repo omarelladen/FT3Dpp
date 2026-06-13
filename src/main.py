@@ -1,6 +1,5 @@
 import os
 import subprocess
-
 import tkinter as tk
 
 import numpy as np
@@ -155,7 +154,6 @@ class App:
 
 
         # Buttons
-
         self.dict_bt = {
             self.icon_open: ("Abrir Arquivo", -1, False),
             self.icon_save: ("Salvar Arquivo", -1, False),
@@ -167,8 +165,8 @@ class App:
             self.icon_freq: ("Resposta em Frequência", 2, True),
             self.icon_freq_db: ("Resposta em Frequência em dB", 2, False),
             self.icon_phase: ("Fase", 2, False),
-            self.icon_imp: ("Resposta ao Impulso", -1, False),
-            self.icon_deg: ("Resposta ao Degrau Unitário", -1, False),
+            self.icon_imp: ("Resposta ao Impulso", 2, False),
+            self.icon_deg: ("Resposta ao Degrau Unitário", 2, False),
             self.icon_3d: ("Gráfico 3D", -1, False),
 
             self.icon_pole: ("Editar Polos", 3, True),
@@ -742,6 +740,7 @@ class App:
             pack_side = "top"
             container = self.frame_bt_left
 
+        last_group = None
         for i, (key, (hint, group, starts_active)) in enumerate(list_bt):
             if isinstance(key, str):
                 img_icon = None
@@ -754,6 +753,15 @@ class App:
 
             self.bt_states[key] = var
             self.bt_groups[key] = group
+
+            # Keep buttons from the same group together
+            extra_pad = 0
+            if (side == "top" and
+                last_group is not None and
+                group != last_group
+            ):
+                extra_pad = 10
+            last_group = group
 
             if side == "left":
                 pack_pady = (60, 3) if i == 0 else 3
@@ -773,7 +781,7 @@ class App:
             )
 
             if side == "top":
-                bt.pack(side=pack_side, padx=2, pady=pack_pady)
+                bt.pack(side=pack_side, padx=(2 + extra_pad, 2), pady=pack_pady)
             else:  # left
                 bt.pack(side=pack_side, fill="x", pady=pack_pady)
 
