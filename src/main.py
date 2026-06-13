@@ -26,9 +26,9 @@ max_resolution = 1000
 dpi = 100
 
 ax_text_pos = 1.6
-lim_plane = 1.5
+lim_plane = 1.3
 lw = 1.5
-win_size = "1200x800"
+win_size = "1000x600"
 
 color_ln = "#00FF00"
 color_bg = "#F0F0F0"  # "#212121"
@@ -208,11 +208,9 @@ class App:
         self.frame_bt_left.pack(side="left", fill="y", padx=5, pady=5)
         self._create_bts(list(self.dict_bt.items())[13:], "left")
 
-
         # Poles and zeros
         self.list_poles = []
         self.list_zeros = []
-
 
         box_poles = self._create_label_frame(self.frame_top, "Polos")
         box_zeros = self._create_label_frame(self.frame_top, "Zeros")
@@ -220,7 +218,7 @@ class App:
         frame_poles_outer, self.frame_poles = self._create_scrollable_frame(
             box_poles,
             width=200,
-            height=100,
+            height=45,
             bg_color=color_bg
         )
         frame_poles_outer.pack(side="left", padx=5, pady=5)
@@ -228,7 +226,7 @@ class App:
         frame_zeros_outer, self.frame_zeros = self._create_scrollable_frame(
             box_zeros,
             width=200,
-            height=100,
+            height=45,
             bg_color=color_bg
         )
         frame_zeros_outer.pack(side="left", padx=5, pady=5)
@@ -261,7 +259,7 @@ class App:
 #         color_text.pack(side="left")
 
 
-        self.frame_bottom = tk.Frame(self.win, bg=color_bg, pady=5)
+        self.frame_bottom = tk.Frame(self.win, bg=color_bg, pady=4)
         self.frame_bottom.pack(side="bottom", fill="x", padx=10)
 
 
@@ -288,18 +286,18 @@ class App:
         )
 
         self.label_hz = self._create_label_frame_text(label_funct, "H(z) = 1")
-        self.label_hz.config(font=("Consolas", 12), justify="left")
+        self.label_hz.config(font=("Consolas", 11), justify="left")
 
 
         self._update_labels_text()
 
-        self.frame_plane = self._create_frame_fig()
-        self.frame_resp  = self._create_frame_fig()
+        self.frame_plane = self._create_frame_fig(width=360)
+        self.frame_resp  = self._create_frame_fig(width=600)
 
 
         # Plane Figure
 
-        self.fig_p = Figure(dpi=dpi, facecolor=color_bg)
+        self.fig_p = Figure(figsize=(2.8, 2.8), dpi=dpi, facecolor=color_bg)
         self.ax_p = self.fig_p.add_subplot()
         self.ax_p.set_facecolor(color_z_bg)
         self.ax_p.set_xlim(-lim_plane, lim_plane)
@@ -308,7 +306,7 @@ class App:
         self.ax_p.set_title(
             "Plano z",
             color=color_text,
-            fontsize=12,
+            fontsize=10,
             pad=10,
             loc="left"
         )
@@ -318,7 +316,7 @@ class App:
             0.5, 1.05,
             "Im",
             color=color_text,
-            fontsize=10,
+            fontsize=8,
             fontweight="bold",
             ha="center",
             va="bottom",
@@ -328,7 +326,7 @@ class App:
             1.05, 0.5,
             "Re",
             color=color_text,
-            fontsize=10,
+            fontsize=8,
             fontweight="bold",
             ha="left",
             va="center",
@@ -366,8 +364,9 @@ class App:
 
         self.canvas_p.get_tk_widget().pack(
             side="top",
-            fill=tk.BOTH,
-            expand=True
+            fill=tk.NONE,
+            expand=False,
+            pady=(2, 0)
         )
         self.toolbar_p.pack(side="top", fill=tk.X)
 
@@ -377,7 +376,7 @@ class App:
             text="Sistema Realizável e Estável",
             fg=color_text,
             bg=color_bg,
-            font=("Segoe UI", 10),  # , "bold"),
+            font=("Segoe UI", 10),
             anchor="w",
             pady=10
         )
@@ -391,7 +390,7 @@ class App:
 
         # Frequency Response Figure
 
-        self.fig_r = Figure(dpi=dpi, facecolor=color_bg)
+        self.fig_r = Figure(figsize=(10, 2.8), dpi=dpi, facecolor=color_bg)
         self.ax_r = self.fig_r.add_subplot()
         self.ax_r.set_facecolor(color_z_bg)
 
@@ -422,7 +421,7 @@ class App:
                 return f"{mult}π"
 
         self.ax_r.xaxis.set_major_formatter(ticker.FuncFormatter(formatter_pi))
-        self.ax_r.format_coord = lambda x, y: f"(x, y) = ({x:.3f}, {y:.3f})"
+        self.ax_r.format_coord = lambda x, y: f"(x, y) = ({x:.2f}, {y:.2f})"
 
         self.canvas_r = FigureCanvasTkAgg(self.fig_r, master=self.frame_resp)
         self.canvas_r.draw()
@@ -437,8 +436,9 @@ class App:
 
         self.canvas_r.get_tk_widget().pack(
             side="top",
-            fill=tk.BOTH,
-            expand=True
+            fill=tk.NONE,
+            expand=False,
+            pady=(2, 0)
         )
         self.toolbar_r.pack(side="top", fill=tk.X)
 
@@ -493,7 +493,7 @@ class App:
             activeforeground=color_text,
             command=self._update_freq_resp
         )
-        self.check_normalize.pack(side="left", padx=50)
+        self.check_normalize.pack(side="left", padx=10)
 
         # Resolution Spin
 
@@ -509,7 +509,6 @@ class App:
             from_=10, to=1000,
             increment=10,
             width=4,
-            # state="readonly",  # block kb
             textvariable=tk.DoubleVar(value=init_resolution),
             bg=color_bg_spin,
             fg=color_text,
@@ -581,16 +580,16 @@ class App:
         self.ax_r.set_title(
             title,
             color=color_text,
-            fontsize=12,
+            fontsize=10,
             pad=10,
             loc="left"
         )
 
-    def _create_frame_fig(self):
+    def _create_frame_fig(self, width):
         frame = tk.Frame(
             self.main_container,
-            width=500,
-            height=600,
+            width=width,
+            height=360,
             bg=color_bg
         )
         frame.pack(side="left", padx=10, pady=5)
@@ -697,8 +696,8 @@ class App:
             marker=marker,
             markerfacecolor="none",
             linestyle="none",
-            markersize=8,
-            markeredgewidth=2,
+            markersize=7,
+            markeredgewidth=1,
             zorder=2
         )
         return points_plot
