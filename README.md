@@ -5,7 +5,7 @@ FT3D Rewrite
 ## Install dependencies
 ### Debian Linux packages
 ```sh
-sudo apt install python3-matplotlib python3-numpy
+sudo apt install python3-matplotlib python3-numpy python3-tk
 ```
 
 ### or from PyPI with pip
