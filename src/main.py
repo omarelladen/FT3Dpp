@@ -302,7 +302,7 @@ class App:
         self.ax_p.set_facecolor(color_z_bg)
         self.ax_p.set_xlim(-lim_plane, lim_plane)
         self.ax_p.set_ylim(-lim_plane, lim_plane)
-        self.ax_p.set_aspect('equal')
+        self.ax_p.set_aspect("equal")
         self.ax_p.set_title(
             "Plano z",
             color=color_text,
@@ -383,9 +383,9 @@ class App:
         self.label_system.pack(side="top", fill="x", padx=10)
 
         # Plane Events
-        self.fig_p.canvas.mpl_connect('button_press_event',   self._on_click)
-        self.fig_p.canvas.mpl_connect('motion_notify_event',  self._on_move)
-        self.fig_p.canvas.mpl_connect('button_release_event', self._on_drop)
+        self.fig_p.canvas.mpl_connect("button_press_event",   self._on_click)
+        self.fig_p.canvas.mpl_connect("motion_notify_event",  self._on_move)
+        self.fig_p.canvas.mpl_connect("button_release_event", self._on_drop)
 
 
         # Frequency Response Figure
@@ -674,7 +674,7 @@ class App:
         canvas.bind("<MouseWheel>", _on_mousewheel)
         scrollable_frame.bind("<MouseWheel>", _on_mousewheel)
 
-        if not hasattr(self, '_scroll_refs'):
+        if not hasattr(self, "_scroll_refs"):
             self._scroll_refs = []
         self._scroll_refs.extend([canvas, scrollbar, scrollable_frame])
 

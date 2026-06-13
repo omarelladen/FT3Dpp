@@ -65,7 +65,7 @@ class MathUtils():
         if not list_poles and not list_zeros:
             return 1, 1
 
-        z_inv = sp.symbols('z_inv')
+        z_inv = sp.symbols("z_inv")
 
         num = 1
         den = 1
@@ -88,7 +88,7 @@ class MathUtils():
         if not list_poles and not list_zeros:
             return 1, 1
 
-        z = sp.symbols('z')
+        z = sp.symbols("z")
 
         num = 1
         den = 1
@@ -121,11 +121,11 @@ class MathUtils():
 
         for exp in range(max_exp, 1, -1):
             new_exp = "⁻" + "".join(dict_subst[d] for d in str(exp))
-            num = num.replace(f'z_inv**{exp}', f'z{new_exp}')
-            den = den.replace(f'z_inv**{exp}', f'z{new_exp}')
+            num = num.replace(f"z_inv**{exp}", f"z{new_exp}")
+            den = den.replace(f"z_inv**{exp}", f"z{new_exp}")
 
-        num = num.replace('z_inv', 'z⁻¹').replace("*", "")
-        den = den.replace('z_inv', 'z⁻¹').replace("*", "")
+        num = num.replace("z_inv", "z⁻¹").replace("*", "")
+        den = den.replace("z_inv", "z⁻¹").replace("*", "")
 
         eq = self._create_eq(num, den)
         return eq
@@ -143,8 +143,8 @@ class MathUtils():
 
         for exp in range(max_exp, 1, -1):
             new_exp = "".join(dict_subst[d] for d in str(exp))
-            num = num.replace(f'z**{exp}', f'z{new_exp}')
-            den = den.replace(f'z**{exp}', f'z{new_exp}')
+            num = num.replace(f"z**{exp}", f"z{new_exp}")
+            den = den.replace(f"z**{exp}", f"z{new_exp}")
 
         num = num.replace("*", "")
         den = den.replace("*", "")
