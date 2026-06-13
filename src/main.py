@@ -164,7 +164,7 @@ class App:
             "Z": ("Plano z", 1, True),
             self.icon_freq: ("Resposta em Frequência", 2, True),
             self.icon_freq_db: ("Resposta em Frequência em dB", 2, False),
-            self.icon_phase: ("Fase", -1, False),
+            self.icon_phase: ("Fase", 2, False),
             self.icon_imp: ("Resposta ao Impulso", -1, False),
             self.icon_deg: ("Resposta ao Degrau Unitário", -1, False),
             self.icon_3d: ("Gráfico 3D", -1, False),
@@ -172,8 +172,15 @@ class App:
             self.icon_pole: ("Editar Polos", 3, True),
             self.icon_zero: ("Editar Zeros", 3, False),
             self.icon_kb: ("Inserir Raízes via Teclado", -1, False),
+            # self.icon_zoom: ("Zoom no Plano", -1, False),
+            # self.icon_hand: ("Movimentar o Plano", -1, False),
+            # self.icon_dim: ("Restaurar Dimensões do Plano", -1, False),
             self.icon_clear: ("Limpar", -1, False),
             self.icon_info: ("Maiores Informações", -1, False),
+
+            # self.icon_exit: ("Sair", -1, False),
+            # self.icon_graphic: ("Salvar Gráfico", -1, False),
+            # self.icon_save_as: ("Salvar como", -1, False),
         }
 
         self.bt_states = {}  # {key: tk.BooleanVar}
@@ -371,13 +378,8 @@ class App:
 
         self.line_r, = self.ax_r.plot([], [], color=color_resp, linewidth=2)
 
-        self.ax_r.set_title(
-            "Resposta em Frequência",
-            color=color_text,
-            fontsize=12,
-            pad=10,
-            loc="left"
-        )
+        self._set_freq_resp_title("Resposta em Frequência")
+
         self.ax_r.grid(True, color=color_grid, linestyle="--")
         self.ax_r.tick_params(colors=color_text)
         self.ax_r.set_ylim(-1, 1)
@@ -505,11 +507,22 @@ class App:
             self.resolution.insert(0, str(self.math_utils.resolution))
 
     def _update_freq_resp(self):
-        H_z = self.math_utils.calc_H(self.list_zeros, self.list_poles)
-        abs_H = self.math_utils.calc_abs_H(H_z)
         w = self.math_utils.get_w()
+        H_z = self.math_utils.calc_H(self.list_zeros, self.list_poles)
 
-        self.line_r.set_data(w, abs_H)
+        if self.bt_states[self.icon_freq_db].get():
+            line = None
+            self._set_freq_resp_title("Resposta em Frequência em dB")
+        elif self.bt_states[self.icon_phase].get():
+            ang_H = self.math_utils.calc_angle_H(H_z)
+            line = ang_H
+            self._set_freq_resp_title("Fase")
+        else:
+            abs_H = self.math_utils.calc_abs_H(H_z)
+            line = abs_H
+            self._set_freq_resp_title("Resposta em Frequência")
+
+        self.line_r.set_data(w, line)
 
         # X limit
         theta_val = int(self.theta_max.get())
@@ -522,6 +535,15 @@ class App:
         self.ax_r.autoscale_view()
 
         self.canvas_r.draw_idle()
+
+    def _set_freq_resp_title(self, title):
+        self.ax_r.set_title(
+            title,
+            color=color_text,
+            fontsize=12,
+            pad=10,
+            loc="left"
+        )
 
     def _create_frame_fig(self):
         frame = tk.Frame(
@@ -730,20 +752,29 @@ class App:
                 bt.pack(side=pack_side, fill="x", pady=pack_pady)
 
     def _on_button_click(self, clicked_key):
-        v_clicked = self.bt_states[clicked_key]
+        v_clicked     = self.bt_states[clicked_key]
         group_clicked = self.bt_groups[clicked_key]
 
         if group_clicked != -1:
+            # Do not toggle when clicking on an already active button
             if not v_clicked.get():
                 v_clicked.set(True)
                 return
 
+            # Unclick other buttons from the same group
             for key, group in self.bt_groups.items():
                 if key != clicked_key and group == group_clicked:
                     self.bt_states[key].set(False)
 
         hint = self.dict_bt[clicked_key][0]
-        print(f"'{hint}' -> {'ON' if v_clicked.get() else 'OFF'}")
+        print(f"'{clicked_key}-{hint}' -> {'ON' if v_clicked.get() else 'OFF'}")
+
+        # Update frequency response
+        if (self.bt_states[self.icon_freq].get() or
+            self.bt_states[self.icon_freq_db].get() or
+            self.bt_states[self.icon_phase].get()
+        ):
+            self._update_freq_resp()
 
     def _center_toplevel(self, tl):
         # Center Toplevel acording to the Main Window
