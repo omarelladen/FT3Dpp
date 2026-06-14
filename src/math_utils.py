@@ -3,9 +3,16 @@ import numpy as np
 import sympy as sp
 
 
-dict_subst = {
+dict_subst_exp = {
     '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
     '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹'
+}
+dict_subst_z = {
+    "z_inv": "z⁻¹",
+    "*": "",
+    "1.0z": "z",
+    "z⁻¹ + 1.0": "z⁻¹ + 1",
+    " ": ""
 }
 
 max_exp = 20
@@ -111,20 +118,19 @@ class MathUtils():
         if num == 1 and den == 1:
             return "H(z) = 1"
 
-        z = sp.symbols("z")
-
         num = str(num)
         den = str(den)
 
         # Substitutions
 
         for exp in range(max_exp, 1, -1):
-            new_exp = "⁻" + "".join(dict_subst[d] for d in str(exp))
+            new_exp = "⁻" + "".join(dict_subst_exp[d] for d in str(exp))
             num = num.replace(f"z_inv**{exp}", f"z{new_exp}")
             den = den.replace(f"z_inv**{exp}", f"z{new_exp}")
 
-        num = num.replace("z_inv", "z⁻¹").replace("*", "").replace("1.0z", "z")
-        den = den.replace("z_inv", "z⁻¹").replace("*", "").replace("1.0z", "z")
+        for old, new in dict_subst_z.items():
+            num = num.replace(old, new)
+            den = den.replace(old, new)
 
         eq = self._create_eq(num, den)
         return eq
@@ -141,12 +147,13 @@ class MathUtils():
         # Substitutions
 
         for exp in range(max_exp, 1, -1):
-            new_exp = "".join(dict_subst[d] for d in str(exp))
+            new_exp = "".join(dict_subst_exp[d] for d in str(exp))
             num = num.replace(f"z**{exp}", f"z{new_exp}")
             den = den.replace(f"z**{exp}", f"z{new_exp}")
 
-        num = num.replace("*", "")
-        den = den.replace("*", "")
+        for old, new in dict_subst_z.items():
+            num = num.replace(old, new)
+            den = den.replace(old, new)
 
         eq = self._create_eq(num, den)
         return eq
