@@ -1042,7 +1042,10 @@ class App:
                 self._update_freq_resp()
 
     def _on_move(self, event):
-        if self.idx_sel_point is not None and event.inaxes == self.ax_p:
+        if (event.button is not None and
+            self.idx_sel_point is not None and
+            event.inaxes == self.ax_p
+        ):
             event_x = event.xdata
             event_y = event.ydata
 
