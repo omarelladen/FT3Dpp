@@ -62,25 +62,22 @@ class MathUtils():
         return np.angle(H_z)
 
     def _calc_H_z_inv_eq(self, list_zeros, list_poles):
-        if not list_poles and not list_zeros:
+        num, den = self._calc_H_z_eq(list_zeros, list_poles)
+
+        if num == 1 and den == 1:
             return 1, 1
 
+        z     = sp.symbols("z")
         z_inv = sp.symbols("z_inv")
 
-        num = 1
-        den = 1
+        H_z = num/den
 
-        for tuple_zero in list_zeros:
-            zero = tuple_zero[0] + 1j * tuple_zero[1]
-            num *= (1 - sp.N(zero, 3) * z_inv)
-        for tuple_pole in list_poles:
-            pole = tuple_pole[0] + 1j * tuple_pole[1]
-            den *= (1 - sp.N(pole, 3) * z_inv)
+        # Replace z with 1/z_inv
+        H_z_inv = H_z.subs(z, 1/z_inv).cancel()
+        num, den = H_z_inv.as_numer_denom()
 
-        if num != 1:
-            num = num.expand()
-        if den != 1:
-            den = den.expand()
+        num = sp.expand(num)
+        den = sp.expand(den)
 
         return num, den
 
@@ -114,6 +111,8 @@ class MathUtils():
         if num == 1 and den == 1:
             return "H(z) = 1"
 
+        z = sp.symbols("z")
+
         num = str(num)
         den = str(den)
 
@@ -124,8 +123,8 @@ class MathUtils():
             num = num.replace(f"z_inv**{exp}", f"z{new_exp}")
             den = den.replace(f"z_inv**{exp}", f"z{new_exp}")
 
-        num = num.replace("z_inv", "z⁻¹").replace("*", "")
-        den = den.replace("z_inv", "z⁻¹").replace("*", "")
+        num = num.replace("z_inv", "z⁻¹").replace("*", "").replace("1.0z", "z")
+        den = den.replace("z_inv", "z⁻¹").replace("*", "").replace("1.0z", "z")
 
         eq = self._create_eq(num, den)
         return eq
