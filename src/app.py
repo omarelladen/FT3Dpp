@@ -20,6 +20,8 @@ from math_utils import MathUtils
 
 icon_logo_path = os.path.join("icons", "logo.png")
 
+range_click = 0.1
+
 max_pi = 4
 
 init_resolution = 500
@@ -982,7 +984,7 @@ class App:
             click = np.array([event.xdata, event.ydata])
             dist = np.sqrt(np.sum((coords - click) ** 2, axis=1))
 
-        next = (len(dist) > 0 and np.min(dist) < 0.05)
+        next = (len(dist) > 0 and np.min(dist) < range_click)
 
         # Right button
         if event.button == R_BUTTON:
