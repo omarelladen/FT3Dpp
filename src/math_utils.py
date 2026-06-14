@@ -113,30 +113,25 @@ class MathUtils():
         return num, den
 
     def format_H_z_inv(self, list_zeros, list_poles):
-        num, den = self._calc_H_z_inv_eq(list_zeros, list_poles)
-
-        if num == 1 and den == 1:
-            return "H(z) = 1"
-
-        num = str(num)
-        den = str(den)
-
-        # Substitutions
-
-        for exp in range(max_exp, 1, -1):
-            new_exp = "⁻" + "".join(dict_subst_exp[d] for d in str(exp))
-            num = num.replace(f"z_inv**{exp}", f"z{new_exp}")
-            den = den.replace(f"z_inv**{exp}", f"z{new_exp}")
-
-        for old, new in dict_subst_z.items():
-            num = num.replace(old, new)
-            den = den.replace(old, new)
-
-        eq = self._create_eq(num, den)
-        return eq
+        return self._format_H_z(
+            list_zeros,
+            list_poles,
+            self._calc_H_z_inv_eq,
+            "⁻",
+            "z_inv"
+        )
 
     def format_H_z(self, list_zeros, list_poles):
-        num, den = self._calc_H_z_eq(list_zeros, list_poles)
+        return self._format_H_z(
+            list_zeros,
+            list_poles,
+            self._calc_H_z_eq,
+            "",
+            "z"
+        )
+
+    def _format_H_z(self, list_zeros, list_poles, funct, signal, base):
+        num, den = funct(list_zeros, list_poles)
 
         if num == 1 and den == 1:
             return "H(z) = 1"
@@ -147,16 +142,15 @@ class MathUtils():
         # Substitutions
 
         for exp in range(max_exp, 1, -1):
-            new_exp = "".join(dict_subst_exp[d] for d in str(exp))
-            num = num.replace(f"z**{exp}", f"z{new_exp}")
-            den = den.replace(f"z**{exp}", f"z{new_exp}")
+            new_exp = signal + "".join(dict_subst_exp[d] for d in str(exp))
+            num = num.replace(f"{base}**{exp}", f"z{new_exp}")
+            den = den.replace(f"{base}**{exp}", f"z{new_exp}")
 
         for old, new in dict_subst_z.items():
             num = num.replace(old, new)
             den = den.replace(old, new)
 
-        eq = self._create_eq(num, den)
-        return eq
+        return self._create_eq(num, den)
 
     def _create_eq(self, num, den):
         bar_size = max(len(num), len(den))
@@ -165,9 +159,8 @@ class MathUtils():
         num_center = num.center(bar_size)
         den_center = den.center(bar_size)
 
-        eq = (
+        return (
             f"       {num_center}\n"
             f"H(z) = {bar}\n"
             f"       {den_center}"
         )
-        return eq
