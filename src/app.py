@@ -480,7 +480,7 @@ class App:
         self.var_ang_deg = tk.BooleanVar(value=True)
         self.check_ang_unit = tk.Checkbutton(
             self.frame_input_r,
-            text="Fase em graus",
+            text="Graus",
             variable=self.var_ang_deg,
             bg=color_bg,
             fg=color_text,
@@ -489,7 +489,6 @@ class App:
             activeforeground=color_text,
             command=self._update_freq_resp
         )
-        self.check_ang_unit.pack(side="left", padx=10)
 
 
         # Resolution Spin
@@ -550,20 +549,23 @@ class App:
         H_z = self.math_utils.calc_H(self.list_zeros, self.list_poles)
 
         # Select what to plot
-        if self.bt_states[self.icon_freq_db].get():
+        if self.bt_states[self.icon_phase].get():
+            if self.var_ang_deg.get():
+                ang_H = self.math_utils.calc_angle_H_deg(H_z)
+                self._set_freq_resp_title("Resposta em Frequência: Fase (graus)")
+            else:
+                ang_H = self.math_utils.calc_angle_H_rad(H_z)
+                self._set_freq_resp_title("Resposta em Frequência: Fase (rad)")
+            line = ang_H
+            self._set_phase_checkbox()
+        elif self.bt_states[self.icon_freq_db].get():
             if self.var_normalize.get():
                 abs_H_db = self.math_utils.calc_abs_H_db_norm(H_z)
             else:
                 abs_H_db = self.math_utils.calc_abs_H_db(H_z)
             line = abs_H_db
             self._set_freq_resp_title("Resposta em Frequência: Magnitude (dB)")
-        elif self.bt_states[self.icon_phase].get():
-            if self.var_ang_deg.get():
-                ang_H = self.math_utils.calc_angle_H_deg(H_z)
-            else:
-                ang_H = self.math_utils.calc_angle_H_rad(H_z)
-            line = ang_H
-            self._set_freq_resp_title("Resposta em Frequência: Fase")
+            self._set_mag_checkbox()
         else:
             if self.var_normalize.get():
                 abs_H = self.math_utils.calc_abs_H_norm(H_z)
@@ -571,6 +573,7 @@ class App:
                 abs_H = self.math_utils.calc_abs_H(H_z)
             line = abs_H
             self._set_freq_resp_title("Resposta em Frequência: Magnitude")
+            self._set_mag_checkbox()
 
         self.line_r.set_data(w, line)
 
@@ -585,6 +588,14 @@ class App:
         self.ax_r.autoscale_view()
 
         self.canvas_r.draw_idle()
+
+    def _set_phase_checkbox(self):
+        self.check_normalize.pack_forget()
+        self.check_ang_unit.pack(side="left", padx=10)
+
+    def _set_mag_checkbox(self):
+        self.check_ang_unit.pack_forget()
+        self.check_normalize.pack(side="left", padx=10)
 
     def _set_freq_resp_title(self, title):
         self.ax_r.set_title(
