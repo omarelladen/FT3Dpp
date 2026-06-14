@@ -1,6 +1,6 @@
 # FT3D++
 
-FT3D Rewrite
+FT3D rewrite
 
 ## Install dependencies
 ### Debian Linux packages
