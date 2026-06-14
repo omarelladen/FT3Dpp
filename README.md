@@ -25,7 +25,6 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-
 ## Run
 
 ### Linux
@@ -37,3 +36,8 @@ python3 src/main.py
 ```sh
 python src/main.py
 ```
+
+## License
+[GPLv3](./LICENSE)
+
+Copyright 2026 Omar Zagonel El Laden
