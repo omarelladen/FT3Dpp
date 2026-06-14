@@ -267,7 +267,7 @@ class App:
         self.var_z_inv = tk.BooleanVar(value=True)
         self.check_z_inv = tk.Checkbutton(
             self.frame_bottom,
-            text="z inv",
+            text="z⁻ⁿ",
             variable=self.var_z_inv,
             bg=color_bg,
             fg=color_text,
