@@ -44,34 +44,34 @@ class MathUtils():
         H_z = num/den
         return H_z
 
-    def calc_abs_H(self, H_z):
-        abs_H = np.abs(H_z)
-        abs_H = np.clip(abs_H, a_min=1e-12, a_max=None)
-        return abs_H
+    def calc_mag_H(self, H_z):
+        mag_H = np.abs(H_z)
+        mag_H = np.clip(mag_H, a_min=1e-12, a_max=None)
+        return mag_H
 
-    def calc_abs_H_db(self, H_z):
-        abs_H = self.calc_abs_H(H_z)
-        abs_H_db = 20 * np.log10(abs_H)
-        return abs_H_db
+    def calc_mag_H_db(self, H_z):
+        mag_H = self.calc_mag_H(H_z)
+        mag_H_db = 20 * np.log10(mag_H)
+        return mag_H_db
 
-    def calc_abs_H_norm(self, H_z):
-        abs_H = self.calc_abs_H(H_z)
-        peak = np.max(abs_H)
+    def calc_mag_H_norm(self, H_z):
+        mag_H = self.calc_mag_H(H_z)
+        peak = np.max(mag_H)
         if peak > 0:
-            abs_H = abs_H / peak
-        return abs_H
+            mag_H = mag_H / peak
+        return mag_H
 
-    def calc_abs_H_db_norm(self, H_z):
-        abs_H_db = self.calc_abs_H_db(H_z)
-        peak = np.max(abs_H_db)
-        abs_H_db = abs_H_db - peak
-        return abs_H_db
+    def calc_mag_H_db_norm(self, H_z):
+        mag_H_db = self.calc_mag_H_db(H_z)
+        peak = np.max(mag_H_db)
+        mag_H_db = mag_H_db - peak
+        return mag_H_db
 
-    def calc_angle_H_rad(self, H_z):
+    def calc_phase_H_rad(self, H_z):
         return np.angle(H_z)
 
-    def calc_angle_H_deg(self, H_z):
-        return np.rad2deg(self.calc_angle_H_rad(H_z))
+    def calc_phase_H_deg(self, H_z):
+        return np.rad2deg(self.calc_phase_H_rad(H_z))
 
     def _calc_H_z_inv_eq(self, list_zeros, list_poles):
         num, den = self._calc_H_z_eq(list_zeros, list_poles)
