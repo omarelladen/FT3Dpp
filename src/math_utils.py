@@ -67,8 +67,11 @@ class MathUtils():
         abs_H_db = abs_H_db - peak
         return abs_H_db
 
-    def calc_angle_H(self, H_z):
+    def calc_angle_H_rad(self, H_z):
         return np.angle(H_z)
+
+    def calc_angle_H_deg(self, H_z):
+        return np.rad2deg(self.calc_angle_H_rad(H_z))
 
     def _calc_H_z_inv_eq(self, list_zeros, list_poles):
         num, den = self._calc_H_z_eq(list_zeros, list_poles)

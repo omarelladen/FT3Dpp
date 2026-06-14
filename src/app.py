@@ -145,8 +145,8 @@ class App:
             self.icon_plane_top: ("Topografia do Plano", -1, False),
             "S": ("Plano s", 1, False),
             "Z": ("Plano z", 1, True),
-            self.icon_freq: ("Resposta em Frequência", 2, True),
-            self.icon_freq_db: ("Resposta em Frequência (dB)", 2, False),
+            self.icon_freq: ("Magnitude", 2, True),
+            self.icon_freq_db: ("Magnitude (dB)", 2, False),
             self.icon_phase: ("Fase", 2, False),
             self.icon_imp: ("Resposta ao Impulso", 2, False),
             self.icon_deg: ("Resposta ao Degrau Unitário", 2, False),
@@ -297,7 +297,7 @@ class App:
 
         # Axis
         self.ax_p.text(
-            0.5, 1.05,
+            0.5, 1.02,
             "Im",
             color=color_text,
             fontsize=8,
@@ -307,7 +307,7 @@ class App:
             transform=self.ax_p.transAxes
         )
         self.ax_p.text(
-            1.05, 0.5,
+            1.02, 0.5,
             "Re",
             color=color_text,
             fontsize=8,
@@ -380,7 +380,7 @@ class App:
         self.ax_r.grid(True, color=color_grid, linestyle="--")
         self.ax_r.tick_params(colors=color_text)
         self.ax_r.set_ylim(-1, 1)
-        self._set_freq_resp_title("Resposta em Frequência")
+        self._set_freq_resp_title("Resposta em Frequência: Magnitude")
 
         self.line_r, = self.ax_r.plot([], [], color=color_resp, linewidth=2)
 
@@ -476,6 +476,22 @@ class App:
         )
         self.check_normalize.pack(side="left", padx=10)
 
+        # Phase unit checkbox
+        self.var_ang_deg = tk.BooleanVar(value=True)
+        self.check_ang_unit = tk.Checkbutton(
+            self.frame_input_r,
+            text="Fase em graus",
+            variable=self.var_ang_deg,
+            bg=color_bg,
+            fg=color_text,
+            selectcolor=color_bg_spin,
+            activebackground=color_bg,
+            activeforeground=color_text,
+            command=self._update_freq_resp
+        )
+        self.check_ang_unit.pack(side="left", padx=10)
+
+
         # Resolution Spin
 
         tk.Label(
@@ -540,18 +556,21 @@ class App:
             else:
                 abs_H_db = self.math_utils.calc_abs_H_db(H_z)
             line = abs_H_db
-            self._set_freq_resp_title("Resposta em Frequência (dB)")
+            self._set_freq_resp_title("Resposta em Frequência: Magnitude (dB)")
         elif self.bt_states[self.icon_phase].get():
-            ang_H = self.math_utils.calc_angle_H(H_z)
+            if self.var_ang_deg.get():
+                ang_H = self.math_utils.calc_angle_H_deg(H_z)
+            else:
+                ang_H = self.math_utils.calc_angle_H_rad(H_z)
             line = ang_H
-            self._set_freq_resp_title("Fase")
+            self._set_freq_resp_title("Resposta em Frequência: Fase")
         else:
             if self.var_normalize.get():
                 abs_H = self.math_utils.calc_abs_H_norm(H_z)
             else:
                 abs_H = self.math_utils.calc_abs_H(H_z)
             line = abs_H
-            self._set_freq_resp_title("Resposta em Frequência")
+            self._set_freq_resp_title("Resposta em Frequência: Magnitude")
 
         self.line_r.set_data(w, line)
 
