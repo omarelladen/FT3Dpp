@@ -163,7 +163,7 @@ class App:
             "S": ("Plano s", 1, False),
             "Z": ("Plano z", 1, True),
             self.icon_freq: ("Resposta em Frequência", 2, True),
-            self.icon_freq_db: ("Resposta em Frequência em dB", 2, False),
+            self.icon_freq_db: ("Resposta em Frequência (dB)", 2, False),
             self.icon_phase: ("Fase", 2, False),
             self.icon_imp: ("Resposta ao Impulso", 2, False),
             self.icon_deg: ("Resposta ao Degrau Unitário", 2, False),
@@ -286,8 +286,6 @@ class App:
         )
 
         self.label_hz = self._create_label_frame_text(label_funct, "H(z) = 1")
-        self.label_hz.config(font=("Consolas", 11), justify="left")
-
 
         self._update_labels_text()
 
@@ -376,7 +374,7 @@ class App:
             text="Sistema Realizável e Estável",
             fg=color_text,
             bg=color_bg,
-            font=("Segoe UI", 10),
+            font=("Arial", 8),
             anchor="w",
             pady=10
         )
@@ -549,7 +547,7 @@ class App:
             else:
                 abs_H_db = self.math_utils.calc_abs_H_db(H_z)
             line = abs_H_db
-            self._set_freq_resp_title("Resposta em Frequência em dB")
+            self._set_freq_resp_title("Resposta em Frequência (dB)")
         elif self.bt_states[self.icon_phase].get():
             ang_H = self.math_utils.calc_angle_H(H_z)
             line = ang_H
@@ -597,11 +595,11 @@ class App:
         return frame
 
     def _create_menu(self):
-        return tk.Menu(master=self.menubar, tearoff=False)
+        return tk.Menu(self.menubar, tearoff=False)
 
     def _create_label_frame(self, master, text, padx=10):
         frame = tk.LabelFrame(
-            master=master,
+            master,
             text=text,
             fg=color_text,
             bg=color_bg,
@@ -704,8 +702,11 @@ class App:
 
     def _create_label_frame_text(self, master, text):
         label = tk.Label(
-            master, text=text,
-            fg=color_text, bg=color_bg, font=("Segoe UI", 9)
+            master,
+            text=text,
+            fg=color_text,
+            bg=color_bg,
+            font=("Consolas", 11)
         )
         label.pack(expand=True)
         return label
@@ -873,21 +874,22 @@ class App:
 
         # Text
         tk.Label(
-            tl,text=app_name,
+            tl,
+            text=app_name,
             fg=color_text,
             bg=color_bg,
             font=("Arial", 12, "bold")
         ).pack(pady=10)
-        tk.Label(tl, text=app_version,     fg="gray", bg=color_bg).pack()
+        tk.Label(tl, text=app_version, fg="gray", bg=color_bg).pack()
         tk.Label(tl, text=app_description, fg="gray", bg=color_bg).pack()
         tk.Label(tl, text=app_copyright, fg=color_text, bg=color_bg).pack(pady=10)
-        tk.Label(tl, text=app_license,   fg=color_text, bg=color_bg).pack()
+        tk.Label(tl, text=app_license, fg=color_text, bg=color_bg).pack()
 
         tk.Button(tl, text="Close", command=tl.destroy, width=10).pack(pady=10)
 
     def _show_info(self, dict_info, title, size, wraplength):
         # Toplevel
-        tl = tk.Toplevel(master=self.win)
+        tl = tk.Toplevel(self.win)
         tl.title(title)
         tl.geometry(size)
         tl.configure(bg=color_bg)
@@ -917,7 +919,7 @@ class App:
         # Add info
         for name, desc in dict_info.items():
             label_name = tk.Label(
-                master=fr,
+                fr,
                 text=f"{name}:",
                 fg=color_text,
                 bg=color_bg,
@@ -925,7 +927,7 @@ class App:
                 font=("Arial", 12, "bold")
             )
             label_desc = tk.Label(
-                master=fr,
+                fr,
                 text=desc,
                 fg=color_text,
                 bg=color_bg,
