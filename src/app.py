@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import os
-import subprocess
 import tkinter as tk
 
 import numpy as np
@@ -21,7 +20,7 @@ from math_utils import MathUtils
 
 icon_logo_path = os.path.join("icons", "logo.png")
 
-max_pi = 6
+max_pi = 4
 
 init_resolution = 500
 max_resolution = 1000
@@ -55,11 +54,7 @@ class App:
         # Main Window
         self.win = tk.Tk()
         self.win.title(app_name)
-
-        # Layout
         self.win.geometry(win_size)
-
-        # Color
         self.win.configure(bg=color_bg)
 
         # Icon
@@ -75,21 +70,12 @@ class App:
 
 
         # Menu Bar
-        small_font = ("Segoe UI", 8)
-        self.menubar = tk.Menu(self.win, font=small_font)
 
-        self.menu_file     = self._create_menu()
-        self.menu_edit     = self._create_menu()
-        self.menu_entry    = self._create_menu()
-        self.menu_plane    = self._create_menu()
-        self.menu_system   = self._create_menu()
-        self.menu_graphics = self._create_menu()
-        self.menu_windows  = self._create_menu()
+        small_font = ("Arial", 8)
+        self.menubar = tk.Menu(self.win, font=small_font)
 
         # Help Menu
         self.menu_help = self._create_menu()
-
-
         self.menu_help.add_command(
             label="Ajuda",
             command=lambda: self._show_info(
@@ -101,8 +87,14 @@ class App:
         )
         self.menu_help.add_command(label="Sobre", command=self._show_about)
 
+        self.menu_file     = self._create_menu()
+        self.menu_edit     = self._create_menu()
+        self.menu_entry    = self._create_menu()
+        self.menu_plane    = self._create_menu()
+        self.menu_system   = self._create_menu()
+        self.menu_graphics = self._create_menu()
+        self.menu_windows  = self._create_menu()
 
-        # Add Help Menu to the Menu Bar
         self.menubar.add_cascade(label="Arquivo", menu=None)
         self.menubar.add_cascade(label="Editar", menu=None)
         self.menubar.add_cascade(label="Entrada de Raízes", menu=None)
@@ -112,49 +104,37 @@ class App:
         self.menubar.add_cascade(label="Janelas", menu=None)
         self.menubar.add_cascade(label="Ajuda", menu=self.menu_help)
 
-
         # Show Menu Bar
         self.win.config(menu=self.menubar)
 
-
         self.toolbar = tk.Frame(self.win, bd=1, relief="raised", bg=color_bg)
 
-        def create_icon(filename, reduction=18):
-            file_path = os.path.join("icons", filename)
-            if os.path.isfile(file_path):
-                try:
-                    img = tk.PhotoImage(file=file_path)
-                    img = img.subsample(reduction, reduction)
-                    return img
-                except Exception as e:
-                    print(f"Error loading image '{file_path}': {e}")
 
         # Icons
 
-        self.icon_open = create_icon("open_t.png")
-        self.icon_save = create_icon("save_t.png")
-        self.icon_plane = create_icon("plane_t.png")
-        self.icon_plane_top = create_icon("plane_top_t.png")
-        self.icon_freq = create_icon("freq_t.png", 16)
-        self.icon_freq_db = create_icon("freq_db_t.png", 16)
-        self.icon_phase = create_icon("phase_t.png", 16)
-        self.icon_imp = create_icon("imp_t.png", 16)
-        self.icon_deg = create_icon("deg_t.png", 16)
-        self.icon_3d = create_icon("3d_t.png", 16)
+        self.icon_open = self._create_icon("open_t.png")
+        self.icon_save = self._create_icon("save_t.png")
+        self.icon_plane = self._create_icon("plane_t.png")
+        self.icon_plane_top = self._create_icon("plane_top_t.png")
+        self.icon_freq = self._create_icon("freq_t.png", 16)
+        self.icon_freq_db = self._create_icon("freq_db_t.png", 16)
+        self.icon_phase = self._create_icon("phase_t.png", 16)
+        self.icon_imp = self._create_icon("imp_t.png", 16)
+        self.icon_deg = self._create_icon("deg_t.png", 16)
+        self.icon_3d = self._create_icon("3d_t.png", 16)
 
-        self.icon_pole = create_icon("pole.png", 3)
-        self.icon_zero = create_icon("zero.png", 3)
-        self.icon_kb = create_icon("kb.png", 3)
-        self.icon_zoom = create_icon("zoom.png", 3)
-        self.icon_hand = create_icon("hand.png", 3)
-        self.icon_dim = create_icon("dim.png", 3)
-        self.icon_clear = create_icon("clear.png", 3)
-        self.icon_info = create_icon("info.png", 3)
+        self.icon_pole = self._create_icon("pole.png", 3)
+        self.icon_zero = self._create_icon("zero.png", 3)
+        self.icon_kb = self._create_icon("kb.png", 3)
+        self.icon_zoom = self._create_icon("zoom.png", 3)
+        self.icon_hand = self._create_icon("hand.png", 3)
+        self.icon_dim = self._create_icon("dim.png", 3)
+        self.icon_clear = self._create_icon("clear.png", 3)
+        self.icon_info = self._create_icon("info.png", 3)
 
-        self.icon_exit = create_icon("exit.png", 6)
-        self.icon_graphic = create_icon("graphic.png", 6)
-        self.icon_save_as = create_icon("save_as.png", 6)
-
+        self.icon_exit = self._create_icon("exit.png", 6)
+        self.icon_graphic = self._create_icon("graphic.png", 6)
+        self.icon_save_as = self._create_icon("save_as.png", 6)
 
         # Buttons
         self.dict_bt = {
@@ -186,9 +166,8 @@ class App:
             # self.icon_save_as: ("Salvar como", -1, False),
         }
 
-        self.bt_states = {}  # {key: tk.BooleanVar}
-        self.bt_groups = {}  # {key: group_id}
-
+        self.bt_states = {}
+        self.bt_groups = {}
 
         # Top Buttons
         self._create_bts(list(self.dict_bt.items())[:13], "top")
@@ -211,7 +190,9 @@ class App:
         self.frame_bt_left.pack(side="left", fill="y", padx=5, pady=5)
         self._create_bts(list(self.dict_bt.items())[13:], "left")
 
+
         # Poles and zeros
+
         self.list_poles = []
         self.list_zeros = []
 
@@ -241,7 +222,6 @@ class App:
         self._create_label_coords(self.frame_zeros, self.text_zeros_var)
 
 
-
 #         self.frame_limits = self._create_label_frame(
 #             self.frame_top,
 #             "Limites do Plano"
@@ -262,9 +242,10 @@ class App:
 #         color_text.pack(side="left")
 
 
+        # Bottom Frame
+
         self.frame_bottom = tk.Frame(self.win, bg=color_bg, pady=4)
         self.frame_bottom.pack(side="bottom", fill="x", padx=10)
-
 
         # z inv checkbox
         self.var_z_inv = tk.BooleanVar(value=True)
@@ -292,6 +273,8 @@ class App:
 
         self._update_labels_text()
 
+
+        # Figure Frames
         self.frame_plane = self._create_frame_fig(width=360)
         self.frame_resp  = self._create_frame_fig(width=600)
 
@@ -371,7 +354,7 @@ class App:
         )
         self.toolbar_p.pack(side="top", fill=tk.X)
 
-
+        # System classification
         self.label_system = tk.Label(
             self.frame_plane,
             text="Sistema Realizável e Estável",
@@ -394,14 +377,12 @@ class App:
         self.fig_r = Figure(figsize=(10, 2.8), dpi=dpi, facecolor=color_bg)
         self.ax_r = self.fig_r.add_subplot()
         self.ax_r.set_facecolor(color_z_bg)
-
-        self.line_r, = self.ax_r.plot([], [], color=color_resp, linewidth=2)
-
-        self._set_freq_resp_title("Resposta em Frequência")
-
         self.ax_r.grid(True, color=color_grid, linestyle="--")
         self.ax_r.tick_params(colors=color_text)
         self.ax_r.set_ylim(-1, 1)
+        self._set_freq_resp_title("Resposta em Frequência")
+
+        self.line_r, = self.ax_r.plot([], [], color=color_resp, linewidth=2)
 
         # Set x ticks as multiples of pi
         step = 0.5 * np.pi
@@ -414,12 +395,11 @@ class App:
             mult = round(v / np.pi, 2)
             if mult == 0:
                 return "0"
-            elif mult == 1:
+            if mult == 1:
                 return "π"
-            elif mult.is_integer():
+            if mult.is_integer():
                 return f"{int(mult)}π"
-            else:
-                return f"{mult}π"
+            return f"{mult}π"
 
         self.ax_r.xaxis.set_major_formatter(ticker.FuncFormatter(formatter_pi))
         self.ax_r.format_coord = lambda x, y: f"(x, y) = ({x:.2f}, {y:.2f})"
@@ -526,9 +506,19 @@ class App:
             bg=color_bg
         ).pack(side="right", padx=frame_r_padx)
 
+        # Events to confirm keyboard values
         self.resolution.bind("<Return>",   lambda event: self._update_resolution())
         self.resolution.bind("<FocusOut>", lambda event: self._update_resolution())
 
+    def _create_icon(self, filename, reduction=18):
+        file_path = os.path.join("icons", filename)
+        if os.path.isfile(file_path):
+            try:
+                img = tk.PhotoImage(file=file_path)
+                img = img.subsample(reduction, reduction)
+                return img
+            except Exception as e:
+                print(f"Error loading image '{file_path}': {e}")
 
     def _update_resolution(self):
         resolution = self.resolution.get()
@@ -614,27 +604,26 @@ class App:
         frame.pack(side="left", padx=10, fill="y")
         return frame
 
-    def _create_spin_top(self, row, col, col_text, text):
-        tk.Label(
-            self.frame_limits,
-            text=text,
-            fg=color_text,
-            bg=color_bg
-        ).grid(row=row, column=col_text, padx=2, pady=2)
-
-        spin = tk.Spinbox(
-            self.frame_limits,
-            from_=-1.5, to=1.5,
-            increment=0.1,
-            width=6,
-            bg=color_bg_spin,
-            fg=color_text,
-            insertbackground=color_text,
-            buttonbackground=color_bg
-        )
-        spin.grid(row=row, column=col, padx=5, pady=2)
-
-        return spin
+#     def _create_spin_top(self, row, col, col_text, text):
+#         tk.Label(
+#             self.frame_limits,
+#             text=text,
+#             fg=color_text,
+#             bg=color_bg
+#         ).grid(row=row, column=col_text, padx=2, pady=2)
+# 
+#         spin = tk.Spinbox(
+#             self.frame_limits,
+#             from_=-1.5, to=1.5,
+#             increment=0.1,
+#             width=6,
+#             bg=color_bg_spin,
+#             fg=color_text,
+#             insertbackground=color_text,
+#             buttonbackground=color_bg
+#         )
+#         spin.grid(row=row, column=col, padx=5, pady=2)
+#         return spin
 
     def _create_scrollable_frame(self, parent, width, height, bg_color):
         outer_frame = tk.Frame(parent, width=width, height=height, bg=bg_color)
@@ -740,13 +729,11 @@ class App:
         self.text_poles_var.set(poles_text)
         self.text_zeros_var.set(zeros_text)
 
-
         if self.var_z_inv.get():
             eq = self.math_utils.format_H_z_inv(self.list_zeros, self.list_poles)
         else:
             eq = self.math_utils.format_H_z(self.list_zeros, self.list_poles)
         self.label_hz.config(text=eq)
-
 
         self.frame_poles.update_idletasks()
         self.frame_zeros.update_idletasks()
@@ -810,7 +797,7 @@ class App:
             )
 
             if side == "top":
-                bt.pack(side=pack_side, padx=(2 + extra_pad, 2), pady=pack_pady)
+                bt.pack(side=pack_side, padx=(2+extra_pad, 2), pady=pack_pady)
             else:  # left
                 bt.pack(side=pack_side, fill="x", pady=pack_pady)
 
@@ -830,7 +817,7 @@ class App:
                     self.bt_states[key].set(False)
 
         hint = self.dict_bt[clicked_key][0]
-        print(f"'{clicked_key}-{hint}' -> {'ON' if v_clicked.get() else 'OFF'}")
+        print(f"'{clicked_key}-{hint}' {'ON' if v_clicked.get() else 'OFF'}")
 
         # Update frequency response
         if clicked_key in (self.icon_freq, self.icon_freq_db, self.icon_phase):
@@ -1021,7 +1008,6 @@ class App:
 
                 self._update_plane()
                 self._update_freq_resp()
-
 
     def _on_move(self, event):
         if self.idx_sel_point is not None and event.inaxes == self.ax_p:
