@@ -537,6 +537,100 @@ class App:
             except Exception as e:
                 print(f"Error loading image '{file_path}': {e}")
 
+    def _create_kb_win(self):
+        # Create Toplevel
+        tl = tk.Toplevel(self.win)
+        tl.title("Inserção de Polos e Zeros via Teclado")
+
+        # Keep the Toplevel in the front
+        tl.transient(self.win)
+        tl.wait_visibility()  # wait until the win is drawn
+        tl.grab_set()
+        tl.lift()
+
+        # Add padding and color to the Toplevel
+        tl.configure(bg=color_bg)
+
+        # Frame
+        fr = tk.Frame(master=tl, bg=color_bg, padx=10, pady=10)
+        fr.pack(anchor="center", expand=True)
+
+
+        # Radiobuttons
+
+        self.mode_var = tk.StringVar(value="Polos")
+
+        fr_type = tk.Frame(fr, bg=color_bg, pady=10)
+        fr_type.grid(row=0, column=0, columnspan=2, sticky="ew")
+
+        for bt in ["Polos", "Zeros"]:
+            rb = tk.Radiobutton(
+                fr_type,
+                text=bt,
+                variable=self.mode_var,
+                value=bt,
+                bg=color_bg,
+                fg=color_text,
+                selectcolor=color_bg,
+                activebackground=color_bg,
+                activeforeground=color_text
+            )
+            rb.pack(side="left", expand=True)
+
+
+        entries = {}
+
+        # Axes Labels
+        for i, axis in enumerate(["X", "Y"]):
+            tk.Label(
+                fr,
+                text=axis,
+                bg=color_bg,
+                fg=color_text,
+                anchor="w"
+            ).grid(row=i+1, column=0, sticky="ew", pady=2)
+
+            entry = tk.Entry(fr, width=6)
+            entry.grid(row=i+1, column=1, sticky="ew", padx=5, pady=2)
+
+            entry.insert(0, "")
+            entries[axis] = entry
+
+        def on_confirm():
+            updates = {}
+            for v_name, widget_item in entries.items():
+                updates[v_name] = widget_item.get()
+
+            tl.destroy()
+
+            # TODO: configs
+            sel_type = self.mode_var.get()
+            print(sel_type, updates)
+
+        def on_cancel():
+            tl.destroy()
+
+        # Buttons
+        bt_fr = tk.Frame(master=tl, bg=color_bg, pady=10)
+        bt_fr.pack(fill="x")
+
+        for bt in [("Cancel", "left"), ("OK", "right")]:
+            tk.Button(
+                bt_fr,
+                text=bt[0],
+                command=on_confirm,
+                width=10,
+                relief="flat",
+                overrelief="groove",
+                cursor="hand2"
+            ).pack(side=bt[1], padx=10, expand=True)
+
+        self._center_toplevel(tl)
+
+        # X click
+        tl.protocol("WM_DELETE_WINDOW", on_cancel)
+
+
     def _update_resolution(self):
         resolution = self.resolution.get()
         if resolution.isdigit() and int(resolution) <= max_resolution:
@@ -848,8 +942,7 @@ class App:
                 if key != clicked_key and group == group_clicked:
                     self.bt_states[key].set(False)
 
-        hint = self.dict_bt[clicked_key][0]
-        print(f"'{clicked_key}-{hint}' {'ON' if v_clicked.get() else 'OFF'}")
+        # hint = self.dict_bt[clicked_key][0]
 
         # Update frequency response
         if clicked_key in (self.icon_freq, self.icon_freq_db, self.icon_phase):
@@ -858,6 +951,10 @@ class App:
             self._clear_poles_zeros()
             self._update_plane()
             self._update_freq_resp()
+            v_clicked.set(False)
+
+        if clicked_key == self.icon_kb:
+            self._create_kb_win()
             v_clicked.set(False)
 
     def _clear_poles_zeros(self):
