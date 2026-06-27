@@ -609,8 +609,8 @@ class App:
                 sel_list = self.list_poles
             else:  # "z":
                 sel_list = self.list_zeros
+
             self._add_element_plane(sel_list, updates["X"], updates["Y"])
-            print(sel_type, updates)
             self._update_plane()
             self._update_freq_resp()
 
@@ -663,7 +663,10 @@ class App:
             self.resolution.insert(0, str(self.math_utils.resolution))
 
     def _update_freq_resp(self):
-        w = self.math_utils.get_w()
+        theta_val = int(self.theta_max.get())
+        self.math_utils.max_pi = theta_val
+
+        w_plot = self.math_utils.get_w_plot()
         H_z = self.math_utils.calc_H(self.list_zeros, self.list_poles)
 
         # Select what to plot
@@ -693,10 +696,9 @@ class App:
             self._set_freq_resp_title("Resposta em Frequência: Magnitude")
             self._set_mag_checkbox()
 
-        self.line_r.set_data(w, line)
+        self.line_r.set_data(w_plot, line)
 
         # X limit
-        theta_val = int(self.theta_max.get())
         x_max = theta_val * np.pi
         self.ax_r.set_xlim(0, x_max)
 

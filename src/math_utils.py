@@ -24,15 +24,18 @@ max_exp = 20
 #               RuntimeWarning: invalid value  encountered in divide
 # TODO: prevent -1 term instead of 1 in Y(z)
 class MathUtils():
-    def __init__(self, resolution, max_pi):
+    def __init__(self, resolution, max_pi=1):
         self.resolution = resolution
         self.max_pi = max_pi
 
-    def get_w(self):
-        return np.linspace(0, self.max_pi*np.pi, self.resolution)
+    def _get_w(self):
+        return np.linspace(0, np.pi, self.resolution)
+
+    def get_w_plot(self):
+        return np.linspace(0, self.max_pi*np.pi, self.max_pi*self.resolution)
 
     def calc_H(self, list_zeros, list_poles):
-        w = self.get_w()
+        w = self._get_w()
 
         num = np.ones(self.resolution, dtype=complex)
         den = np.ones(self.resolution, dtype=complex)
@@ -56,12 +59,29 @@ class MathUtils():
                 if p1 != p2:  # conj
                     den *= np.exp(1j*w) - p2
 
-        H_z = num/den
+        with np.errstate(divide='ignore', invalid='ignore'):
+            H_z = num / den  # den=0 => H_z=np.inf
+
+        H_z = np.nan_to_num(H_z, nan=0.0, posinf=1e12, neginf=-1e12)
         return H_z
 
     def calc_mag_H(self, H_z):
-        mag_H = np.abs(H_z)
+        mag_base = np.abs(H_z)
+
+        # 3,2,1,1,0 + 1,1,2 = 3,2,1,1,0,1,1,2,3 (e.g 500 pts -> 998 pts)
+        mag_2pi = np.concatenate([mag_base, mag_base[::-1][1:-1]])
+
+        num_rep = int(np.ceil(self.max_pi/2.0))  # repetitions of 2pi
+        mag_total = np.tile(mag_2pi, num_rep)    # create repetition
+
+        xp = np.linspace(0, num_rep*2.0*np.pi, len(mag_total))
+        w_plot = self.get_w_plot()
+
+        # Interpolate bc len(xp) != len(w_plot)
+        mag_H = np.interp(w_plot, xp, mag_total)
+
         mag_H = np.clip(mag_H, a_min=1e-12, a_max=None)
+
         return mag_H
 
     def calc_mag_H_db(self, H_z):
