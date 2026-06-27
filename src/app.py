@@ -359,7 +359,7 @@ class App:
         # System classification
         self.label_system = tk.Label(
             self.frame_plane,
-            text="Sistema Realizável e Estável",
+            text="",  # "Sistema Realizável e Estável",
             fg=color_text,
             bg=color_bg,
             font=("Arial", 8),
