@@ -20,6 +20,8 @@ dict_subst_z = {
 max_exp = 20
 
 
+# TODO: prevent RuntimeWarning: divide by zero encountered in divide
+#               RuntimeWarning: invalid value  encountered in divide
 class MathUtils():
     def __init__(self, resolution, max_pi):
         self.resolution = resolution
@@ -34,12 +36,24 @@ class MathUtils():
         num = np.ones(self.resolution, dtype=complex)
         den = np.ones(self.resolution, dtype=complex)
 
-        for tuple_zero in list_zeros:
-            zero = tuple_zero[0] + 1j*tuple_zero[1]
-            num *= np.exp(1j*w) - zero
-        for tuple_pole in list_poles:
-            pole = tuple_pole[0] + 1j*tuple_pole[1]
-            den *= np.exp(1j*w) - pole
+        for i in range(0, len(list_zeros), 2):
+            if i + 1 < len(list_zeros):
+                tuple_z1 = list_zeros[i]
+                tuple_z2 = list_zeros[i+1]
+                z1 = tuple_z1[0] + 1j*tuple_z1[1]
+                z2 = tuple_z2[0] + 1j*tuple_z2[1]
+                num *= np.exp(1j*w) - z1
+                if z1 != z2:  # conj
+                    num *= np.exp(1j*w) - z2
+        for i in range(0, len(list_poles), 2):
+            if i + 1 < len(list_poles):
+                tuple_p1 = list_poles[i]
+                tuple_p2 = list_poles[i+1]
+                p1 = tuple_p1[0] + 1j*tuple_p1[1]
+                p2 = tuple_p2[0] + 1j*tuple_p2[1]
+                den *= np.exp(1j*w) - p1
+                if p1 != p2:  # conj
+                    den *= np.exp(1j*w) - p2
 
         H_z = num/den
         return H_z
@@ -58,7 +72,7 @@ class MathUtils():
         mag_H = self.calc_mag_H(H_z)
         peak = np.max(mag_H)
         if peak > 0:
-            mag_H = mag_H / peak
+            mag_H = mag_H/peak
         return mag_H
 
     def calc_mag_H_db_norm(self, H_z):
@@ -102,13 +116,24 @@ class MathUtils():
         num = 1
         den = 1
 
-        for tuple_zero in list_zeros:
-            zero = tuple_zero[0] + 1j*tuple_zero[1]
-            num *= z - sp.N(zero, 3)
-
-        for tuple_pole in list_poles:
-            pole = tuple_pole[0] + 1j*tuple_pole[1]
-            den *= z - sp.N(pole, 3)
+        for i in range(0, len(list_zeros), 2):
+            if i + 1 < len(list_zeros):
+                tuple_z1 = list_zeros[i]
+                tuple_z2 = list_zeros[i+1]
+                z1 = tuple_z1[0] + 1j*tuple_z1[1]
+                z2 = tuple_z2[0] + 1j*tuple_z2[1]
+                num *= z - sp.N(z1, 3)
+                if z1 != z2:  # conj
+                    num *= z - sp.N(z2, 3)
+        for i in range(0, len(list_poles), 2):
+            if i + 1 < len(list_poles):
+                tuple_p1 = list_poles[i]
+                tuple_p2 = list_poles[i+1]
+                p1 = tuple_p1[0] + 1j*tuple_p1[1]
+                p2 = tuple_p2[0] + 1j*tuple_p2[1]
+                den *= z - sp.N(p1, 3)
+                if p1 != p2:  # conj
+                    den *= z - sp.N(p2, 3)
 
         if num != 1:
             num = num.expand()
