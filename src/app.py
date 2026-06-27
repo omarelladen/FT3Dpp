@@ -857,14 +857,25 @@ class App:
             if i + 1 < len(self.list_poles):
                 pole = self.list_poles[i]
                 pole_text = f"({pole[0]:.3f} + j{abs(pole[1]):.3f})"
-                poles_text += f"{pole_text} e {pole_text.replace('+', '-')}\n"
+                poles_text += f"{pole_text}"
+                conj = self.list_poles[i+1]
+                if pole[0] == conj[0] and pole[1] == conj[1]:
+                    poles_text += "\n"
+                else:
+                    poles_text += f" e {pole_text.replace('+', '-')}\n"
 
         zeros_text = ""
         for i in range(0, len(self.list_zeros), 2):
             if i + 1 < len(self.list_zeros):
                 zero = self.list_zeros[i]
                 zero_text = f"({zero[0]:.3f} + j{abs(zero[1]):.3f})"
-                zeros_text += f"{zero_text} e {zero_text.replace('+', '-')}\n"
+                zeros_text += f"{zero_text}"
+                conj = self.list_zeros[i+1]
+                if zero[0] == conj[0] and zero[1] == conj[1]:
+                    zeros_text += "\n"
+                else:
+                    zeros_text += f" e {zero_text.replace('+', '-')}\n"
+
 
         poles_text = poles_text.strip()
         zeros_text = zeros_text.strip()
