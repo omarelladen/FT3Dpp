@@ -558,7 +558,7 @@ class App:
 
         # Radiobuttons
 
-        self.mode_var = tk.StringVar(value="Polos")
+        self.mode_var = tk.StringVar(value="p")
 
         fr_type = tk.Frame(fr, bg=color_bg, pady=10)
         fr_type.grid(row=0, column=0, columnspan=2, sticky="ew")
@@ -568,7 +568,7 @@ class App:
                 fr_type,
                 text=bt,
                 variable=self.mode_var,
-                value=bt,
+                value=bt[0].lower(),
                 bg=color_bg,
                 fg=color_text,
                 selectcolor=color_bg,
@@ -593,7 +593,7 @@ class App:
             entry = tk.Entry(fr, width=6)
             entry.grid(row=i+1, column=1, sticky="ew", padx=5, pady=2)
 
-            entry.insert(0, "")
+            entry.insert(0, "0")
             entries[axis] = entry
 
         def on_confirm():
@@ -605,7 +605,14 @@ class App:
 
             # TODO: configs
             sel_type = self.mode_var.get()
+            if sel_type == "p":
+                sel_list = self.list_poles
+            else:  # "z":
+                sel_list = self.list_zeros
+            self._add_element_plane(sel_list, updates["X"], updates["Y"])
             print(sel_type, updates)
+            self._update_plane()
+            self._update_freq_resp()
 
         def on_cancel():
             tl.destroy()
@@ -630,6 +637,21 @@ class App:
         # X click
         tl.protocol("WM_DELETE_WINDOW", on_cancel)
 
+    def _add_element_plane(self, list_elements, x, y):
+        if isinstance(x, str):
+            x = x.replace(",", ".")
+        if isinstance(x, str):
+            y = y.replace(",", ".")
+
+        try:
+            x = float(x)
+            y = float(y)
+        except ValueError:
+            print(f"Failed to insert ({x}, {y})")
+            return
+
+        list_elements.append((x, y))
+        list_elements.append((x, -y))
 
     def _update_resolution(self):
         resolution = self.resolution.get()
@@ -1125,9 +1147,7 @@ class App:
                     self.idx_sel_point = None
                     self.type_sel_point = None
             else:
-                list_sel.append((event.xdata, event.ydata))
-                list_sel.append((event.xdata, -event.ydata))
-
+                self._add_element_plane(list_sel, event.xdata, event.ydata)
                 self.idx_sel_point = len(list_sel) - 1
 
                 if list_sel == self.list_poles:
