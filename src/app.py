@@ -621,11 +621,11 @@ class App:
         bt_fr = tk.Frame(master=tl, bg=color_bg, pady=10)
         bt_fr.pack(fill="x")
 
-        for bt in [("Cancel", "left"), ("OK", "right")]:
+        for bt in [("Cancel", "left", on_cancel), ("OK", "right", on_confirm)]:
             tk.Button(
                 bt_fr,
                 text=bt[0],
-                command=on_confirm,
+                command=bt[2],
                 width=10,
                 relief="flat",
                 overrelief="groove",
