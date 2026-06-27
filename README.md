@@ -2,6 +2,10 @@
 
 [FT3D](https://www.abenge.org.br/cobenge/legado/arquivos/18/trabalhos/NTM090.pdf) rewrite
 
+<p align="center" width="100%">
+<img src="imgs/main.png">
+</p>
+
 ## Install dependencies
 ### Debian Linux packages
 ```sh
