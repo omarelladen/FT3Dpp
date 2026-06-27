@@ -22,6 +22,7 @@ max_exp = 20
 
 # TODO: prevent RuntimeWarning: divide by zero encountered in divide
 #               RuntimeWarning: invalid value  encountered in divide
+# TODO: prevent -1 term instead of 1 in Y(z)
 class MathUtils():
     def __init__(self, resolution, max_pi):
         self.resolution = resolution

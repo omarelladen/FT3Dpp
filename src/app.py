@@ -563,7 +563,7 @@ class App:
         fr_type = tk.Frame(fr, bg=color_bg, pady=10)
         fr_type.grid(row=0, column=0, columnspan=2, sticky="ew")
 
-        for bt in ["Polos", "Zeros"]:
+        for bt in ["Polo", "Zero"]:
             rb = tk.Radiobutton(
                 fr_type,
                 text=bt,
