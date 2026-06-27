@@ -297,7 +297,7 @@ class App:
             loc="left"
         )
 
-        # Axis
+        # Axes
         self.ax_p.text(
             0.5, 1.02,
             "Im",
