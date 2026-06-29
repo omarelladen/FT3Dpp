@@ -556,7 +556,7 @@ class App:
         fr.pack(anchor="center", expand=True)
 
 
-        # Radiobuttons
+        # Pole/Zero Radiobuttons
 
         self.mode_var = tk.StringVar(value="p")
 
@@ -580,7 +580,7 @@ class App:
 
         entries = {}
 
-        # Axes Labels
+        # Axes values
         for i, axis in enumerate(["X", "Y"]):
             tk.Label(
                 fr,
@@ -588,10 +588,10 @@ class App:
                 bg=color_bg,
                 fg=color_text,
                 anchor="w"
-            ).grid(row=i+1, column=0, sticky="ew", pady=2)
+            ).grid(row=1+i, column=0, sticky="ew", pady=2)
 
             entry = tk.Entry(fr, width=6)
-            entry.grid(row=i+1, column=1, sticky="ew", padx=5, pady=2)
+            entry.grid(row=1+i, column=1, sticky="ew", padx=5, pady=2)
 
             entry.insert(0, "0")
             entries[axis] = entry
@@ -603,7 +603,6 @@ class App:
 
             tl.destroy()
 
-            # TODO: configs
             sel_type = self.mode_var.get()
             if sel_type == "p":
                 sel_list = self.list_poles
