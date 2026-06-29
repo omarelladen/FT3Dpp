@@ -20,8 +20,6 @@ dict_subst_z = {
 max_exp = 20
 
 
-# TODO: prevent RuntimeWarning: divide by zero encountered in divide
-#               RuntimeWarning: invalid value  encountered in divide
 # TODO: prevent -1 term instead of 1 in Y(z)
 class MathUtils():
     def __init__(self, resolution, max_pi=1):
@@ -68,7 +66,7 @@ class MathUtils():
     def calc_mag_H(self, H_z):
         mag_base = np.abs(H_z)
 
-        # 3,2,1,1,0 + 1,1,2 = 3,2,1,1,0,1,1,2,3 (e.g 500 pts -> 998 pts)
+        # [3,2,1,1,0] + [1,1,2] = [3,2,1,1,0,1,1,2,3] (e.g 500 pts -> 998 pts)
         mag_2pi = np.concatenate([mag_base, mag_base[::-1][1:-1]])
 
         num_rep = int(np.ceil(self.max_pi/2.0))  # repetitions of 2pi
@@ -103,7 +101,21 @@ class MathUtils():
         return mag_H_db
 
     def calc_phase_H_rad(self, H_z):
-        return np.angle(H_z)
+        phase_base = np.angle(H_z)
+
+        # [3,2,1,1,0] -> [3,2,1,1,0,-1,-1,-2,-3]
+        phase_2pi = np.concatenate([phase_base, -phase_base[::-1][1:-1]])
+
+        num_rep = int(np.ceil(self.max_pi/2.0))    # repetitions of 2pi
+        phase_total = np.tile(phase_2pi, num_rep)  # create repetition
+
+        xp = np.linspace(0, num_rep*2.0*np.pi, len(phase_total))
+        w_plot = self.get_w_plot()
+
+        # Interpolate bc len(xp) != len(w_plot)
+        phase_final = np.interp(w_plot, xp, phase_total)
+
+        return phase_final
 
     def calc_phase_H_deg(self, H_z):
         return np.rad2deg(self.calc_phase_H_rad(H_z))
