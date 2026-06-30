@@ -7,10 +7,6 @@ app_version = "0.3.0"
 app_copyright = "Copyright 2026 Omar Zagonel El Laden"
 app_license = "License: GPLv3"
 
-dict_help = {
-    "FT": "Função de Transferência",
-}
-
 color_ln = "#00FF00"
 color_bg = "#F0F0F0"  # "#212121"
 color_z_bg = "#000000"

@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import colorchooser
 
+from configs import *
+
 
 # TODO: save default and current value
 dict_color_menu = {

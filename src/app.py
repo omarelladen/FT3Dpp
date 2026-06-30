@@ -15,9 +15,12 @@ from matplotlib.backends.backend_tkagg import (
 )
 
 from configs import *
+
 from math_utils import MathUtils
 from color_dialog import ColorDialog
 from kb_dialog import KBDialog
+from about_dialog import AboutDialog
+from info_dialog import InfoDialog
 
 
 icon_logo_path = os.path.join("icons", "logo.png")
@@ -75,21 +78,13 @@ class App:
         self.menu_system   = self._create_menu()
 
         self.menu_graphics = self._create_menu()
-        self.menu_graphics.add_command(label="Cores", command=self._create_color_dialog)
+        self.menu_graphics.add_command(label="Cores", command=self._show_color_dialog)
 
         self.menu_windows  = self._create_menu()
 
         self.menu_help = self._create_menu()
-        self.menu_help.add_command(
-            label="Ajuda",
-            command=lambda: self._show_info(
-                dict_help,
-                "Help",
-                "950x650",
-                wraplength=900
-            )
-        )
-        self.menu_help.add_command(label="Sobre", command=self._show_about)
+        self.menu_help.add_command(label="Ajuda", command=self._show_help_dialog)
+        self.menu_help.add_command(label="Sobre", command=self._show_about_dialog)
 
 
         self.menubar.add_cascade(label="Arquivo", menu=self.menu_file)
@@ -545,10 +540,10 @@ class App:
 #         self.canvas.draw_idle()
         pass
 
-    def _create_kb_dialog(self):
+    def _show_kb_dialog(self):
         KBDialog(self.win, self)
 
-    def _create_color_dialog(self):
+    def _show_color_dialog(self):
         ColorDialog(self.win, self)
 
     def add_element_plane(self, list_elements, x, y):
@@ -722,11 +717,11 @@ class App:
         canvas.grid(row=0, column=0, sticky="nsew")
         scrollbar.grid(row=0, column=1, sticky="ns")
 
-        def _on_mousewheel(event):
+        def on_mousewheel(event):
             canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
-        canvas.bind("<MouseWheel>", _on_mousewheel)
-        scrollable_frame.bind("<MouseWheel>", _on_mousewheel)
+        canvas.bind("<MouseWheel>", on_mousewheel)
+        scrollable_frame.bind("<MouseWheel>", on_mousewheel)
 
         if not hasattr(self, "_scroll_refs"):
             self._scroll_refs = []
@@ -903,7 +898,7 @@ class App:
             v_clicked.set(False)
 
         if clicked_key == self.icon_kb:
-            self._create_kb_dialog()
+            self._show_kb_dialog()
             v_clicked.set(False)
 
     def _clear_poles_zeros(self):
@@ -928,94 +923,11 @@ class App:
 
         tl.geometry(f"+{x}+{y}")
 
-    def _show_about(self):
-        # Toplevel
-        tl = tk.Toplevel(self.win)
-        tl.title("Sobre")
-        tl.geometry("400x200")
-        tl.configure(bg=color_bg)
-        tl.resizable(False, False)
-        tl.transient(self.win)
-        tl.grab_set()
+    def _show_about_dialog(self):
+        AboutDialog(self.win, self)
 
-        self.center_toplevel(tl)
-
-        # Text
-        tk.Label(
-            tl,
-            text=app_name,
-            fg=color_text,
-            bg=color_bg,
-            font=("Arial", 12, "bold")
-        ).pack(pady=10)
-        tk.Label(tl, text=app_version, fg="gray", bg=color_bg).pack()
-        tk.Label(tl, text=app_description, fg="gray", bg=color_bg).pack()
-        tk.Label(tl, text=app_copyright, fg=color_text, bg=color_bg).pack(pady=10)
-        tk.Label(tl, text=app_license, fg=color_text, bg=color_bg).pack()
-
-        tk.Button(tl, text="Close", command=tl.destroy, width=10).pack(pady=10)
-
-    def _show_info(self, dict_info, title, size, wraplength):
-        # Toplevel
-        tl = tk.Toplevel(self.win)
-        tl.title(title)
-        tl.geometry(size)
-        tl.configure(bg=color_bg)
-        tl.transient(self.win)
-        tl.grab_set()
-
-        canvas = tk.Canvas(tl, bg=color_bg, highlightthickness=0)
-        scrollbar = tk.Scrollbar(tl, orient="vertical", command=canvas.yview)
-
-        # Frame with labels
-        fr = tk.Frame(canvas, bg=color_bg, padx=20, pady=20)
-
-        # Configure scroll
-        fr.bind(
-            "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
-        )
-
-        # Create the window inside the canvas for the frame
-        canvas.create_window((0, 0), window=fr, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
-
-        # Layout
-        scrollbar.pack(side="right", fill="y")
-        canvas.pack(side="left", fill="both", expand=True)
-
-        # Add info
-        for name, desc in dict_info.items():
-            label_name = tk.Label(
-                fr,
-                text=f"{name}:",
-                fg=color_text,
-                bg=color_bg,
-                anchor="w",
-                font=("Arial", 12, "bold")
-            )
-            label_desc = tk.Label(
-                fr,
-                text=desc,
-                fg=color_text,
-                bg=color_bg,
-                anchor="w",
-                justify="left",
-                wraplength=wraplength
-            )
-
-            label_name.pack(fill="x")
-            label_desc.pack(fill="x", pady=(0, 10))
-
-        # Add support for mouse scroll
-        def on_mousewheel(event):
-            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        canvas.bind_all("<MouseWheel>", on_mousewheel)
-
-        # Close Button outside the canvas
-        tk.Button(tl, text="Close", command=tl.destroy, width=10).pack(pady=10)
-
-        self.center_toplevel(tl)
+    def _show_help_dialog(self):
+        InfoDialog(self.win, self)
 
     def _on_click(self, event):
         if self.toolbar_p.mode != "" or event.inaxes != self.ax_p:
