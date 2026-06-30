@@ -34,7 +34,7 @@ class ColorDialog:
         tl.title("Configuração de Cores")
 
         # tl.geometry("320x400")
-        tl.resizable(False, False)
+        # tl.resizable(False, False)
         tl.transient(parent)
         # tl.grab_set()
 
