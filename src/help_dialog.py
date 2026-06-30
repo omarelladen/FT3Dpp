@@ -8,7 +8,7 @@ dict_help = {
 }
 
 
-class InfoDialog:
+class HelpDialog:
     def __init__(self, parent, app):
         # Toplevel
         tl = tk.Toplevel(parent)
@@ -68,6 +68,6 @@ class InfoDialog:
         canvas.bind_all("<MouseWheel>", on_mousewheel)
 
         # Close Button outside the canvas
-        tk.Button(tl, text="Close", command=tl.destroy, width=10).pack(pady=10)
+        # tk.Button(tl, text="Close", command=tl.destroy, width=10).pack(pady=10)
 
         app.center_toplevel(tl)

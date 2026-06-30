@@ -20,7 +20,7 @@ from math_utils import MathUtils
 from color_dialog import ColorDialog
 from kb_dialog import KBDialog
 from about_dialog import AboutDialog
-from info_dialog import InfoDialog
+from help_dialog import HelpDialog
 
 
 icon_logo_path = os.path.join("icons", "logo.png")
@@ -549,7 +549,7 @@ class App:
         AboutDialog(self.win, self)
 
     def _open_help_dialog(self):
-        InfoDialog(self.win, self)
+        HelpDialog(self.win, self)
 
     def add_element_plane(self, list_elements, x, y):
         if isinstance(x, str):
