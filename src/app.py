@@ -16,8 +16,8 @@ from matplotlib.backends.backend_tkagg import (
 
 from configs import *
 from math_utils import MathUtils
-from color_menu import ColorMenu
-from kb_menu import KBMenu
+from color_dialog import ColorDialog
+from kb_dialog import KBDialog
 
 
 icon_logo_path = os.path.join("icons", "logo.png")
@@ -75,7 +75,7 @@ class App:
         self.menu_system   = self._create_menu()
 
         self.menu_graphics = self._create_menu()
-        self.menu_graphics.add_command(label="Cores", command=self._create_color_win)
+        self.menu_graphics.add_command(label="Cores", command=self._create_color_dialog)
 
         self.menu_windows  = self._create_menu()
 
@@ -545,11 +545,11 @@ class App:
 #         self.canvas.draw_idle()
         pass
 
-    def _create_kb_win(self):
-        KBMenu(self.win, self)
+    def _create_kb_dialog(self):
+        KBDialog(self.win, self)
 
-    def _create_color_win(self):
-        ColorMenu(self.win, self)
+    def _create_color_dialog(self):
+        ColorDialog(self.win, self)
 
     def add_element_plane(self, list_elements, x, y):
         if isinstance(x, str):
@@ -903,7 +903,7 @@ class App:
             v_clicked.set(False)
 
         if clicked_key == self.icon_kb:
-            self._create_kb_win()
+            self._create_kb_dialog()
             v_clicked.set(False)
 
     def _clear_poles_zeros(self):

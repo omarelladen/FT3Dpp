@@ -24,7 +24,7 @@ list_elements = [
 ]
 
 
-class ColorMenu:
+class ColorDialog:
     def __init__(self, parent, app):
         self.app = app
 

@@ -3,7 +3,7 @@ import tkinter as tk
 from configs import *
 
 
-class KBMenu:
+class KBDialog:
     def __init__(self, parent, app):
         self.app = app
 
