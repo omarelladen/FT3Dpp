@@ -16,6 +16,8 @@ from matplotlib.backends.backend_tkagg import (
 
 from configs import *
 from math_utils import MathUtils
+from color_menu import ColorMenu
+from kb_menu import KBMenu
 
 
 icon_logo_path = os.path.join("icons", "logo.png")
@@ -33,17 +35,6 @@ ax_text_pos = 1.6
 lim_plane = 1.3
 lw = 1.5
 win_size = "1000x600"
-
-color_ln = "#00FF00"
-color_bg = "#F0F0F0"  # "#212121"
-color_z_bg = "#000000"
-color_text = "#000000"
-color_grid = "#008000"
-color_bg_spin = "#FFFFFF"
-color_bt_selected = "#d1d1d1"
-color_poles = "white"
-color_zeros = "yellow"
-color_resp = "white"
 
 R_BUTTON = 3
 L_BUTTON = 1
@@ -76,7 +67,18 @@ class App:
         small_font = ("Arial", 8)
         self.menubar = tk.Menu(self.win, font=small_font)
 
-        # Help Menu
+
+        self.menu_file     = self._create_menu()
+        self.menu_edit     = self._create_menu()
+        self.menu_entry    = self._create_menu()
+        self.menu_plane    = self._create_menu()
+        self.menu_system   = self._create_menu()
+
+        self.menu_graphics = self._create_menu()
+        self.menu_graphics.add_command(label="Cores", command=self._create_color_win)
+
+        self.menu_windows  = self._create_menu()
+
         self.menu_help = self._create_menu()
         self.menu_help.add_command(
             label="Ajuda",
@@ -89,22 +91,16 @@ class App:
         )
         self.menu_help.add_command(label="Sobre", command=self._show_about)
 
-        self.menu_file     = self._create_menu()
-        self.menu_edit     = self._create_menu()
-        self.menu_entry    = self._create_menu()
-        self.menu_plane    = self._create_menu()
-        self.menu_system   = self._create_menu()
-        self.menu_graphics = self._create_menu()
-        self.menu_windows  = self._create_menu()
 
-        self.menubar.add_cascade(label="Arquivo", menu=None)
-        self.menubar.add_cascade(label="Editar", menu=None)
-        self.menubar.add_cascade(label="Entrada de Raízes", menu=None)
-        self.menubar.add_cascade(label="Plano", menu=None)
-        self.menubar.add_cascade(label="Sistema", menu=None)
-        self.menubar.add_cascade(label="Gráficos", menu=None)
-        self.menubar.add_cascade(label="Janelas", menu=None)
+        self.menubar.add_cascade(label="Arquivo", menu=self.menu_file)
+        self.menubar.add_cascade(label="Editar", menu=self.menu_edit)
+        self.menubar.add_cascade(label="Entrada de Raízes", menu=self.menu_entry)
+        self.menubar.add_cascade(label="Plano", menu=self.menu_plane)
+        self.menubar.add_cascade(label="Sistema", menu=self.menu_system)
+        self.menubar.add_cascade(label="Gráficos", menu=self.menu_graphics)
+        self.menubar.add_cascade(label="Janelas", menu=self.menu_windows)
         self.menubar.add_cascade(label="Ajuda", menu=self.menu_help)
+
 
         # Show Menu Bar
         self.win.config(menu=self.menubar)
@@ -452,7 +448,7 @@ class App:
             fg=color_text,
             insertbackground=color_text,
             buttonbackground=color_bg,
-            command=self._update_freq_resp
+            command=self.update_freq_resp
         )
         self.theta_max.pack(side="left", padx=frame_r_padx)
 
@@ -474,7 +470,7 @@ class App:
             selectcolor=color_bg_spin,
             activebackground=color_bg,
             activeforeground=color_text,
-            command=self._update_freq_resp
+            command=self.update_freq_resp
         )
         self.check_normalize.pack(side="left", padx=10)
 
@@ -489,7 +485,7 @@ class App:
             selectcolor=color_bg_spin,
             activebackground=color_bg,
             activeforeground=color_text,
-            command=self._update_freq_resp
+            command=self.update_freq_resp
         )
 
 
@@ -537,106 +533,25 @@ class App:
             except Exception as e:
                 print(f"Error loading image '{file_path}': {e}")
 
+    def update_colors(self, key, new_color):
+#         if key == "curve":
+#             self.line.set_color(new_color)
+#         elif key == "grid":
+#             self.ax.grid(True, color=new_color)
+#         elif chave == "bg":
+#             self.fig.patch.set_facecolor(new_color)
+#             self.ax.set_facecolor(new_color)
+# 
+#         self.canvas.draw_idle()
+        pass
+
     def _create_kb_win(self):
-        # Create Toplevel
-        tl = tk.Toplevel(self.win)
-        tl.title("Inserção de Polos e Zeros via Teclado")
+        KBMenu(self.win, self)
 
-        # Keep the Toplevel in the front
-        tl.transient(self.win)
-        tl.wait_visibility()  # wait until the win is drawn
-        tl.grab_set()
-        tl.lift()
+    def _create_color_win(self):
+        ColorMenu(self.win, self)
 
-        # Add padding and color to the Toplevel
-        tl.configure(bg=color_bg)
-
-        # Frame
-        fr = tk.Frame(master=tl, bg=color_bg, padx=10, pady=10)
-        fr.pack(anchor="center", expand=True)
-
-
-        # Pole/Zero Radiobuttons
-
-        self.mode_var = tk.StringVar(value="p")
-
-        fr_type = tk.Frame(fr, bg=color_bg, pady=10)
-        fr_type.grid(row=0, column=0, columnspan=2, sticky="ew")
-
-        for bt in ["Polo", "Zero"]:
-            rb = tk.Radiobutton(
-                fr_type,
-                text=bt,
-                variable=self.mode_var,
-                value=bt[0].lower(),
-                bg=color_bg,
-                fg=color_text,
-                selectcolor=color_bg,
-                activebackground=color_bg,
-                activeforeground=color_text
-            )
-            rb.pack(side="left", expand=True)
-
-
-        entries = {}
-
-        # Axes values
-        for i, axis in enumerate(["X", "Y"]):
-            tk.Label(
-                fr,
-                text=axis,
-                bg=color_bg,
-                fg=color_text,
-                anchor="w"
-            ).grid(row=1+i, column=0, sticky="ew", pady=2)
-
-            entry = tk.Entry(fr, width=6)
-            entry.grid(row=1+i, column=1, sticky="ew", padx=5, pady=2)
-
-            entry.insert(0, "0")
-            entries[axis] = entry
-
-        def on_confirm():
-            updates = {}
-            for v_name, widget_item in entries.items():
-                updates[v_name] = widget_item.get()
-
-            tl.destroy()
-
-            sel_type = self.mode_var.get()
-            if sel_type == "p":
-                sel_list = self.list_poles
-            else:  # "z":
-                sel_list = self.list_zeros
-
-            self._add_element_plane(sel_list, updates["X"], updates["Y"])
-            self._update_plane()
-            self._update_freq_resp()
-
-        def on_cancel():
-            tl.destroy()
-
-        # Buttons
-        bt_fr = tk.Frame(master=tl, bg=color_bg, pady=10)
-        bt_fr.pack(fill="x")
-
-        for bt in [("Cancel", "left", on_cancel), ("OK", "right", on_confirm)]:
-            tk.Button(
-                bt_fr,
-                text=bt[0],
-                command=bt[2],
-                width=10,
-                relief="flat",
-                overrelief="groove",
-                cursor="hand2"
-            ).pack(side=bt[1], padx=10, expand=True)
-
-        self._center_toplevel(tl)
-
-        # X click
-        tl.protocol("WM_DELETE_WINDOW", on_cancel)
-
-    def _add_element_plane(self, list_elements, x, y):
+    def add_element_plane(self, list_elements, x, y):
         if isinstance(x, str):
             x = x.replace(",", ".")
         if isinstance(x, str):
@@ -656,12 +571,12 @@ class App:
         resolution = self.resolution.get()
         if resolution.isdigit() and int(resolution) <= max_resolution:
             self.math_utils.resolution = int(self.resolution.get())
-            self._update_freq_resp()
+            self.update_freq_resp()
         else:
             self.resolution.delete(0, "end")
             self.resolution.insert(0, str(self.math_utils.resolution))
 
-    def _update_freq_resp(self):
+    def update_freq_resp(self):
         theta_val = int(self.theta_max.get())
         self.math_utils.max_pi = theta_val
 
@@ -980,11 +895,11 @@ class App:
 
         # Update frequency response
         if clicked_key in (self.icon_freq, self.icon_freq_db, self.icon_phase):
-            self._update_freq_resp()
+            self.update_freq_resp()
         if self.bt_states[self.icon_clear].get():
             self._clear_poles_zeros()
-            self._update_plane()
-            self._update_freq_resp()
+            self.update_plane()
+            self.update_freq_resp()
             v_clicked.set(False)
 
         if clicked_key == self.icon_kb:
@@ -995,7 +910,7 @@ class App:
         self.list_poles = []
         self.list_zeros = []
 
-    def _center_toplevel(self, tl):
+    def center_toplevel(self, tl):
         # Center Toplevel acording to the Main Window
         self.win.update_idletasks()
 
@@ -1023,7 +938,7 @@ class App:
         tl.transient(self.win)
         tl.grab_set()
 
-        self._center_toplevel(tl)
+        self.center_toplevel(tl)
 
         # Text
         tk.Label(
@@ -1100,7 +1015,7 @@ class App:
         # Close Button outside the canvas
         tk.Button(tl, text="Close", command=tl.destroy, width=10).pack(pady=10)
 
-        self._center_toplevel(tl)
+        self.center_toplevel(tl)
 
     def _on_click(self, event):
         if self.toolbar_p.mode != "" or event.inaxes != self.ax_p:
@@ -1138,8 +1053,8 @@ class App:
                     self.list_zeros.pop(idx_start + 1)
                     self.list_zeros.pop(idx_start)
 
-                self._update_plane()
-                self._update_freq_resp()
+                self.update_plane()
+                self.update_freq_resp()
 
         # Left button
         elif event.button == L_BUTTON:
@@ -1159,7 +1074,7 @@ class App:
                     self.idx_sel_point = None
                     self.type_sel_point = None
             else:
-                self._add_element_plane(list_sel, event.xdata, event.ydata)
+                self.add_element_plane(list_sel, event.xdata, event.ydata)
                 self.idx_sel_point = len(list_sel) - 1
 
                 if list_sel == self.list_poles:
@@ -1167,8 +1082,8 @@ class App:
                 elif list_sel == self.list_zeros:
                     self.type_sel_point = "zero"
 
-                self._update_plane()
-                self._update_freq_resp()
+                self.update_plane()
+                self.update_freq_resp()
 
     def _on_move(self, event):
         if (event.button is not None and
@@ -1193,14 +1108,14 @@ class App:
             if conj_idx < len(target_list):
                 target_list[conj_idx] = (event_x, -event_y)
 
-            self._update_plane()
-            self._update_freq_resp()
+            self.update_plane()
+            self.update_freq_resp()
 
     def _on_drop(self, event):
         self.idx_sel_point = None
         self.type_sel_point = None
 
-    def _update_plane(self):
+    def update_plane(self):
         if self.list_poles:
             x_poles, y_poles = zip(*self.list_poles)
             self.points_plot_poles.set_data(x_poles, y_poles)

@@ -10,3 +10,14 @@ app_license = "License: GPLv3"
 dict_help = {
     "FT": "Função de Transferência",
 }
+
+color_ln = "#00FF00"
+color_bg = "#F0F0F0"  # "#212121"
+color_z_bg = "#000000"
+color_text = "#000000"
+color_grid = "#008000"
+color_bg_spin = "#FFFFFF"
+color_bt_selected = "#d1d1d1"
+color_poles = "white"
+color_zeros = "yellow"
+color_resp = "white"
