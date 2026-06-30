@@ -3,7 +3,7 @@
 [FT3D](https://www.abenge.org.br/cobenge/legado/arquivos/18/trabalhos/NTM090.pdf) rewrite
 
 <p align="center" width="100%">
-<img src="imgs/main.png">
+<img src="data/imgs/main.png">
 </p>
 
 ## Install dependencies
@@ -42,7 +42,7 @@ python src/main.py
 ```
 
 ## Features
-### FT3D Features
+### FT3D
 - [x] Visual insertion in z plane
 - [ ] Visual insertion in s plane
 - [x] Keyboard insertion in z plane
@@ -58,8 +58,8 @@ python src/main.py
 - [ ] Phase plot for s plane
 - [ ] s <-> z mapping
 - [ ] 3D plot
-- [ ] 3D plot customization
-- [ ] 3D plot navigation
+- [ ] 3D customization
+- [ ] 3D navigation
 - [x] 2D plot navigation
 - [x] Choose frequency response limits from z plane
 - [ ] Choose frequency response limits from s plane
@@ -68,19 +68,18 @@ python src/main.py
 - [ ] System classification
 - [ ] System classification reasons
 - [ ] Impulse response plot
-- [ ] Choose impulse response sample size
 - [ ] Step response plot
+- [ ] Choose impulse response sample size
 - [ ] Choose step response sample size
 - [ ] Choose plane limits
 - [ ] Save plot
 - [ ] Save system
 - [ ] Choose plot colors
 - [x] Show mouse coordinates below 2D plots
-- [ ] Show mouse coordinates below 3D plots
 - [ ] Show magnitude value below z plane
 - [ ] Show magnitude value below s plane
 - [ ] Show magnitude and phase values below both plots
-- [ ] Allow exact frequency response at from mouse x position
+- [ ] Show exact frequency response at mouse x position
 - [ ] Choose sample rate
 - [ ] Calculate minimum phase system
 - [ ] Calculate maximum phase system
@@ -89,9 +88,9 @@ python src/main.py
 - [ ] Redo insertion
 - [ ] Undo mapping
 - [ ] Redo mapping
-- [ ] Shortcuts to close app and to open and save files
+- [ ] Shortcuts to close app, and to open and save files
 - [ ] Help page
-### New Features
+### New
 - [x] Choose frequency response resolution
 - [x] Choose phase unit
 - [x] Choose normalized frequency response
@@ -105,6 +104,7 @@ python src/main.py
 - [x] Allow poles and zeros removal regardless of which one is selected
 - [ ] Allow poles and zeros move regardless of which one is selected
 - [ ] Show number of poles and zeros
+- [ ] Show mouse coordinates below 3D plots
 - [ ] Add button hints
 - [ ] Choose to add spaces inside transfer function
 - [ ] Choose font size of transfer function
