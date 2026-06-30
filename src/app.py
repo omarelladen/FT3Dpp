@@ -76,15 +76,14 @@ class App:
         self.menu_entry    = self._create_menu()
         self.menu_plane    = self._create_menu()
         self.menu_system   = self._create_menu()
-
         self.menu_graphics = self._create_menu()
-        self.menu_graphics.add_command(label="Cores", command=self._show_color_dialog)
-
         self.menu_windows  = self._create_menu()
+        self.menu_help     = self._create_menu()
 
-        self.menu_help = self._create_menu()
-        self.menu_help.add_command(label="Ajuda", command=self._show_help_dialog)
-        self.menu_help.add_command(label="Sobre", command=self._show_about_dialog)
+        self.menu_graphics.add_command(label="Cores", command=self._open_color_dialog)
+
+        self.menu_help.add_command(label="Ajuda", command=self._open_help_dialog)
+        self.menu_help.add_command(label="Sobre", command=self._open_about_dialog)
 
 
         self.menubar.add_cascade(label="Arquivo", menu=self.menu_file)
@@ -540,11 +539,17 @@ class App:
 #         self.canvas.draw_idle()
         pass
 
-    def _show_kb_dialog(self):
+    def _open_kb_dialog(self):
         KBDialog(self.win, self)
 
-    def _show_color_dialog(self):
+    def _open_color_dialog(self):
         ColorDialog(self.win, self)
+
+    def _open_about_dialog(self):
+        AboutDialog(self.win, self)
+
+    def _open_help_dialog(self):
+        InfoDialog(self.win, self)
 
     def add_element_plane(self, list_elements, x, y):
         if isinstance(x, str):
@@ -898,7 +903,7 @@ class App:
             v_clicked.set(False)
 
         if clicked_key == self.icon_kb:
-            self._show_kb_dialog()
+            self._open_kb_dialog()
             v_clicked.set(False)
 
     def _clear_poles_zeros(self):
@@ -922,12 +927,6 @@ class App:
         y = win_y + (win_h // 2) - (popup_h // 2)
 
         tl.geometry(f"+{x}+{y}")
-
-    def _show_about_dialog(self):
-        AboutDialog(self.win, self)
-
-    def _show_help_dialog(self):
-        InfoDialog(self.win, self)
 
     def _on_click(self, event):
         if self.toolbar_p.mode != "" or event.inaxes != self.ax_p:
