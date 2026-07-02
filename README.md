@@ -1,6 +1,7 @@
 # FT3D++
 
-[FT3D](https://www.abenge.org.br/cobenge/legado/arquivos/18/trabalhos/NTM090.pdf) rewrite
+[FT3D](https://www.abenge.org.br/cobenge/legado/arquivos/18/trabalhos/NTM090.pdf)
+rewrite
 
 <p align="center" width="100%">
 <img src="data/imgs/main.png">
@@ -111,6 +112,9 @@ python src/main.py
 - [ ] Choose font size of coordinates
 - [ ] No button duplication in menu
 - [ ] Translations
+
+## Icons
+The icons were extracted from FT3D
 
 ## License
 [GPLv3](./LICENSE)
