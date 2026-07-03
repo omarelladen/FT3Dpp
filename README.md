@@ -4,7 +4,7 @@
 rewrite
 
 <p align="center" width="100%">
-<img src="data/imgs/main.png">
+<img src="imgs/main.png">
 </p>
 
 ## Install dependencies
@@ -46,8 +46,8 @@ python src/main.py
 ### FT3D
 - [x] Visual insertion in z plane
 - [ ] Visual insertion in s plane
-- [x] Keyboard insertion in z plane
-- [ ] Keyboard insertion in s plane
+- [x] Insertion from coordinates in z plane
+- [ ] Insertion from coordinates in s plane
 - [ ] Transfer function insertion
 - [x] Clear all insertions
 - [x] Frame with poles and zeros coordinates
@@ -92,6 +92,7 @@ python src/main.py
 - [ ] Shortcuts to close app, and to open and save files
 - [ ] Help page
 ### New
+- [ ] Insertion from polar form in z plane
 - [x] Choose frequency response resolution
 - [x] Choose phase unit
 - [x] Choose normalized frequency response
