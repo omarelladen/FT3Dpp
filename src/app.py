@@ -21,6 +21,7 @@ from color_dialog import ColorDialog
 from kb_dialog import KBDialog
 from about_dialog import AboutDialog
 from help_dialog import HelpDialog
+from plotter_3d import Plotter3D
 
 
 icon_logo_path = os.path.join("icons", "logo.png")
@@ -888,17 +889,18 @@ class App:
 
         # hint = self.dict_bt[clicked_key][0]
 
-        # Update frequency response
         if clicked_key in (self.icon_freq, self.icon_freq_db, self.icon_phase):
             self.update_freq_resp()
-        if self.bt_states[self.icon_clear].get():
+        elif clicked_key == self.icon_clear:
             self._clear_poles_zeros()
             self.update_plane()
             self.update_freq_resp()
             v_clicked.set(False)
-
-        if clicked_key == self.icon_kb:
+        elif clicked_key == self.icon_kb:
             self._open_kb_dialog()
+            v_clicked.set(False)
+        elif clicked_key == self.icon_3d:
+            Plotter3D(self.win, self)
             v_clicked.set(False)
 
     def _clear_poles_zeros(self):

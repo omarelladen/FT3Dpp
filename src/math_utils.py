@@ -24,6 +24,8 @@ max_exp = 20
 class MathUtils():
     def __init__(self, resolution, max_pi=1):
         self.resolution = resolution
+        self.resolution_u = 70
+        self.resolution_v = 70
         self.max_pi = max_pi
 
     def _get_w(self):
@@ -174,6 +176,53 @@ class MathUtils():
             den = den.expand()
 
         return num, den
+
+    def calc_mag_H_3d(self, list_zeros, list_poles, clip_limit):
+        u = np.linspace(0, 2*np.pi, self.resolution_u)
+        v = np.linspace(0.01, 2.0, self.resolution_v)
+        U, V = np.meshgrid(u, v)
+
+        x_mesh = V*np.cos(U)
+        y_mesh = V*np.sin(U)
+
+        z_mesh = np.zeros_like(x_mesh)
+
+        z_points = x_mesh + 1j*y_mesh
+
+        num = np.ones_like(z_points, dtype=complex)
+        den = np.ones_like(z_points, dtype=complex)
+
+        for i in range(0, len(list_zeros), 2):
+            if i + 1 < len(list_zeros):
+                tuple_z1 = list_zeros[i]
+                tuple_z2 = list_zeros[i+1]
+                z1 = tuple_z1[0] + 1j * tuple_z1[1]
+                z2 = tuple_z2[0] + 1j * tuple_z2[1]
+
+                num *= (z_points - z1)
+                if z1 != z2:  # conj
+                    num *= (z_points - z2)
+
+        for i in range(0, len(list_poles), 2):
+            if i + 1 < len(list_poles):
+                tuple_p1 = list_poles[i]
+                tuple_p2 = list_poles[i+1]
+                p1 = tuple_p1[0] + 1j * tuple_p1[1]
+                p2 = tuple_p2[0] + 1j * tuple_p2[1]
+
+                den *= (z_points - p1)
+                if p1 != p2:  # conj
+                    den *= (z_points - p2)
+
+        with np.errstate(divide='ignore', invalid='ignore'):
+            H_z_mesh = num/den
+
+        H_z_mesh = np.nan_to_num(H_z_mesh, nan=0.0, posinf=1e12, neginf=-1e12)
+
+        z_mesh = np.abs(H_z_mesh)
+        z_mesh = np.clip(z_mesh, None, clip_limit)
+
+        return x_mesh, y_mesh, z_mesh
 
     def format_H_z_inv(self, list_zeros, list_poles):
         return self._format_H_z(
