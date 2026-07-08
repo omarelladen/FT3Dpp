@@ -1,3 +1,4 @@
+import math
 import tkinter as tk
 
 from configs import *
@@ -9,8 +10,8 @@ class KBDialog:
 
         # Create Toplevel
         self.tl = tk.Toplevel(parent)
-        self.tl.title("Inserção de Polos e Zeros via Teclado")
-        self.tl.resizable(False, False)
+        self.tl.title("Inserção via Teclado")
+        self.tl.resizable(True, True)
 
         # Keep the Toplevel in the front
         self.tl.transient(parent)
@@ -21,55 +22,80 @@ class KBDialog:
         # Add padding and color to the Toplevel
         self.tl.configure(bg=color_bg)
 
-        self.entries = {}
+        self.dict_entries = {}
+        self.dict_labels = {}
 
-        # Frame
+        # Main Frame
         fr = tk.Frame(self.tl, bg=color_bg, padx=10, pady=10)
         fr.pack(anchor="center", expand=True)
 
 
         # Pole/Zero Radiobuttons
 
-        self.mode_var = tk.StringVar(value="p")
+        self.type_var = tk.StringVar(value="p")
 
         fr_type = tk.Frame(fr, bg=color_bg, pady=10)
         fr_type.grid(row=0, column=0, columnspan=2, sticky="ew")
 
         for bt in ["Polo", "Zero"]:
-            rb = tk.Radiobutton(
-                fr_type,
+            rb = self._create_radiobutton(
+                frame=fr_type,
                 text=bt,
-                variable=self.mode_var,
+                variable=self.type_var,
                 value=bt[0].lower(),
-                bg=color_bg,
-                fg=color_text,
-                selectcolor=color_bg,
-                activebackground=color_bg,
-                activeforeground=color_text
             )
             rb.pack(side="left", expand=True)
 
-        # Axes values
-        for i, axis in enumerate(["X", "Y"]):
-            tk.Label(
+
+        # Rect/Polar Radiobuttons
+
+        self.format_var = tk.StringVar(value="rect")
+        fr_coord = tk.Frame(fr, bg=color_bg, pady=5)
+        fr_coord.grid(row=1, column=0, columnspan=2, sticky="ew")
+
+        self._create_radiobutton(
+            frame=fr_coord,
+            text="(X, Y)",
+            variable=self.format_var,
+            value="rect",
+            command=self._update_label_texts,
+        ).pack(side="left", expand=True)
+
+        self._create_radiobutton(
+            frame=fr_coord,
+            text="(r, θ)",
+            variable=self.format_var,
+            value="polar",
+            command=self._update_label_texts,
+        ).pack(side="left", expand=True)
+
+
+        # Entries
+        for i in range(0, 2):
+            label_entry = tk.Label(
                 fr,
-                text=axis,
+                text="X" if i == 0 else "Y",
                 bg=color_bg,
                 fg=color_text,
                 anchor="w"
-            ).grid(row=1+i, column=0, sticky="ew", pady=2)
+            )
+            label_entry.grid(row=2+i, column=0, sticky="ew", pady=2)
+            self.dict_labels[i] = label_entry
 
             entry = tk.Entry(fr, width=6)
-            entry.grid(row=1+i, column=1, sticky="ew", padx=5, pady=2)
+            entry.grid(row=2+i, column=1, sticky="ew", padx=5, pady=2)
 
             entry.insert(0, "0")
-            self.entries[axis] = entry
+            self.dict_entries[i] = entry
 
         # Buttons
         bt_fr = tk.Frame(self.tl, bg=color_bg, pady=10)
         bt_fr.pack(fill="x")
 
-        for bt in [("Cancel", "left", self.on_cancel), ("OK", "right", self.on_confirm)]:
+        for bt in [
+            ("Cancel", "left",  self._on_cancel),
+            ("OK",     "right", self._on_confirm)
+        ]:
             tk.Button(
                 bt_fr,
                 text=bt[0],
@@ -83,24 +109,63 @@ class KBDialog:
         self.app.center_toplevel(self.tl)
 
         # X click
-        self.tl.protocol("WM_DELETE_WINDOW", self.on_cancel)
+        self.tl.protocol("WM_DELETE_WINDOW", self._on_cancel)
 
-    def on_confirm(self):
-        updates = {}
-        for v_name, widget_item in self.entries.items():
-            updates[v_name] = widget_item.get()
+    def _create_radiobutton(self, frame, text, variable, value, command=None):
+        bt = tk.Radiobutton(
+            frame,
+            text=text,
+            variable=variable,
+            value=value,
+            command=command,
+            bg=color_bg,
+            fg=color_text,
+            selectcolor=color_bg
+        )
+        return bt
+
+    def _update_label_texts(self):
+        if self.format_var.get() == "rect":
+            self.dict_labels[0].config(text="X")
+            self.dict_labels[1].config(text="Y")
+        else:  # "rect"
+            self.dict_labels[0].config(text="r")
+            self.dict_labels[1].config(text="θ(°)")
+
+    def _on_confirm(self):
+        v0 = self.dict_entries[0].get()
+        v1 = self.dict_entries[1].get()
+
+        if isinstance(v0, str):
+            v0 = v0.replace(",", ".")
+        if isinstance(v1, str):
+            v1 = v1.replace(",", ".")
+
+        try:
+            v0 = float(v0)
+            v1 = float(v1)
+        except ValueError:
+            self.app.add_element_plane(None, None, None)
+            return
+
+        if self.format_var.get() == "polar":
+            angle_rad = math.radians(v1)
+            x = v0 * math.cos(angle_rad)
+            y = v0 * math.sin(angle_rad)
+        else:  # "rect"
+            x = v0
+            y = v1
 
         self.tl.destroy()
 
-        sel_type = self.mode_var.get()
+        sel_type = self.type_var.get()
+
         if sel_type == "p":
-            sel_list = self.app.list_poles
-        else:  # "z":
-            sel_list = self.app.list_zeros
+            list_sel = self.app.list_poles
+        else:  # "z"
+            list_sel = self.app.list_zeros
 
-        self.app.add_element_plane(sel_list, updates["X"], updates["Y"])
-        self.app.update_plane()
-        self.app.update_freq_resp()
+        self.app.add_element_plane(list_sel, x, y)
 
-    def on_cancel(self):
+    def _on_cancel(self):
         self.tl.destroy()

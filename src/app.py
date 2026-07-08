@@ -551,21 +551,16 @@ class App:
     def _open_help_dialog(self):
         HelpDialog(self.win, self)
 
-    def add_element_plane(self, list_elements, x, y):
-        if isinstance(x, str):
-            x = x.replace(",", ".")
-        if isinstance(x, str):
-            y = y.replace(",", ".")
-
-        try:
-            x = float(x)
-            y = float(y)
-        except ValueError:
-            print(f"Failed to insert ({x}, {y})")
+    def add_element_plane(self, list_sel, x, y):
+        if list_sel is None:
+            print("Failed to insert")
             return
 
-        list_elements.append((x, y))
-        list_elements.append((x, -y))
+        list_sel.append((x, y))
+        list_sel.append((x, -y))
+
+        self.update_plane()
+        self.update_freq_resp()
 
     def _update_resolution(self):
         resolution = self.resolution.get()
@@ -992,9 +987,6 @@ class App:
                     self.type_sel_point = "pole"
                 elif list_sel == self.list_zeros:
                     self.type_sel_point = "zero"
-
-                self.update_plane()
-                self.update_freq_resp()
 
     def _on_move(self, event):
         if (event.button is not None and
