@@ -42,7 +42,7 @@ class Plotter3D:
 
         # Surface
 
-        x_mesh, y_mesh, z_mesh = self.app.math_utils.calc_mag_H_3d(
+        x_mesh, y_mesh, z_mesh = self.app.math_utils.calc_mag_H_3D(
             self.app.list_zeros,
             self.app.list_poles,
             clip_limit
@@ -62,16 +62,11 @@ class Plotter3D:
 
         # Line in unit circle
 
-        w_plot = self.app.math_utils.get_w_plot()
-        H_z_line = self.app.math_utils.calc_H(
+        x_line, y_line, z_line = self.app.math_utils.calc_line_3D(
             self.app.list_zeros,
-            self.app.list_poles
+            self.app.list_poles,
+            clip_limit
         )
-
-        z_line = self.app.math_utils.calc_mag_H(H_z_line)
-        z_line = np.clip(z_line, None, clip_limit)
-        x_line = np.cos(w_plot)
-        y_line = np.sin(w_plot)
 
         self.ax.plot(
             x_line,

@@ -177,7 +177,7 @@ class MathUtils():
 
         return num, den
 
-    def calc_mag_H_3d(self, list_zeros, list_poles, clip_limit):
+    def calc_mag_H_3D(self, list_zeros, list_poles, clip_limit):
         u = np.linspace(0, 2*np.pi, self.resolution_u)
         v = np.linspace(0.01, 2.0, self.resolution_v)
         U, V = np.meshgrid(u, v)
@@ -223,6 +223,20 @@ class MathUtils():
         z_mesh = np.clip(z_mesh, None, clip_limit)
 
         return x_mesh, y_mesh, z_mesh
+
+    def calc_line_3D(self, list_zeros, list_poles, clip_limit):
+        w_plot = self.get_w_plot()
+        H_z_line = self.calc_H(
+            list_zeros,
+            list_poles
+        )
+
+        z_line = self.calc_mag_H(H_z_line)
+        z_line = np.clip(z_line, None, clip_limit)
+        x_line = np.cos(w_plot)
+        y_line = np.sin(w_plot)
+
+        return x_line, y_line, z_line
 
     def format_H_z_inv(self, list_zeros, list_poles):
         return self._format_H_z(
