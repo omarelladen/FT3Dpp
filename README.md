@@ -58,9 +58,10 @@ python src/main.py
 - [ ] Magnitude plot in dB for s plane
 - [ ] Phase plot for s plane
 - [ ] s <-> z mapping
-- [ ] 3D plot
+- [x] 3D plot from z plane
+- [ ] 3D plot from s plane
 - [ ] 3D customization
-- [ ] 3D navigation
+- [x] 3D navigation
 - [x] 2D plot navigation
 - [x] Choose frequency response limits from z plane
 - [ ] Choose frequency response limits from s plane
@@ -90,9 +91,10 @@ python src/main.py
 - [ ] Undo mapping
 - [ ] Redo mapping
 - [ ] Shortcuts to close app, and to open and save files
+- [ ] Button hints
 - [ ] Help page
 ### New
-- [ ] Insertion from polar form in z plane
+- [x] Insertion from polar form in z plane
 - [x] Choose frequency response resolution
 - [x] Choose phase unit
 - [x] Choose normalized frequency response
@@ -107,15 +109,16 @@ python src/main.py
 - [ ] Allow poles and zeros move regardless of which one is selected
 - [ ] Show number of poles and zeros
 - [ ] Show mouse coordinates below 3D plots
-- [ ] Add button hints
 - [ ] Choose to add spaces inside transfer function
 - [ ] Choose font size of transfer function
 - [ ] Choose font size of coordinates
 - [ ] No button duplication in menu
 - [ ] Translations
 
-## Icons
-The icons were extracted from FT3D
+## Credits
+- Icons: The icons were extracted from FT3D
+- 3D inspiration:
+[Z-plane to Frequency Response](https://dspfirst.gatech.edu/chapters/08feedbac/demos/z2freq/index.html)
 
 ## License
 [GPLv3](./LICENSE)
