@@ -93,8 +93,7 @@ class KBDialog:
         bt_fr.pack(fill="x")
 
         for bt in [
-            ("Cancel", "left",  self._on_cancel),
-            ("OK",     "right", self._on_confirm)
+            ("OK", "right", self._on_confirm)
         ]:
             tk.Button(
                 bt_fr,
@@ -155,8 +154,6 @@ class KBDialog:
         else:  # "rect"
             x = v0
             y = v1
-
-        self.tl.destroy()
 
         sel_type = self.type_var.get()
 
