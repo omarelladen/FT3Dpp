@@ -251,7 +251,7 @@ class App:
             selectcolor=color_bg_spin,
             activebackground=color_bg,
             activeforeground=color_text,
-            command=self._update_labels_text
+            command=self._update_label_tf
         )
         self.check_z_inv.pack(side="left", padx=10)
 
@@ -263,9 +263,6 @@ class App:
         )
 
         self.label_hz = self._create_label_frame_text(label_funct, "H(z) = 1")
-
-        self._update_labels_text()
-
 
         # Figure Frames
         self.frame_plane = self._create_frame_fig(width=360)
@@ -503,7 +500,7 @@ class App:
             fg=color_text,
             insertbackground=color_text,
             buttonbackground=color_bg,
-            command=self._update_resolution
+            command=self._change_resolution
         )
         self.resolution.pack(side="right", padx=frame_r_padx)
 
@@ -515,8 +512,10 @@ class App:
         ).pack(side="right", padx=frame_r_padx)
 
         # Events to confirm keyboard values
-        self.resolution.bind("<Return>",   lambda event: self._update_resolution())
-        self.resolution.bind("<FocusOut>", lambda event: self._update_resolution())
+        self.resolution.bind("<Return>",   lambda event: self._change_resolution())
+        self.resolution.bind("<FocusOut>", lambda event: self._change_resolution())
+
+        self._update_all()
 
     def _create_icon(self, filename, reduction=18):
         file_path = os.path.join("icons", filename)
@@ -560,10 +559,9 @@ class App:
         list_sel.append((x, y))
         list_sel.append((x, -y))
 
-        self.update_plane()
-        self.update_freq_resp()
+        self._update_all()
 
-    def _update_resolution(self):
+    def _change_resolution(self):
         resolution = self.resolution.get()
         if resolution.isdigit() and int(resolution) <= max_resolution:
             self.math_utils.resolution = int(self.resolution.get())
@@ -763,7 +761,7 @@ class App:
         label.pack(expand=True)
         return label
 
-    def _update_labels_text(self):
+    def _update_labels_coords(self):
         poles_text = ""
         for i in range(0, len(self.list_poles), 2):
             if i + 1 < len(self.list_poles):
@@ -788,10 +786,10 @@ class App:
                 else:
                     zeros_text += f" e {zero_text.replace('+', '-')}\n"
 
-
         poles_text = poles_text.strip()
         zeros_text = zeros_text.strip()
 
+        # Keep width when empty
         if not poles_text:
             poles_text = 54*" "
         if not zeros_text:
@@ -800,14 +798,15 @@ class App:
         self.text_poles_var.set(poles_text)
         self.text_zeros_var.set(zeros_text)
 
+        self.frame_poles.update_idletasks()
+        self.frame_zeros.update_idletasks()
+
+    def _update_label_tf(self):
         if self.var_z_inv.get():
             eq = self.math_utils.format_H_z_inv(self.list_zeros, self.list_poles)
         else:
             eq = self.math_utils.format_H_z(self.list_zeros, self.list_poles)
         self.label_hz.config(text=eq)
-
-        self.frame_poles.update_idletasks()
-        self.frame_zeros.update_idletasks()
 
     def _get_list_sel(self):
         if self.bt_states[self.icon_pole].get():
@@ -893,8 +892,7 @@ class App:
             self.update_freq_resp()
         elif clicked_key == self.icon_clear:
             self._clear_poles_zeros()
-            self.update_plane()
-            self.update_freq_resp()
+            self._update_all()
             v_clicked.set(False)
         elif clicked_key == self.icon_kb:
             self._open_kb_dialog()
@@ -961,8 +959,7 @@ class App:
                     self.list_zeros.pop(idx_start + 1)
                     self.list_zeros.pop(idx_start)
 
-                self.update_plane()
-                self.update_freq_resp()
+                self._update_all()
 
         # Left button
         elif event.button == L_BUTTON:
@@ -1013,12 +1010,17 @@ class App:
             if conj_idx < len(target_list):
                 target_list[conj_idx] = (event_x, -event_y)
 
-            self.update_plane()
-            self.update_freq_resp()
+            self._update_all()
 
     def _on_drop(self, event):
         self.idx_sel_point = None
         self.type_sel_point = None
+
+    def _update_all(self):
+        self.update_plane()
+        self.update_freq_resp()
+        self._update_labels_coords()
+        self._update_label_tf()
 
     def update_plane(self):
         if self.list_poles:
@@ -1034,7 +1036,6 @@ class App:
             self.points_plot_zeros.set_data([], [])
 
         self.canvas_p.draw_idle()
-        self._update_labels_text()
 
     def run(self):
         self.win.mainloop()
