@@ -276,7 +276,7 @@ class App:
 
         self.fig_p = Figure(figsize=(2.8, 2.8), dpi=dpi, facecolor=color_bg)
         self.ax_p = self.fig_p.add_subplot()
-        self.ax_p.set_facecolor(color_z_bg)
+        self.ax_p.set_facecolor(color_2d_bg)
         self.ax_p.set_xlim(-lim_plane, lim_plane)
         self.ax_p.set_ylim(-lim_plane, lim_plane)
         self.ax_p.set_aspect("equal")
@@ -311,17 +311,17 @@ class App:
         )
 
         # Circle
-        self.ax_p.axhline(0, color=color_ln, lw=lw, zorder=1)
-        self.ax_p.axvline(0, color=color_ln, lw=lw, zorder=1)
-        circle = patches.Circle(
+        self.ln_ax_p_h = self.ax_p.axhline(0, color=color_axes, lw=lw, zorder=1)
+        self.ln_ax_p_v = self.ax_p.axvline(0, color=color_axes, lw=lw, zorder=1)
+        self.circle = patches.Circle(
             xy=(0, 0),
             radius=1,
-            color=color_ln,
+            color=color_axes,
             fill=False,
             lw=lw,
             zorder=1
         )
-        self.ax_p.add_patch(circle)
+        self.ax_p.add_patch(self.circle)
 
         self.points_plot_poles = self._setup_point_plotter("x", color_poles)
         self.points_plot_zeros = self._setup_point_plotter("o", color_zeros)
@@ -369,7 +369,7 @@ class App:
 
         self.fig_r = Figure(figsize=(10, 2.8), dpi=dpi, facecolor=color_bg)
         self.ax_r = self.fig_r.add_subplot()
-        self.ax_r.set_facecolor(color_z_bg)
+        self.ax_r.set_facecolor(color_2d_bg)
         self.ax_r.grid(True, color=color_grid, linestyle="--")
         self.ax_r.tick_params(colors=color_text)
         self.ax_r.set_ylim(-1, 1)
@@ -531,19 +531,32 @@ class App:
                 print(f"Error loading image '{file_path}': {e}")
 
     def change_colors(self, key, new_color):
-        if key == "curve":
+        if key == "poles":
+            self.points_plot_poles.set_color(new_color)
+        elif key == "zeros":
+            self.points_plot_zeros.set_color(new_color)
+        elif key == "axes":
+            self.ln_ax_p_h.set_color(new_color)
+            self.ln_ax_p_v.set_color(new_color)
+            self.circle.set_edgecolor(new_color)
+        elif key == "bg_p":
+            # self.fig_p.patch.set_facecolor(new_color)
+            self.ax_p.set_facecolor(new_color)
+        elif key == "curve":
             self.line_r.set_color(new_color)
+        elif key == "graduation":
+            self.ax_r.tick_params(color=new_color)
         elif key == "grid":
             self.ax_r.grid(True, color=new_color)
-        elif key == "bg":
+        elif key == "bg_r":
             # self.fig_r.patch.set_facecolor(new_color)
             self.ax_r.set_facecolor(new_color)
         elif key == "caption":
-            self.ax_r.tick_params(axis='both', labelcolor=new_color)
-        elif key == "graduation":
-            self.ax_r.tick_params(axis='both', color=new_color)
+            self.ax_r.tick_params(labelcolor=new_color)
 
+        self.canvas_p.draw_idle()
         self.canvas_r.draw_idle()
+
 
     def _open_kb_dialog(self):
         KBDialog(self.win, self)
