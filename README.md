@@ -67,16 +67,17 @@ python src/main.py
 - [ ] Choose frequency response limits from s plane
 - [ ] Topography heat map plot
 - [ ] Topography heat map customization
-- [ ] System classification
+- [x] System classification
 - [ ] System classification reasons
 - [ ] Impulse response plot
 - [ ] Step response plot
 - [ ] Choose impulse response sample size
 - [ ] Choose step response sample size
 - [ ] Choose plane limits
-- [ ] Save plot
+- [x] Save plots
 - [ ] Save system
-- [ ] Choose plot colors
+- [x] Choose 2D plot colors
+- [ ] Reset 2D plot colors
 - [x] Show mouse coordinates below 2D plots
 - [ ] Show magnitude value below z plane
 - [ ] Show magnitude value below s plane
@@ -103,16 +104,17 @@ python src/main.py
 - [x] Choose transfer function format
 - [x] Padding between related buttons
 - [x] Window resize
-- [ ] Plot resize along window resize
+- [ ] 2D plot resize along window resize
+- [x] 3D plot resize along window resize
 - [x] Save plot in multiple formats
 - [x] Allow poles and zeros removal regardless of which one is selected
 - [ ] Allow poles and zeros move regardless of which one is selected
 - [ ] Show number of poles and zeros
-- [ ] Show mouse coordinates below 3D plots
+- [x] Show mouse coordinates below 3D plots
 - [ ] Choose to add spaces inside transfer function
 - [ ] Choose font size of transfer function
 - [ ] Choose font size of coordinates
-- [ ] No button duplication in menu
+- [x] No button duplication in menu
 - [ ] Translations
 
 ## Credits
