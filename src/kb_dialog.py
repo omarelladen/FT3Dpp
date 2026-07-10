@@ -93,7 +93,8 @@ class KBDialog:
         bt_fr.pack(fill="x")
 
         for bt in [
-            ("OK", "right", self._on_confirm)
+            ("OK",     "left",  self._on_confirm),
+            ("Cancel", "right", self._on_cancel)
         ]:
             tk.Button(
                 bt_fr,
