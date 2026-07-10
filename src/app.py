@@ -3,6 +3,7 @@
 
 import os
 import tkinter as tk
+from tkinter import messagebox
 
 import numpy as np
 
@@ -141,8 +142,8 @@ class App:
             self.icon_freq: ("Magnitude", 2, True),
             self.icon_freq_db: ("Magnitude (dB)", 2, False),
             self.icon_phase: ("Fase", 2, False),
-            self.icon_imp: ("Resposta ao Impulso", 2, False),
-            self.icon_deg: ("Resposta ao Degrau Unitário", 2, False),
+            self.icon_imp: ("Resposta ao Impulso", -1, False),
+            self.icon_deg: ("Resposta ao Degrau Unitário", -1, False),
             self.icon_3d: ("Gráfico 3D", -1, False),
 
             self.icon_pole: ("Editar Polos", 3, True),
@@ -528,16 +529,7 @@ class App:
                 print(f"Error loading image '{file_path}': {e}")
 
     def update_colors(self, key, new_color):
-#         if key == "curve":
-#             self.line.set_color(new_color)
-#         elif key == "grid":
-#             self.ax.grid(True, color=new_color)
-#         elif chave == "bg":
-#             self.fig.patch.set_facecolor(new_color)
-#             self.ax.set_facecolor(new_color)
-# 
-#         self.canvas.draw_idle()
-        pass
+        self._show_warning("Ainda não implementado")
 
     def _open_kb_dialog(self):
         KBDialog(self.win, self)
@@ -551,9 +543,15 @@ class App:
     def _open_help_dialog(self):
         HelpDialog(self.win, self)
 
+    def _show_warning(self, msg):
+        messagebox.showwarning(title="Warning", message=msg)
+
+    def _show_error(self, msg):
+        messagebox.showerror(title="Error", message=msg)
+
     def add_element_plane(self, list_sel, x, y):
         if list_sel is None:
-            print("Failed to insert")
+            self._show_error("Valor Inválido")
             return
 
         list_sel.append((x, y))
@@ -899,6 +897,9 @@ class App:
             v_clicked.set(False)
         elif clicked_key == self.icon_3d:
             Plotter3D(self.win, self)
+            v_clicked.set(False)
+        else:
+            self._show_warning("Ainda não implementado")
             v_clicked.set(False)
 
     def _clear_poles_zeros(self):
