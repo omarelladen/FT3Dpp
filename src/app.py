@@ -1058,6 +1058,25 @@ class App:
         self.update_freq_resp()
         self._update_labels_coords()
         self._update_label_tf()
+        self._update_sys_clf()
+
+    def _update_sys_clf(self):
+        if len(self.list_zeros) > len(self.list_poles):
+            text = "Sistema Irrealizável"
+        else:
+            stable = True
+            for p in self.list_poles:
+                x = p[0]
+                y = p[1]
+                r = np.sqrt(x**2 + y**2)
+                if r >= 1:
+                    text = "Sistema Realizável e Instável"
+                    stable = False
+                    break
+            if stable:
+                text = "Sistema Realizável e Estável"
+
+        self.label_system.config(text=text)
 
     def update_plane(self):
         if self.list_poles:
