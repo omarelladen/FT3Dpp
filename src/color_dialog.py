@@ -72,13 +72,13 @@ class ColorDialog:
             )
             bt_color.pack(side="right", padx=5)
 
-    def open_selector(self, botao, key):
-        cor_hex = colorchooser.askcolor(
-            initialcolor=botao["bg"],
+    def open_selector(self, bt, key):
+        color_hex = colorchooser.askcolor(
+            initialcolor=bt["bg"],
             title="Selecione a Cor"
         )[1]
 
-        if cor_hex:
-            botao.config(bg=cor_hex)
-            self.app.update_colors(key, cor_hex)
-            dict_color_menu[key] = cor_hex
+        if color_hex:
+            bt.config(bg=color_hex)
+            self.app.update_colors(key, color_hex)
+            dict_color_menu[key] = color_hex
