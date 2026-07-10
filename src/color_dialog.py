@@ -7,9 +7,9 @@ from configs import *
 # TODO: save default and current value
 dict_color_menu = {
     "curve": "#ffffff",
-    "axes": "#00ff00",
+    # "axes": "#00ff00",
     "graduation": "#ffff00",
-    "lines": "#0000ff",
+    # "lines": "#0000ff",
     "grid": "#008000",
     "caption": "#ffffff",
     "bg": "#000000",
@@ -17,9 +17,9 @@ dict_color_menu = {
 
 list_elements = [
     ("Curva", "curve"),
-    ("Eixos", "axes"),
+    # ("Eixos", "axes"),
     ("Graduação", "graduation"),
-    ("Linhas de Cota", "lines"),
+    # ("Linhas de Cota", "lines"),
     ("Grades", "grid"),
     ("Legenda", "caption"),
     ("Fundo", "bg"),
@@ -80,5 +80,5 @@ class ColorDialog:
 
         if color_hex:
             bt.config(bg=color_hex)
-            self.app.update_colors(key, color_hex)
+            self.app.change_colors(key, color_hex)
             dict_color_menu[key] = color_hex

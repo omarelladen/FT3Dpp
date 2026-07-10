@@ -73,28 +73,30 @@ class App:
         self.menubar = tk.Menu(self.win, font=small_font)
 
 
-        self.menu_file     = self._create_menu()
-        self.menu_edit     = self._create_menu()
-        self.menu_entry    = self._create_menu()
-        self.menu_plane    = self._create_menu()
+        # self.menu_file     = self._create_menu()
+        # self.menu_edit     = self._create_menu()
+        # self.menu_entry    = self._create_menu()
+        # self.menu_plane    = self._create_menu()
         self.menu_system   = self._create_menu()
-        self.menu_graphics = self._create_menu()
-        self.menu_windows  = self._create_menu()
+        # self.menu_graphics = self._create_menu()
+        self.menu_colors   = self._create_menu()
+        # self.menu_windows  = self._create_menu()
         self.menu_help     = self._create_menu()
 
-        self.menu_graphics.add_command(label="Cores", command=self._open_color_dialog)
+        self.menu_colors.add_command(label="Cores", command=self._open_color_dialog)
 
         self.menu_help.add_command(label="Ajuda", command=self._open_help_dialog)
         self.menu_help.add_command(label="Sobre", command=self._open_about_dialog)
 
 
-        self.menubar.add_cascade(label="Arquivo", menu=self.menu_file)
-        self.menubar.add_cascade(label="Editar", menu=self.menu_edit)
-        self.menubar.add_cascade(label="Entrada de Raízes", menu=self.menu_entry)
-        self.menubar.add_cascade(label="Plano", menu=self.menu_plane)
+        # self.menubar.add_cascade(label="Arquivo", menu=self.menu_file)
+        # self.menubar.add_cascade(label="Editar", menu=self.menu_edit)
+        # self.menubar.add_cascade(label="Entrada de Raízes", menu=self.menu_entry)
+        # self.menubar.add_cascade(label="Plano", menu=self.menu_plane)
         self.menubar.add_cascade(label="Sistema", menu=self.menu_system)
-        self.menubar.add_cascade(label="Gráficos", menu=self.menu_graphics)
-        self.menubar.add_cascade(label="Janelas", menu=self.menu_windows)
+        self.menubar.add_cascade(label="Cores", menu=self.menu_colors)
+        # self.menubar.add_cascade(label="Gráficos", menu=self.menu_graphics)
+        # self.menubar.add_cascade(label="Janelas", menu=self.menu_windows)
         self.menubar.add_cascade(label="Ajuda", menu=self.menu_help)
 
 
@@ -528,8 +530,20 @@ class App:
             except Exception as e:
                 print(f"Error loading image '{file_path}': {e}")
 
-    def update_colors(self, key, new_color):
-        self._show_warning("Ainda não implementado")
+    def change_colors(self, key, new_color):
+        if key == "curve":
+            self.line_r.set_color(new_color)
+        elif key == "grid":
+            self.ax_r.grid(True, color=new_color)
+        elif key == "bg":
+            # self.fig_r.patch.set_facecolor(new_color)
+            self.ax_r.set_facecolor(new_color)
+        elif key == "caption":
+            self.ax_r.tick_params(axis='both', labelcolor=new_color)
+        elif key == "graduation":
+            self.ax_r.tick_params(axis='both', color=new_color)
+
+        self.canvas_r.draw_idle()
 
     def _open_kb_dialog(self):
         KBDialog(self.win, self)
