@@ -10,7 +10,7 @@ rewrite
 ## Install dependencies
 ### Debian Linux packages
 ```sh
-sudo apt install python3-matplotlib python3-numpy python3-tk
+sudo apt install python3-tk python3-matplotlib python3-numpy python3-sympy
 ```
 
 ### or from PyPI with pip
