@@ -120,15 +120,15 @@ class App:
         self.icon_pole = self._create_icon("pole.png", 3)
         self.icon_zero = self._create_icon("zero.png", 3)
         self.icon_kb = self._create_icon("kb.png", 3)
-        self.icon_zoom = self._create_icon("zoom.png", 3)
-        self.icon_hand = self._create_icon("hand.png", 3)
-        self.icon_dim = self._create_icon("dim.png", 3)
+        # self.icon_zoom = self._create_icon("zoom.png", 3)
+        # self.icon_hand = self._create_icon("hand.png", 3)
+        # self.icon_dim = self._create_icon("dim.png", 3)
         self.icon_clear = self._create_icon("clear.png", 3)
         self.icon_info = self._create_icon("info.png", 3)
 
-        self.icon_exit = self._create_icon("exit.png", 6)
-        self.icon_graphic = self._create_icon("graphic.png", 6)
-        self.icon_save_as = self._create_icon("save_as.png", 6)
+        # self.icon_exit = self._create_icon("exit.png", 6)
+        # self.icon_graphic = self._create_icon("graphic.png", 6)
+        # self.icon_save_as = self._create_icon("save_as.png", 6)
 
         # Buttons
         self.dict_bt = {
@@ -544,10 +544,10 @@ class App:
         HelpDialog(self.win, self)
 
     def _show_warning(self, msg):
-        messagebox.showwarning(title="Warning", message=msg)
+        messagebox.showwarning(message=msg)
 
     def _show_error(self, msg):
-        messagebox.showerror(title="Error", message=msg)
+        messagebox.showerror(message=msg)
 
     def add_element_plane(self, list_sel, x, y):
         if list_sel is None:
@@ -898,7 +898,16 @@ class App:
         elif clicked_key == self.icon_3d:
             Plotter3D(self.win, self)
             v_clicked.set(False)
-        else:
+        elif clicked_key in (
+            self.icon_open,
+            self.icon_save,
+            self.icon_plane_top,
+            self.icon_imp,
+            self.icon_deg,
+            self.icon_info,
+            "FT",
+            "S",
+        ):
             self._show_warning("Ainda não implementado")
             v_clicked.set(False)
 
