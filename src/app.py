@@ -350,10 +350,10 @@ class App:
         # System classification
         self.label_system = tk.Label(
             self.frame_plane,
-            text="",  # "Sistema Realizável e Estável",
-            fg=color_text,
+            text="",
+            fg="white",
             bg=color_bg,
-            font=("Arial", 8),
+            font=("Arial", 10),
             anchor="w",
             pady=10
         )
@@ -1063,6 +1063,7 @@ class App:
     def _update_sys_clf(self):
         if len(self.list_zeros) > len(self.list_poles):
             text = "Sistema Irrealizável"
+            bg = "red"
         else:
             stable = True
             for p in self.list_poles:
@@ -1072,11 +1073,14 @@ class App:
                 if r >= 1:
                     text = "Sistema Realizável e Instável"
                     stable = False
+                    bg = "red"
                     break
             if stable:
                 text = "Sistema Realizável e Estável"
+                bg = "green"
 
         self.label_system.config(text=text)
+        self.label_system.config(bg=bg)
 
     def update_plane(self):
         if self.list_poles:
