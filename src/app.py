@@ -569,46 +569,43 @@ class App:
     def _open_help_dialog(self):
         HelpDialog(self.win, self)
 
-    def _show_sys_info(self):
-        if not self.sys_causal:
-            self._show_info(
-                title="Informações adicionais sobre o sistema",
-                msg=(
-                    "O sistema é irrealizável (não causal), pois o grau do "
-                    "denominador da Função de Transferência é menor que o "
-                    "grau do numerador."
-                    "\n\n"
-                    "Por isso, as respostas ao impulso e ao degrau unitário "
-                    "não serão exibidas."
-                )
+    def _open_sys_clf_info(self):
+        if self.sys_empty:
+            msg = "Sistema vazio."
+        elif not self.sys_causal:
+            msg = (
+                "O sistema é irrealizável (não causal), pois o grau do "
+                "denominador da Função de Transferência é menor que o "
+                "grau do numerador."
+                "\n\n"
+                "Por isso, as respostas ao impulso e ao degrau unitário "
+                "não serão exibidas."
             )
         else:
             if self.sys_stable:
-                self._show_info(
-                    title="Informações adicionais sobre o sistema",
-                    msg=(
-                        "O sistema é realizável (causal), pois o grau do "
-                        "denominador da Função de Transferência é maior ou "
-                        "igual que o grau do numerador."
-                        "\n\n"
-                        "O sistema é estável, pois todos os seus polos estão "
-                        "dentro da circunferência de raio unitário."
-                    )
+                msg = (
+                    "O sistema é realizável (causal), pois o grau do "
+                    "denominador da Função de Transferência é maior ou "
+                    "igual que o grau do numerador."
+                    "\n\n"
+                    "O sistema é estável, pois todos os seus polos estão "
+                    "dentro da circunferência de raio unitário."
                 )
             else:
-
-                self._show_info(
-                    title="Informações adicionais sobre o sistema",
-                    msg=(
-                        "O sistema é realizável (causal), pois o grau do "
-                        "denominador da Função de Transferência é maior ou "
-                        "igual que o grau do numerador."
-                        "\n\n"
-                        "O sistema é instável, pois pelo menos um de seus "
-                        "polos está fora ou sobre a circunferência de raio "
-                        "unitário."
-                    )
+                msg = (
+                    "O sistema é realizável (causal), pois o grau do "
+                    "denominador da Função de Transferência é maior ou "
+                    "igual que o grau do numerador."
+                    "\n\n"
+                    "O sistema é instável, pois pelo menos um de seus "
+                    "polos está fora ou sobre a circunferência de raio "
+                    "unitário."
                 )
+
+        self._show_info(
+            title="Informações adicionais sobre o sistema",
+            msg=msg
+        )
 
     def _show_info(self, msg, title="Info"):
         messagebox.showinfo(title=title, message=msg)
@@ -969,7 +966,7 @@ class App:
             Plotter3D(self.win, self)
             v_clicked.set(False)
         elif clicked_key == self.icon_info:
-            self._show_sys_info()
+            self._open_sys_clf_info()
             v_clicked.set(False)
         elif clicked_key in (
             self.icon_open,
@@ -1106,25 +1103,31 @@ class App:
         self._update_sys_clf()
 
     def _update_sys_clf(self):
-        if len(self.list_zeros) > len(self.list_poles):
-            text = "Sistema Irrealizável"
-            bg = "red"
-            self.sys_causal = False
+        if len(self.list_zeros) == 0 and len(self.list_poles) == 0:
+            text = ""
+            bg = color_bg
+            self.sys_empty = True
         else:
-            self.sys_causal = True
-            self.sys_stable = True
-            for p in self.list_poles:
-                x = p[0]
-                y = p[1]
-                r = np.sqrt(x**2 + y**2)
-                if r >= 1:
-                    text = "Sistema Realizável e Instável"
-                    self.sys_stable = False
-                    bg = "red"
-                    break
-            if self.sys_stable:
-                text = "Sistema Realizável e Estável"
-                bg = "green"
+            self.sys_empty = False
+            if len(self.list_zeros) > len(self.list_poles):
+                text = "Sistema Irrealizável"
+                bg = "red"
+                self.sys_causal = False
+            else:
+                self.sys_causal = True
+                self.sys_stable = True
+                for p in self.list_poles:
+                    x = p[0]
+                    y = p[1]
+                    r = np.sqrt(x**2 + y**2)
+                    if r >= 1:
+                        text = "Sistema Realizável e Instável"
+                        self.sys_stable = False
+                        bg = "red"
+                        break
+                if self.sys_stable:
+                    text = "Sistema Realizável e Estável"
+                    bg = "green"
 
         self.label_system.config(text=text)
         self.label_system.config(bg=bg)
