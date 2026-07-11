@@ -169,8 +169,8 @@ class App:
         self._create_bts(list(self.dict_bt.items())[:13], "top")
         self.toolbar.pack(side="top", fill="x")
 
-        self.frame_top = tk.Frame(self.win, bg=color_bg, pady=5)
-        self.frame_top.pack(side="top", fill="x", padx=10)
+        self.fr_top = tk.Frame(self.win, bg=color_bg, pady=5)
+        self.fr_top.pack(side="top", fill="x", padx=10)
 
         self.main_container = tk.Frame(self.win, bg=color_bg)
         self.main_container.pack(
@@ -182,8 +182,8 @@ class App:
         )
 
         # Left Buttons
-        self.frame_bt_left = tk.Frame(self.main_container, bg=color_bg)
-        self.frame_bt_left.pack(side="left", fill="y", padx=5, pady=5)
+        self.fr_bt_left = tk.Frame(self.main_container, bg=color_bg)
+        self.fr_bt_left.pack(side="left", fill="y", padx=5, pady=5)
         self._create_bts(list(self.dict_bt.items())[13:], "left")
 
 
@@ -192,34 +192,34 @@ class App:
         self.list_poles = []
         self.list_zeros = []
 
-        box_poles = self._create_label_frame(self.frame_top, "Polos")
-        box_zeros = self._create_label_frame(self.frame_top, "Zeros")
+        box_poles = self._create_label_fr(self.fr_top, "Polos")
+        box_zeros = self._create_label_fr(self.fr_top, "Zeros")
 
-        frame_poles_outer, self.frame_poles = self._create_scrollable_frame(
+        fr_poles_outer, self.fr_poles = self._create_scrollable_fr(
             box_poles,
             width=200,
             height=45,
             bg_color=color_bg
         )
-        frame_poles_outer.pack(side="left", padx=5, pady=5)
+        fr_poles_outer.pack(side="left", padx=5, pady=5)
 
-        frame_zeros_outer, self.frame_zeros = self._create_scrollable_frame(
+        fr_zeros_outer, self.fr_zeros = self._create_scrollable_fr(
             box_zeros,
             width=200,
             height=45,
             bg_color=color_bg
         )
-        frame_zeros_outer.pack(side="left", padx=5, pady=5)
+        fr_zeros_outer.pack(side="left", padx=5, pady=5)
 
         self.text_poles_var = tk.StringVar()
         self.text_zeros_var = tk.StringVar()
 
-        self._create_label_coords(self.frame_poles, self.text_poles_var)
-        self._create_label_coords(self.frame_zeros, self.text_zeros_var)
+        self._create_label_coords(self.fr_poles, self.text_poles_var)
+        self._create_label_coords(self.fr_zeros, self.text_zeros_var)
 
 
-#         self.frame_limits = self._create_label_frame(
-#             self.frame_top,
+#         self.fr_limits = self._create_label_fr(
+#             self.fr_top,
 #             "Limites do Plano"
 #         )
 #         self.spin_a = self._create_spin_top(0, 1, 0, "Eixo X")
@@ -229,7 +229,7 @@ class App:
 
 
 #         entry = tk.Entry(
-#             self.frame_bottom,
+#             self.fr_bottom,
 #             width=20,
 #             bg="#151515",
 #             fg="white",
@@ -240,13 +240,13 @@ class App:
 
         # Bottom Frame
 
-        self.frame_bottom = tk.Frame(self.win, bg=color_bg, pady=4)
-        self.frame_bottom.pack(side="bottom", fill="x", padx=10)
+        self.fr_bottom = tk.Frame(self.win, bg=color_bg, pady=4)
+        self.fr_bottom.pack(side="bottom", fill="x", padx=10)
 
         # z inv checkbox
         self.var_z_inv = tk.BooleanVar(value=True)
         self.check_z_inv = tk.Checkbutton(
-            self.frame_bottom,
+            self.fr_bottom,
             text="z⁻ⁿ",
             variable=self.var_z_inv,
             bg=color_bg,
@@ -260,16 +260,16 @@ class App:
 
         # Transfer Function equation
 
-        label_funct = self._create_label_frame(
-            self.frame_bottom,
+        label_funct = self._create_label_fr(
+            self.fr_bottom,
             "Função de transferência"
         )
 
-        self.label_hz = self._create_label_frame_text(label_funct, "H(z) = 1")
+        self.label_hz = self._create_label_fr_text(label_funct, "H(z) = 1")
 
         # Figure Frames
-        self.frame_plane = self._create_frame_fig(width=360)
-        self.frame_resp  = self._create_frame_fig(width=600)
+        self.fr_plane = self._create_fr_fig(width=360)
+        self.fr_resp  = self._create_fr_fig(width=600)
 
 
         # Plane Figure
@@ -328,13 +328,13 @@ class App:
 
         self.idx_sel_point = None
 
-        self.canvas_p = FigureCanvasTkAgg(self.fig_p, master=self.frame_plane)
+        self.canvas_p = FigureCanvasTkAgg(self.fig_p, master=self.fr_plane)
         self.canvas_p.draw()
 
         # Matplotlib toolbar
         self.toolbar_p = NavigationToolbar2Tk(
             self.canvas_p,
-            window=self.frame_plane,
+            window=self.fr_plane,
             pack_toolbar=False
         )
         self.toolbar_p.update()
@@ -349,7 +349,7 @@ class App:
 
         # System classification
         self.label_system = tk.Label(
-            self.frame_plane,
+            self.fr_plane,
             text="",
             fg="white",
             bg=color_bg,
@@ -397,13 +397,13 @@ class App:
         self.ax_r.xaxis.set_major_formatter(ticker.FuncFormatter(formatter_pi))
         self.ax_r.format_coord = lambda x, y: f"(x, y) = ({x:.2f}, {y:.2f})"
 
-        self.canvas_r = FigureCanvasTkAgg(self.fig_r, master=self.frame_resp)
+        self.canvas_r = FigureCanvasTkAgg(self.fig_r, master=self.fr_resp)
         self.canvas_r.draw()
 
         # Matplotlib toolbar
         self.toolbar_r = NavigationToolbar2Tk(
             self.canvas_r,
-            window=self.frame_resp,
+            window=self.fr_resp,
             pack_toolbar=False
         )
         self.toolbar_r.update()
@@ -419,22 +419,22 @@ class App:
 
         # Frquency response bottom Frame
 
-        self.frame_input_r = tk.Frame(self.frame_resp, bg=color_bg, pady=5)
-        self.frame_input_r.pack(side="top", fill="x")
+        self.fr_input_r = tk.Frame(self.fr_resp, bg=color_bg, pady=5)
+        self.fr_input_r.pack(side="top", fill="x")
 
-        frame_r_padx = 2
+        fr_r_padx = 2
 
         # Theta Spin
 
         tk.Label(
-            self.frame_input_r,
+            self.fr_input_r,
             text="θₘₐₓ =",
             fg=color_text,
             bg=color_bg
-        ).pack(side="left", padx=frame_r_padx)
+        ).pack(side="left", padx=fr_r_padx)
 
         self.theta_max = tk.Spinbox(
-            self.frame_input_r,
+            self.fr_input_r,
             from_=1, to=max_pi,
             increment=1,
             width=2,
@@ -445,19 +445,19 @@ class App:
             buttonbackground=color_bg,
             command=self.update_freq_resp
         )
-        self.theta_max.pack(side="left", padx=frame_r_padx)
+        self.theta_max.pack(side="left", padx=fr_r_padx)
 
         tk.Label(
-            self.frame_input_r,
+            self.fr_input_r,
             text="π",
             fg=color_text,
             bg=color_bg
-        ).pack(side="left", padx=frame_r_padx)
+        ).pack(side="left", padx=fr_r_padx)
 
         # Normalized checkbox
         self.var_normalize = tk.BooleanVar(value=True)
         self.check_normalize = tk.Checkbutton(
-            self.frame_input_r,
+            self.fr_input_r,
             text="Normalizado",
             variable=self.var_normalize,
             bg=color_bg,
@@ -472,7 +472,7 @@ class App:
         # Phase unit checkbox
         self.var_phase_deg = tk.BooleanVar(value=True)
         self.check_phase_unit = tk.Checkbutton(
-            self.frame_input_r,
+            self.fr_input_r,
             text="Graus",
             variable=self.var_phase_deg,
             bg=color_bg,
@@ -487,14 +487,14 @@ class App:
         # Resolution Spin
 
         tk.Label(
-            self.frame_input_r,
+            self.fr_input_r,
             text="pts",
             fg=color_text,
             bg=color_bg
-        ).pack(side="right", padx=frame_r_padx)
+        ).pack(side="right", padx=fr_r_padx)
 
         self.resolution = tk.Spinbox(
-            self.frame_input_r,
+            self.fr_input_r,
             from_=10, to=1000,
             increment=10,
             width=4,
@@ -505,14 +505,14 @@ class App:
             buttonbackground=color_bg,
             command=self._change_resolution
         )
-        self.resolution.pack(side="right", padx=frame_r_padx)
+        self.resolution.pack(side="right", padx=fr_r_padx)
 
         tk.Label(
-            self.frame_input_r,
+            self.fr_input_r,
             text="Resolução =",
             fg=color_text,
             bg=color_bg
-        ).pack(side="right", padx=frame_r_padx)
+        ).pack(side="right", padx=fr_r_padx)
 
 
         self.color_dialog = ColorDialog(self.win, self)
@@ -711,22 +711,22 @@ class App:
             loc="left"
         )
 
-    def _create_frame_fig(self, width):
-        frame = tk.Frame(
+    def _create_fr_fig(self, width):
+        fr = tk.Frame(
             self.main_container,
             width=width,
             height=360,
             bg=color_bg
         )
-        frame.pack(side="left", padx=10, pady=5)
-        frame.pack_propagate(False)
-        return frame
+        fr.pack(side="left", padx=10, pady=5)
+        fr.pack_propagate(False)
+        return fr
 
     def _create_menu(self):
         return tk.Menu(self.menubar, tearoff=False)
 
-    def _create_label_frame(self, master, text, padx=10):
-        frame = tk.LabelFrame(
+    def _create_label_fr(self, master, text, padx=10):
+        fr = tk.LabelFrame(
             master,
             text=text,
             fg=color_text,
@@ -736,19 +736,19 @@ class App:
             padx=padx,
             pady=5
         )
-        frame.pack(side="left", padx=10, fill="y")
-        return frame
+        fr.pack(side="left", padx=10, fill="y")
+        return fr
 
 #     def _create_spin_top(self, row, col, col_text, text):
 #         tk.Label(
-#             self.frame_limits,
+#             self.fr_limits,
 #             text=text,
 #             fg=color_text,
 #             bg=color_bg
 #         ).grid(row=row, column=col_text, padx=2, pady=2)
 # 
 #         spin = tk.Spinbox(
-#             self.frame_limits,
+#             self.fr_limits,
 #             from_=-1.5, to=1.5,
 #             increment=0.1,
 #             width=6,
@@ -760,35 +760,35 @@ class App:
 #         spin.grid(row=row, column=col, padx=5, pady=2)
 #         return spin
 
-    def _create_scrollable_frame(self, parent, width, height, bg_color):
-        outer_frame = tk.Frame(parent, width=width, height=height, bg=bg_color)
-        outer_frame.grid_propagate(False)
+    def _create_scrollable_fr(self, parent, width, height, bg_color):
+        outer_fr = tk.Frame(parent, width=width, height=height, bg=bg_color)
+        outer_fr.grid_propagate(False)
 
-        canvas = tk.Canvas(outer_frame, bg=bg_color, highlightthickness=0)
+        canvas = tk.Canvas(outer_fr, bg=bg_color, highlightthickness=0)
 
         scrollbar = tk.Scrollbar(
-            outer_frame,
+            outer_fr,
             orient="vertical",
             command=canvas.yview
         )
 
-        scrollable_frame = tk.Frame(canvas, bg=bg_color)
-        scrollable_frame.bind(
+        scrollable_fr = tk.Frame(canvas, bg=bg_color)
+        scrollable_fr.bind(
             "<Configure>",
             lambda e: canvas.configure(
                 scrollregion=(
                     0, 0,
-                    scrollable_frame.winfo_reqwidth(),
-                    scrollable_frame.winfo_reqheight())
+                    scrollable_fr.winfo_reqwidth(),
+                    scrollable_fr.winfo_reqheight())
                 )
         )
 
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.create_window((0, 0), window=scrollable_fr, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
 
-        outer_frame.grid_rowconfigure(0, weight=1)
-        outer_frame.grid_columnconfigure(0, weight=1)
-        outer_frame.grid_columnconfigure(1, weight=0)
+        outer_fr.grid_rowconfigure(0, weight=1)
+        outer_fr.grid_columnconfigure(0, weight=1)
+        outer_fr.grid_columnconfigure(1, weight=0)
 
         canvas.grid(row=0, column=0, sticky="nsew")
         scrollbar.grid(row=0, column=1, sticky="ns")
@@ -797,17 +797,17 @@ class App:
             canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
         canvas.bind("<MouseWheel>", on_mousewheel)
-        scrollable_frame.bind("<MouseWheel>", on_mousewheel)
+        scrollable_fr.bind("<MouseWheel>", on_mousewheel)
 
         if not hasattr(self, "_scroll_refs"):
             self._scroll_refs = []
-        self._scroll_refs.extend([canvas, scrollbar, scrollable_frame])
+        self._scroll_refs.extend([canvas, scrollbar, scrollable_fr])
 
-        return outer_frame, scrollable_frame
+        return outer_fr, scrollable_fr
 
-    def _create_label_coords(self, frame, text_var):
+    def _create_label_coords(self, fr, text_var):
         tk.Label(
-            frame,
+            fr,
             textvariable=text_var,
             bg=color_bg,
             font=("Arial", 8)
@@ -827,7 +827,7 @@ class App:
         )
         return points_plot
 
-    def _create_label_frame_text(self, master, text):
+    def _create_label_fr_text(self, master, text):
         label = tk.Label(
             master,
             text=text,
@@ -875,8 +875,8 @@ class App:
         self.text_poles_var.set(poles_text)
         self.text_zeros_var.set(zeros_text)
 
-        self.frame_poles.update_idletasks()
-        self.frame_zeros.update_idletasks()
+        self.fr_poles.update_idletasks()
+        self.fr_zeros.update_idletasks()
 
     def _update_label_tf(self):
         if self.var_z_inv.get():
@@ -901,7 +901,7 @@ class App:
         else:  # left
             padx, pady = 6, 6
             pack_side = "top"
-            container = self.frame_bt_left
+            container = self.fr_bt_left
 
         last_group = None
         for i, (key, (hint, group, starts_active)) in enumerate(list_bt):

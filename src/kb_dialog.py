@@ -39,7 +39,7 @@ class KBDialog:
 
         for bt in ["Polo", "Zero"]:
             rb = self._create_radiobutton(
-                frame=fr_type,
+                fr=fr_type,
                 text=bt,
                 variable=self.type_var,
                 value=bt[0].lower(),
@@ -54,7 +54,7 @@ class KBDialog:
         fr_coord.grid(row=1, column=0, columnspan=2, sticky="ew")
 
         self._create_radiobutton(
-            frame=fr_coord,
+            fr=fr_coord,
             text="(X, Y)",
             variable=self.format_var,
             value="rect",
@@ -62,7 +62,7 @@ class KBDialog:
         ).pack(side="left", expand=True)
 
         self._create_radiobutton(
-            frame=fr_coord,
+            fr=fr_coord,
             text="(r, θ)",
             variable=self.format_var,
             value="polar",
@@ -111,9 +111,9 @@ class KBDialog:
         # X click
         self.tl.protocol("WM_DELETE_WINDOW", self._on_cancel)
 
-    def _create_radiobutton(self, frame, text, variable, value, command=None):
+    def _create_radiobutton(self, fr, text, variable, value, command=None):
         bt = tk.Radiobutton(
-            frame,
+            fr,
             text=text,
             variable=variable,
             value=value,

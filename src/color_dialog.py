@@ -4,7 +4,6 @@ from tkinter import colorchooser
 from configs import *
 
 
-# TODO: save default and current value
 og_dict_colors = {
     "poles": color_poles,
     "zeros": color_zeros,
@@ -84,15 +83,15 @@ class ColorDialog:
             font=("Arial", 10)
         ).pack(pady=15)
 
-        frame_bt = tk.Frame(self.tl)
-        frame_bt.pack(pady=5, padx=20, fill="both", expand=True)
+        fr_bt = tk.Frame(self.tl)
+        fr_bt.pack(pady=5, padx=20, fill="both", expand=True)
 
         for name, key in list_elements:
-            row_frame = tk.Frame(frame_bt)
-            row_frame.pack(fill="x", pady=6)
+            fr_row = tk.Frame(fr_bt)
+            fr_row.pack(fill="x", pady=6)
 
             tk.Label(
-                row_frame,
+                fr_row,
                 text=name,
                 width=18,
                 anchor="w"
@@ -101,7 +100,7 @@ class ColorDialog:
             current_color = self.dict_colors[key]
 
             bt_color = tk.Button(
-                row_frame,
+                fr_row,
                 bg=current_color,
                 width=6,
                 relief="groove"
