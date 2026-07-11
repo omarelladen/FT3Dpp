@@ -1,5 +1,5 @@
 import tkinter as tk
-import numpy as np
+
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -39,15 +39,12 @@ class Plotter3D:
         # self.ax.set_title("Gráfico 3D")
         self.ax.set_zlim(0, clip_limit)
 
-
         # Surface
-
         x_mesh, y_mesh, z_mesh = self.app.math_utils.calc_mag_H_3D(
             self.app.list_zeros,
             self.app.list_poles,
             clip_limit
         )
-
         self.ax.plot_surface(
             x_mesh,
             y_mesh,
@@ -59,15 +56,12 @@ class Plotter3D:
             alpha=0.4
         )
 
-
         # Line in unit circle
-
         x_line, y_line, z_line = self.app.math_utils.calc_line_3D(
             self.app.list_zeros,
             self.app.list_poles,
             clip_limit
         )
-
         self.ax.plot(
             x_line,
             y_line,
@@ -77,6 +71,5 @@ class Plotter3D:
             label="|H(eʲʷ)|"
         )
         self.ax.legend()
-
 
         self.canvas.draw_idle()
