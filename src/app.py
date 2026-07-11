@@ -514,6 +514,9 @@ class App:
             bg=color_bg
         ).pack(side="right", padx=frame_r_padx)
 
+
+        self.color_dialog = ColorDialog(self.win, self)
+
         # Events to confirm keyboard values
         self.resolution.bind("<Return>",   lambda event: self._change_resolution())
         self.resolution.bind("<FocusOut>", lambda event: self._change_resolution())
@@ -561,7 +564,7 @@ class App:
         KBDialog(self.win, self)
 
     def _open_color_dialog(self):
-        ColorDialog(self.win, self)
+        self.color_dialog.open()
 
     def _open_about_dialog(self):
         AboutDialog(self.win, self)
