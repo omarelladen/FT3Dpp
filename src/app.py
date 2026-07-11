@@ -572,6 +572,15 @@ class App:
     def _open_sys_clf_info(self):
         if self.sys_empty:
             msg = "Sistema vazio."
+        elif self.sys_integrator:
+            if self.sys_integrator_zeros:
+                msg = (
+                    "O sistema se comporta como um possível integrador digital"
+                )
+            else:
+                msg = (
+                    "O sistema se comporta como um integrador digital"
+                )
         elif not self.sys_causal:
             msg = (
                 "O sistema é irrealizável (não causal), pois o grau do "
@@ -1109,7 +1118,27 @@ class App:
             self.sys_empty = True
         else:
             self.sys_empty = False
-            if len(self.list_zeros) > len(self.list_poles):
+
+            self.sys_integrator = True
+            if len(self.list_poles) == 0:
+                self.sys_integrator = False
+            for p in self.list_poles:
+                x = p[0]
+                y = p[1]
+                if x != 1 or y != 0:
+                    self.sys_integrator = False
+                    break
+            if self.sys_integrator:
+                if len(self.list_zeros) > 0:
+                    self.sys_integrator_zeros = True
+                    text = "Integrador com constante"
+                    bg = "green"
+                else:
+                    self.sys_integrator_zeros = False
+                    text = f"Integrador de grau {int(len(self.list_poles)/2)}"
+                    bg = "green"
+
+            elif len(self.list_zeros) > len(self.list_poles):
                 text = "Sistema Irrealizável"
                 bg = "red"
                 self.sys_causal = False
