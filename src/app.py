@@ -24,6 +24,8 @@ from about_dialog import AboutDialog
 from help_dialog import HelpDialog
 from plotter_3d import Plotter3D
 from elements import Elements
+from tf_displayer import TFDisplayer
+
 
 icon_logo_path = os.path.join("icons", "logo.png")
 
@@ -39,7 +41,7 @@ dpi = 100
 ax_text_pos = 1.6
 lim_plane = 1.3
 lw = 1.5
-win_size = "1000x600"
+win_size = "1000x620"
 
 R_BUTTON = 3
 L_BUTTON = 1
@@ -218,12 +220,12 @@ class App:
         self._create_label_coords(self.fr_zeros, self.text_zeros_var)
 
 
-        self.fr_stats = self._create_label_fr(
+        self.box_stats = self._create_label_fr(
             self.fr_top,
             "Total"
         )
         self.label_stats = tk.Label(
-            self.fr_stats,
+            self.box_stats,
             text="",
             fg=color_text,
             bg=color_bg
@@ -266,18 +268,17 @@ class App:
             selectcolor=color_bg_spin,
             activebackground=color_bg,
             activeforeground=color_text,
-            command=self._update_label_tf
+            command=self._on_z_inv_click
         )
         self.check_z_inv.pack(side="left", padx=10)
 
+
         # Transfer Function equation
-
-        label_funct = self._create_label_fr(
+        box_tf = self._create_label_fr(
             self.fr_bottom,
-            "Função de transferência"
+            "Função de Transferência"
         )
-
-        self.label_hz = self._create_label_fr_text(label_funct, "H(z) = 1")
+        self.tf_displayer = TFDisplayer(self, box_tf)
 
         # Figure Frames
         self.fr_plane = self._create_fr_fig(width=360)
@@ -390,7 +391,7 @@ class App:
         self.line_r, = self.ax_r.plot([], [], color=color_resp, linewidth=2)
 
         # Set x ticks as multiples of pi
-        step = 0.5 * np.pi
+        step = 0.5*np.pi
         intervals = np.arange(0, max_pi*np.pi + step, step)
         self.ax_r.set_xticks(intervals)
 
@@ -698,7 +699,7 @@ class App:
         self.line_r.set_data(w_plot, line)
 
         # X limit
-        x_max = theta_val * np.pi
+        x_max = theta_val*np.pi
         self.ax_r.set_xlim(0, x_max)
 
         # Auto scale
@@ -808,7 +809,7 @@ class App:
         scrollbar.grid(row=0, column=1, sticky="ns")
 
         def on_mousewheel(event):
-            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
         canvas.bind("<MouseWheel>", on_mousewheel)
         scrollable_fr.bind("<MouseWheel>", on_mousewheel)
@@ -840,17 +841,6 @@ class App:
             zorder=2
         )
         return points_plot
-
-    def _create_label_fr_text(self, master, text):
-        label = tk.Label(
-            master,
-            text=text,
-            fg=color_text,
-            bg=color_bg,
-            font=("Consolas", 11)
-        )
-        label.pack(expand=True)
-        return label
 
     def _update_labels_coords(self):
         poles_text = ""
@@ -891,13 +881,6 @@ class App:
 
         self.fr_poles.update_idletasks()
         self.fr_zeros.update_idletasks()
-
-    def _update_label_tf(self):
-        if self.var_z_inv.get():
-            eq = self.math_utils.format_H_z_inv(self.zeros, self.poles)
-        else:
-            eq = self.math_utils.format_H_z(self.zeros, self.poles)
-        self.label_hz.config(text=eq)
 
     def _get_list_sel(self):
         if self.bt_states[self.icon_pole].get():
@@ -994,17 +977,26 @@ class App:
         elif clicked_key == self.icon_info:
             self._open_sys_clf_info()
             v_clicked.set(False)
+        elif clicked_key == self.icon_plane:
+            self.tf_displayer.update_label_tf()
+        elif clicked_key == "FT":
+            self.tf_displayer.show_tf_entries()
         elif clicked_key in (
             self.icon_open,
             self.icon_save,
             self.icon_plane_top,
             self.icon_imp,
             self.icon_deg,
-            "FT",
             "S",
         ):
             self._show_warning("Ainda não implementado")
             v_clicked.set(False)
+
+    def _on_z_inv_click(self):
+        if self.bt_states[self.icon_plane].get():
+            self.tf_displayer.update_label_tf()
+        else:
+            self.tf_displayer.update_entries_tf()
 
     def _clear_poles_zeros(self):
         self.poles.clear()
@@ -1054,7 +1046,7 @@ class App:
         if len(list_coords) > 0:
             coords = np.array(list_coords)
             click = np.array([event.xdata, event.ydata])
-            dist = np.sqrt(np.sum((coords - click) ** 2, axis=1))
+            dist = np.sqrt(np.sum((coords - click)**2, axis=1))
         next = (len(dist) > 0 and np.min(dist) < range_click)
 
         # Right button
@@ -1129,9 +1121,10 @@ class App:
         self.update_plane()
         self.update_freq_resp()
         self._update_labels_coords()
-        self._update_label_tf()
-        self._update_sys_clf()
         self._update_stats()
+        self._update_sys_clf()
+        if self.bt_states[self.icon_plane].get():
+            self.tf_displayer.update_label_tf()
 
     def _update_stats(self):
         text = (
