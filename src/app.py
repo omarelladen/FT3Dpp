@@ -1065,10 +1065,10 @@ class App:
                 idx = np.argmin(dist)
                 element_type, idx_group = list_mapping[idx]
 
-                if list_sel == self.poles and element_type == "p":
+                if element_type == "p":
                     self.idx_sel_point = idx_group
                     self.type_sel_point = "p"
-                elif list_sel == self.zeros and element_type == "z":
+                elif element_type == "z":
                     self.idx_sel_point = idx_group
                     self.type_sel_point = "z"
                 else:
