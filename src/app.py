@@ -495,8 +495,8 @@ class App:
 
         self.resolution = tk.Spinbox(
             self.fr_input_r,
-            from_=10, to=1000,
-            increment=10,
+            from_=5, to=max_resolution,
+            increment=5,
             width=4,
             textvariable=tk.DoubleVar(value=init_resolution),
             bg=color_bg_spin,
@@ -640,7 +640,10 @@ class App:
 
     def _change_resolution(self):
         resolution = self.resolution.get()
-        if resolution.isdigit() and int(resolution) <= max_resolution:
+        if (resolution.isdigit() and
+            int(resolution) > 1 and
+            int(resolution) <= max_resolution
+        ):
             self.math_utils.resolution = int(self.resolution.get())
             self.update_freq_resp()
         else:
