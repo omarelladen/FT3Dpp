@@ -89,15 +89,15 @@ class KBDialog:
             self.dict_entries[i] = entry
 
         # Buttons
-        bt_fr = tk.Frame(self.tl, bg=color_bg, pady=10)
-        bt_fr.pack(fill="x")
+        fr_bt = tk.Frame(self.tl, bg=color_bg, pady=10)
+        fr_bt.pack(fill="x")
 
         for bt in [
             ("OK",     "left",  self._on_confirm),
             ("Cancel", "right", self._on_cancel)
         ]:
             tk.Button(
-                bt_fr,
+                fr_bt,
                 text=bt[0],
                 command=bt[2],
                 width=10,
