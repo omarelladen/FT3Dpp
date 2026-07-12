@@ -24,8 +24,8 @@ max_exp = 20
 class MathUtils():
     def __init__(self, resolution, max_pi=1):
         self.resolution = resolution
-        self.resolution_u = 70
-        self.resolution_v = 70
+        self.resolution_u = 0
+        self.resolution_v = 0
         self.max_pi = max_pi
 
     def _get_w(self):
