@@ -1,3 +1,6 @@
+# Copyright 2026 Omar Zagonel El Laden
+# SPDX-License-Identifier: GPL-3.0-only
+
 import tkinter as tk
 
 from matplotlib.figure import Figure
