@@ -34,30 +34,18 @@ class MathUtils():
     def get_w_plot(self):
         return np.linspace(0, self.max_pi*np.pi, self.max_pi*self.resolution)
 
-    def calc_H(self, list_zeros, list_poles):
+    def calc_H(self, zeros, poles):
         w = self._get_w()
 
         num = np.ones(self.resolution, dtype=complex)
         den = np.ones(self.resolution, dtype=complex)
 
-        for i in range(0, len(list_zeros), 2):
-            if i + 1 < len(list_zeros):
-                tuple_z1 = list_zeros[i]
-                tuple_z2 = list_zeros[i+1]
-                z1 = tuple_z1[0] + 1j*tuple_z1[1]
-                z2 = tuple_z2[0] + 1j*tuple_z2[1]
-                num *= np.exp(1j*w) - z1
-                if z1 != z2:  # conj
-                    num *= np.exp(1j*w) - z2
-        for i in range(0, len(list_poles), 2):
-            if i + 1 < len(list_poles):
-                tuple_p1 = list_poles[i]
-                tuple_p2 = list_poles[i+1]
-                p1 = tuple_p1[0] + 1j*tuple_p1[1]
-                p2 = tuple_p2[0] + 1j*tuple_p2[1]
-                den *= np.exp(1j*w) - p1
-                if p1 != p2:  # conj
-                    den *= np.exp(1j*w) - p2
+        for pair_z in zeros.list:
+            for zero in pair_z:
+                num *= np.exp(1j*w) - zero
+        for pair_p in poles.list:
+            for pole in pair_p:
+                den *= np.exp(1j*w) - pole
 
         with np.errstate(divide='ignore', invalid='ignore'):
             H_z = num / den  # den=0 => H_z=np.inf
@@ -122,8 +110,8 @@ class MathUtils():
     def calc_phase_H_deg(self, H_z):
         return np.rad2deg(self.calc_phase_H_rad(H_z))
 
-    def _calc_H_z_inv_eq(self, list_zeros, list_poles):
-        num, den = self._calc_H_z_eq(list_zeros, list_poles)
+    def _calc_H_z_inv_eq(self, zeros, poles):
+        num, den = self._calc_H_z_eq(zeros, poles)
 
         if num == 1 and den == 1:
             return 1, 1
@@ -142,8 +130,8 @@ class MathUtils():
 
         return num, den
 
-    def _calc_H_z_eq(self, list_zeros, list_poles):
-        if not list_poles and not list_zeros:
+    def _calc_H_z_eq(self, zeros, poles):
+        if not poles and not zeros:
             return 1, 1
 
         z = sp.symbols("z")
@@ -151,24 +139,12 @@ class MathUtils():
         num = 1
         den = 1
 
-        for i in range(0, len(list_zeros), 2):
-            if i + 1 < len(list_zeros):
-                tuple_z1 = list_zeros[i]
-                tuple_z2 = list_zeros[i+1]
-                z1 = tuple_z1[0] + 1j*tuple_z1[1]
-                z2 = tuple_z2[0] + 1j*tuple_z2[1]
-                num *= z - sp.N(z1, 3)
-                if z1 != z2:  # conj
-                    num *= z - sp.N(z2, 3)
-        for i in range(0, len(list_poles), 2):
-            if i + 1 < len(list_poles):
-                tuple_p1 = list_poles[i]
-                tuple_p2 = list_poles[i+1]
-                p1 = tuple_p1[0] + 1j*tuple_p1[1]
-                p2 = tuple_p2[0] + 1j*tuple_p2[1]
-                den *= z - sp.N(p1, 3)
-                if p1 != p2:  # conj
-                    den *= z - sp.N(p2, 3)
+        for pair_z in zeros.list:
+            for zero in pair_z:
+                num *= z - sp.N(zero, 3)
+        for pair_p in poles.list:
+            for pole in pair_p:
+                den *= z - sp.N(pole, 3)
 
         if num != 1:
             num = num.expand()
@@ -177,7 +153,7 @@ class MathUtils():
 
         return num, den
 
-    def calc_mag_H_3D(self, list_zeros, list_poles, clip_limit):
+    def calc_mag_H_3D(self, zeros, poles, clip_limit):
         u = np.linspace(0, 2*np.pi, self.resolution_u)
         v = np.linspace(0.01, 2.0, self.resolution_v)
         U, V = np.meshgrid(u, v)
@@ -192,27 +168,13 @@ class MathUtils():
         num = np.ones_like(z_points, dtype=complex)
         den = np.ones_like(z_points, dtype=complex)
 
-        for i in range(0, len(list_zeros), 2):
-            if i + 1 < len(list_zeros):
-                tuple_z1 = list_zeros[i]
-                tuple_z2 = list_zeros[i+1]
-                z1 = tuple_z1[0] + 1j * tuple_z1[1]
-                z2 = tuple_z2[0] + 1j * tuple_z2[1]
+        for pair_z in zeros.list:
+            for zero in pair_z:
+                num *= z_points - zero
 
-                num *= (z_points - z1)
-                if z1 != z2:  # conj
-                    num *= (z_points - z2)
-
-        for i in range(0, len(list_poles), 2):
-            if i + 1 < len(list_poles):
-                tuple_p1 = list_poles[i]
-                tuple_p2 = list_poles[i+1]
-                p1 = tuple_p1[0] + 1j * tuple_p1[1]
-                p2 = tuple_p2[0] + 1j * tuple_p2[1]
-
-                den *= (z_points - p1)
-                if p1 != p2:  # conj
-                    den *= (z_points - p2)
+        for pair_p in poles.list:
+            for pole in pair_p:
+                den *= z_points - pole
 
         with np.errstate(divide='ignore', invalid='ignore'):
             H_z_mesh = num/den
@@ -224,11 +186,11 @@ class MathUtils():
 
         return x_mesh, y_mesh, z_mesh
 
-    def calc_line_3D(self, list_zeros, list_poles, clip_limit):
+    def calc_line_3D(self, zeros, poles, clip_limit):
         w_plot = self.get_w_plot()
         H_z_line = self.calc_H(
-            list_zeros,
-            list_poles
+            zeros,
+            poles
         )
 
         z_line = self.calc_mag_H(H_z_line)
@@ -238,26 +200,26 @@ class MathUtils():
 
         return x_line, y_line, z_line
 
-    def format_H_z_inv(self, list_zeros, list_poles):
+    def format_H_z_inv(self, zeros, poles):
         return self._format_H_z(
-            list_zeros,
-            list_poles,
+            zeros,
+            poles,
             self._calc_H_z_inv_eq,
             "⁻",
             "z_inv"
         )
 
-    def format_H_z(self, list_zeros, list_poles):
+    def format_H_z(self, zeros, poles):
         return self._format_H_z(
-            list_zeros,
-            list_poles,
+            zeros,
+            poles,
             self._calc_H_z_eq,
             "",
             "z"
         )
 
-    def _format_H_z(self, list_zeros, list_poles, funct, signal, base):
-        num, den = funct(list_zeros, list_poles)
+    def _format_H_z(self, zeros, poles, funct, signal, base):
+        num, den = funct(zeros, poles)
 
         if num == 1 and den == 1:
             return "H(z) = 1"

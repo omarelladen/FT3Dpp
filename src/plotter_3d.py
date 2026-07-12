@@ -45,8 +45,8 @@ class Plotter3D:
         self.fr_bt = tk.Frame(self.tl, bg=color_bg, pady=10)
         self.fr_bt.pack(fill="x")
 
-        self.box_res_u = self._create_spinbox("U", self._change_resolution_u)
         self.box_res_v = self._create_spinbox("V", self._change_resolution_v)
+        self.box_res_u = self._create_spinbox("U", self._change_resolution_u)
 
 
     def _create_spinbox(self, axis, cmd):
@@ -123,8 +123,8 @@ class Plotter3D:
 
         # Surface
         x_mesh, y_mesh, z_mesh = self.app.math_utils.calc_mag_H_3D(
-            self.app.list_zeros,
-            self.app.list_poles,
+            self.app.zeros,
+            self.app.poles,
             clip_limit
         )
         self.ax.plot_surface(
@@ -140,8 +140,8 @@ class Plotter3D:
 
         # Line in unit circle
         x_line, y_line, z_line = self.app.math_utils.calc_line_3D(
-            self.app.list_zeros,
-            self.app.list_poles,
+            self.app.zeros,
+            self.app.poles,
             clip_limit
         )
         self.ax.plot(

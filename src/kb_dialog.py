@@ -162,9 +162,9 @@ class KBDialog:
         sel_type = self.type_var.get()
 
         if sel_type == "p":
-            list_sel = self.app.list_poles
+            list_sel = self.app.poles
         else:  # "z"
-            list_sel = self.app.list_zeros
+            list_sel = self.app.zeros
 
         self.app.add_element_plane(list_sel, x, y)
 

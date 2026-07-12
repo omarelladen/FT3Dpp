@@ -23,7 +23,7 @@ from kb_dialog import KBDialog
 from about_dialog import AboutDialog
 from help_dialog import HelpDialog
 from plotter_3d import Plotter3D
-
+from elements import Elements
 
 icon_logo_path = os.path.join("icons", "logo.png")
 
@@ -189,8 +189,8 @@ class App:
 
         # Poles and zeros
 
-        self.list_poles = []
-        self.list_zeros = []
+        self.poles = Elements("p")
+        self.zeros = Elements("z")
 
         box_poles = self._create_label_fr(self.fr_top, "Polos")
         box_zeros = self._create_label_fr(self.fr_top, "Zeros")
@@ -633,8 +633,7 @@ class App:
             self._show_error("Valor Inválido")
             return
 
-        list_sel.append((x, y))
-        list_sel.append((x, -y))
+        list_sel.add(x, y)
 
         self._update_all()
 
@@ -655,7 +654,7 @@ class App:
         self.math_utils.max_pi = theta_val
 
         w_plot = self.math_utils.get_w_plot()
-        H_z = self.math_utils.calc_H(self.list_zeros, self.list_poles)
+        H_z = self.math_utils.calc_H(self.zeros, self.poles)
 
         # Select what to plot
         if self.bt_states[self.icon_phase].get():
@@ -843,28 +842,28 @@ class App:
 
     def _update_labels_coords(self):
         poles_text = ""
-        for i in range(0, len(self.list_poles), 2):
-            if i + 1 < len(self.list_poles):
-                pole = self.list_poles[i]
-                pole_text = f"({pole[0]:.3f} + j{abs(pole[1]):.3f})"
-                poles_text += f"{pole_text}"
-                conj = self.list_poles[i+1]
-                if pole[0] == conj[0] and pole[1] == conj[1]:
-                    poles_text += "\n"
-                else:
-                    poles_text += f" e {pole_text.replace('+', '-')}\n"
+        for pair_p in self.poles.list:
+            p1 = pair_p[0]
+            sign_1 = "+" if p1.imag >= 0 else "-"
+            poles_text += f"({p1.real:.3f} {sign_1} j{abs(p1.imag):.3f})"
+            if len(pair_p) == 2:
+                p2 = pair_p[1]
+                sign_2 = "+" if p2.imag >= 0 else "-"
+                poles_text += f" e ({p2.real:.3f} {sign_2} j{abs(p2.imag):.3f})\n"
+            else:
+                poles_text += "\n"
 
         zeros_text = ""
-        for i in range(0, len(self.list_zeros), 2):
-            if i + 1 < len(self.list_zeros):
-                zero = self.list_zeros[i]
-                zero_text = f"({zero[0]:.3f} + j{abs(zero[1]):.3f})"
-                zeros_text += f"{zero_text}"
-                conj = self.list_zeros[i+1]
-                if zero[0] == conj[0] and zero[1] == conj[1]:
-                    zeros_text += "\n"
-                else:
-                    zeros_text += f" e {zero_text.replace('+', '-')}\n"
+        for pair_z in self.zeros.list:
+            z1 = pair_z[0]
+            sign_1 = "+" if z1.imag >= 0 else "-"
+            zeros_text += f"({z1.real:.3f} {sign_1} j{abs(z1.imag):.3f})"
+            if len(pair_z) == 2:
+                z2 = pair_z[1]
+                sign_2 = "+" if z2.imag >= 0 else "-"
+                zeros_text += f" e ({z2.real:.3f} {sign_2} j{abs(z2.imag):.3f})\n"
+            else:
+                zeros_text += "\n"
 
         poles_text = poles_text.strip()
         zeros_text = zeros_text.strip()
@@ -883,16 +882,16 @@ class App:
 
     def _update_label_tf(self):
         if self.var_z_inv.get():
-            eq = self.math_utils.format_H_z_inv(self.list_zeros, self.list_poles)
+            eq = self.math_utils.format_H_z_inv(self.zeros, self.poles)
         else:
-            eq = self.math_utils.format_H_z(self.list_zeros, self.list_poles)
+            eq = self.math_utils.format_H_z(self.zeros, self.poles)
         self.label_hz.config(text=eq)
 
     def _get_list_sel(self):
         if self.bt_states[self.icon_pole].get():
-            list_sel = self.list_poles
+            list_sel = self.poles
         elif self.bt_states[self.icon_zero].get():
-            list_sel = self.list_zeros
+            list_sel = self.zeros
         return list_sel
 
     def _create_bts(self, list_bt, side):
@@ -996,8 +995,8 @@ class App:
             v_clicked.set(False)
 
     def _clear_poles_zeros(self):
-        self.list_poles = []
-        self.list_zeros = []
+        self.poles.clear()
+        self.zeros.clear()
 
     def center_toplevel(self, tl):
         # Center Toplevel acording to the Main Window
@@ -1017,41 +1016,44 @@ class App:
 
         tl.geometry(f"+{x}+{y}")
 
+    def _map_elements(self):
+        list_coords = []
+        list_mapping = []  # ("p"|"z", idx_in_list)
+
+        for i, pair_p in enumerate(self.poles.list):
+            for p in pair_p:
+                list_coords.append([p.real, p.imag])
+                list_mapping.append(("p", i))
+        for i, pair_z in enumerate(self.zeros.list):
+            for p in pair_z:
+                list_coords.append([p.real, p.imag])
+                list_mapping.append(("z", i))
+
+        return list_coords, list_mapping
+
     def _on_click(self, event):
         if self.toolbar_p.mode != "" or event.inaxes != self.ax_p:
             return
 
-        list_poles_zeros = self.list_poles + self.list_zeros
+        list_coords, list_mapping = self._map_elements()
 
         # Calculate distance to prevent duplicated
         dist = np.array([])
-        if len(list_poles_zeros) > 0:
-            coords = np.array(list_poles_zeros)
+        if len(list_coords) > 0:
+            coords = np.array(list_coords)
             click = np.array([event.xdata, event.ydata])
             dist = np.sqrt(np.sum((coords - click) ** 2, axis=1))
-
         next = (len(dist) > 0 and np.min(dist) < range_click)
 
         # Right button
         if event.button == R_BUTTON:
             if next:
                 idx = np.argmin(dist)
-                len_poles = len(self.list_poles)
-
-                if idx < len_poles:
-                    idx_start = idx if (idx % 2 == 0) else (idx - 1)
-
-                    self.list_poles.pop(idx_start + 1)
-                    self.list_poles.pop(idx_start)
-                else:
-                    idx_rel = idx - len_poles
-                    if (idx_rel % 2 == 0):
-                        idx_start = idx_rel
-                    else:
-                        idx_start = idx_rel-1
-
-                    self.list_zeros.pop(idx_start + 1)
-                    self.list_zeros.pop(idx_start)
+                element_type, idx_group = list_mapping[idx]
+                if element_type == "p":
+                    self.poles.pop(idx_group)
+                else:  # "z"
+                    self.zeros.pop(idx_group)
 
                 self._update_all()
 
@@ -1061,25 +1063,26 @@ class App:
 
             if next:
                 idx = np.argmin(dist)
-                len_poles = len(self.list_poles)
+                element_type, idx_group = list_mapping[idx]
 
-                if list_sel == self.list_poles and idx < len_poles:
-                    self.idx_sel_point = idx
-                    self.type_sel_point = "pole"
-                elif list_sel == self.list_zeros and idx >= len_poles:
-                    self.idx_sel_point = idx - len_poles
-                    self.type_sel_point = "zero"
+                if list_sel == self.poles and element_type == "p":
+                    self.idx_sel_point = idx_group
+                    self.type_sel_point = "p"
+                elif list_sel == self.zeros and element_type == "z":
+                    self.idx_sel_point = idx_group
+                    self.type_sel_point = "z"
                 else:
                     self.idx_sel_point = None
                     self.type_sel_point = None
             else:
                 self.add_element_plane(list_sel, event.xdata, event.ydata)
-                self.idx_sel_point = len(list_sel) - 1
 
-                if list_sel == self.list_poles:
-                    self.type_sel_point = "pole"
-                elif list_sel == self.list_zeros:
-                    self.type_sel_point = "zero"
+                if list_sel == self.poles:
+                    self.idx_sel_point = self.poles.num_pairs() - 1
+                    self.type_sel_point = "p"
+                elif list_sel == self.zeros:
+                    self.idx_sel_point = self.zeros.num_pairs() - 1
+                    self.type_sel_point = "z"
 
     def _on_move(self, event):
         if (event.button is not None and
@@ -1089,20 +1092,20 @@ class App:
             event_x = event.xdata
             event_y = event.ydata
 
-            if self.type_sel_point == "pole":
-                target_list = self.list_poles
+            if self.type_sel_point == "p":
+                target_list = self.poles.list
+            else:  # "z"
+                target_list = self.zeros.list
+
+            current_group = target_list[self.idx_sel_point]
+
+            if len(current_group) == 2:
+                p1 = complex(event_x, event_y)
+                p2 = complex(event_x, -event_y)
+                target_list[self.idx_sel_point] = (p1, p2)
             else:
-                target_list = self.list_zeros
-
-            target_list[self.idx_sel_point] = (event_x, event_y)
-
-            if self.idx_sel_point % 2 == 0:
-                conj_idx = self.idx_sel_point + 1
-            else:
-                conj_idx = self.idx_sel_point - 1
-
-            if conj_idx < len(target_list):
-                target_list[conj_idx] = (event_x, -event_y)
+                p_real = complex(event_x, 0)
+                target_list[self.idx_sel_point] = (p_real,)
 
             self._update_all()
 
@@ -1118,7 +1121,7 @@ class App:
         self._update_sys_clf()
 
     def _update_sys_clf(self):
-        if len(self.list_zeros) == 0 and len(self.list_poles) == 0:
+        if self.zeros.num_elements() == 0 and self.poles.num_elements() == 0:
             text = ""
             bg = color_bg
             self.sys_empty = True
@@ -1126,34 +1129,36 @@ class App:
             self.sys_empty = False
 
             self.sys_integrator = True
-            if len(self.list_poles) == 0:
+            if self.poles.num_elements() == 0:
                 self.sys_integrator = False
-            for p in self.list_poles:
-                x = p[0]
-                y = p[1]
+            for pair_p in self.poles.list:
+                p1 = pair_p[0]
+                x = p1.real
+                y = p1.imag
                 if x != 1 or y != 0:
                     self.sys_integrator = False
                     break
             if self.sys_integrator:
-                if len(self.list_zeros) > 0:
+                if self.zeros.num_elements() > 0:
                     self.sys_integrator_zeros = True
                     text = "Integrador com constante"
                     bg = "green"
                 else:
                     self.sys_integrator_zeros = False
-                    text = f"Integrador de grau {int(len(self.list_poles)/2)}"
+                    text = f"Integrador de grau {self.poles.num_elements()}"
                     bg = "green"
 
-            elif len(self.list_zeros) > len(self.list_poles):
+            elif self.zeros.num_elements() > self.poles.num_elements():
                 text = "Sistema Irrealizável"
                 bg = "red"
                 self.sys_causal = False
             else:
                 self.sys_causal = True
                 self.sys_stable = True
-                for p in self.list_poles:
-                    x = p[0]
-                    y = p[1]
+                for pair_p in self.poles.list:
+                    p1 = pair_p[0]
+                    x = p1.real
+                    y = p1.imag
                     r = np.sqrt(x**2 + y**2)
                     if r >= 1:
                         text = "Sistema Realizável e Instável"
@@ -1168,15 +1173,26 @@ class App:
         self.label_system.config(bg=bg)
 
     def update_plane(self):
-        if self.list_poles:
-            x_poles, y_poles = zip(*self.list_poles)
-            self.points_plot_poles.set_data(x_poles, y_poles)
+        if not self.poles.empty():
+            list_x_poles = []
+            list_y_poles = []
+            for pair_p in self.poles.list:
+                for p in pair_p:
+                    list_x_poles.append(p.real)
+                    list_y_poles.append(p.imag)
+
+            self.points_plot_poles.set_data(list_x_poles, list_y_poles)
         else:
             self.points_plot_poles.set_data([], [])
 
-        if self.list_zeros:
-            x_zeros, y_zeros = zip(*self.list_zeros)
-            self.points_plot_zeros.set_data(x_zeros, y_zeros)
+        if not self.zeros.empty():
+            list_x_zeros = []
+            list_y_zeros = []
+            for pair_z in self.zeros.list:
+                for z in pair_z:
+                    list_x_zeros.append(z.real)
+                    list_y_zeros.append(z.imag)
+            self.points_plot_zeros.set_data(list_x_zeros, list_y_zeros)
         else:
             self.points_plot_zeros.set_data([], [])
 
