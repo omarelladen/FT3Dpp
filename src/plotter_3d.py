@@ -48,7 +48,6 @@ class Plotter3D:
         self.box_res_v = self._create_spinbox("V", self._change_resolution_v)
         self.box_res_u = self._create_spinbox("U", self._change_resolution_u)
 
-
     def _create_spinbox(self, axis, cmd):
         fr_padx = 2
 
