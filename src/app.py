@@ -218,6 +218,18 @@ class App:
         self._create_label_coords(self.fr_zeros, self.text_zeros_var)
 
 
+        self.fr_stats = self._create_label_fr(
+            self.fr_top,
+            "Total"
+        )
+        self.label_stats = tk.Label(
+            self.fr_stats,
+            text="",
+            fg=color_text,
+            bg=color_bg
+        )
+        self.label_stats.grid(row=0, column=0, padx=2, pady=2)
+
 #         self.fr_limits = self._create_label_fr(
 #             self.fr_top,
 #             "Limites do Plano"
@@ -1119,6 +1131,14 @@ class App:
         self._update_labels_coords()
         self._update_label_tf()
         self._update_sys_clf()
+        self._update_stats()
+
+    def _update_stats(self):
+        text = (
+            f"Polos: {self.poles.num_elements()}\n"
+            f"Zeros: {self.zeros.num_elements()}"
+        )
+        self.label_stats.config(text=text)
 
     def _update_sys_clf(self):
         if self.zeros.num_elements() == 0 and self.poles.num_elements() == 0:
