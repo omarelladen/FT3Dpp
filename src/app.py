@@ -594,20 +594,20 @@ class App:
                 "não serão exibidas."
             )
         else:
+            msg = (
+                "O sistema é realizável (causal), pois o grau do "
+                "denominador da Função de Transferência é maior ou "
+                "igual ao o grau do numerador."
+            )
+
             if self.sys_stable:
-                msg = (
-                    "O sistema é realizável (causal), pois o grau do "
-                    "denominador da Função de Transferência é maior ou "
-                    "igual que o grau do numerador."
+                msg += (
                     "\n\n"
                     "O sistema é estável, pois todos os seus polos estão "
                     "dentro da circunferência de raio unitário."
                 )
             else:
-                msg = (
-                    "O sistema é realizável (causal), pois o grau do "
-                    "denominador da Função de Transferência é maior ou "
-                    "igual que o grau do numerador."
+                msg += (
                     "\n\n"
                     "O sistema é instável, pois pelo menos um de seus "
                     "polos está fora ou sobre a circunferência de raio "
