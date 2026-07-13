@@ -6,6 +6,22 @@ import tkinter as tk
 from configs import *
 
 
+max_exp = 20
+
+dict_subst_z = {
+    "z_inv": "z⁻¹",
+    "*": "",
+    "1.0z": "z",
+    "z⁻¹ + 1.0": "z⁻¹ + 1",
+    " ": ""
+}
+
+dict_subst_exp = {
+    '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
+    '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹'
+}
+
+
 class TFDisplayer:
     def __init__(self, app, box):
         self.app = app
@@ -97,9 +113,9 @@ class TFDisplayer:
 
     def update_label_tf(self):
         if self.app.var_z_inv.get():
-            eq = self.app.math_utils.format_H_z_inv(self.app.zeros, self.app.poles)
+            eq = self._format_H_z_inv(self.app.zeros, self.app.poles)
         else:
-            eq = self.app.math_utils.format_H_z(self.app.zeros, self.app.poles)
+            eq = self._format_H_z(self.app.zeros, self.app.poles)
         self.subfr_form.pack_forget()
         self.label_hz.config(text=eq)
         self.label_hz.pack()
@@ -116,3 +132,56 @@ class TFDisplayer:
 
     def _on_calc_tf2zpk(self):
         pass
+
+    def _format_H_z_inv(self, zeros, poles):
+        return self._format_H_z_eq(
+            zeros,
+            poles,
+            self.app.math_utils.calc_H_z_inv_eq,
+            "⁻",
+            "z_inv"
+        )
+
+    def _format_H_z(self, zeros, poles):
+        return self._format_H_z_eq(
+            zeros,
+            poles,
+            self.app.math_utils.calc_H_z_eq,
+            "",
+            "z"
+        )
+
+    def _format_H_z_eq(self, zeros, poles, funct, signal, base):
+        num, den = funct(zeros, poles)
+
+        if num == 1 and den == 1:
+            return "H(z) = 1"
+
+        num = str(num)
+        den = str(den)
+
+        # Substitutions
+
+        for exp in range(max_exp, 1, -1):
+            new_exp = signal + "".join(dict_subst_exp[d] for d in str(exp))
+            num = num.replace(f"{base}**{exp}", f"z{new_exp}")
+            den = den.replace(f"{base}**{exp}", f"z{new_exp}")
+
+        for old, new in dict_subst_z.items():
+            num = num.replace(old, new)
+            den = den.replace(old, new)
+
+        return self._create_eq(num, den)
+
+    def _create_eq(self, num, den):
+        bar_size = max(len(num), len(den))
+        bar = "—" * bar_size
+
+        num_center = num.center(bar_size)
+        den_center = den.center(bar_size)
+
+        return (
+            f"       {num_center}\n"
+            f"H(z) = {bar}\n"
+            f"       {den_center}"
+        )

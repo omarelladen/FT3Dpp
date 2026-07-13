@@ -4,19 +4,6 @@
 import numpy as np
 import sympy as sp
 
-from configs import *
-
-
-dict_subst_z = {
-    "z_inv": "z⁻¹",
-    "*": "",
-    "1.0z": "z",
-    "z⁻¹ + 1.0": "z⁻¹ + 1",
-    " ": ""
-}
-
-max_exp = 20
-
 
 # TODO: prevent -1 term instead of 1 in Y(z)
 class MathUtils():
@@ -108,8 +95,8 @@ class MathUtils():
     def calc_phase_H_deg(self, H_z):
         return np.rad2deg(self.calc_phase_H_rad(H_z))
 
-    def _calc_H_z_inv_eq(self, zeros, poles):
-        num, den = self._calc_H_z_eq(zeros, poles)
+    def calc_H_z_inv_eq(self, zeros, poles):
+        num, den = self.calc_H_z_eq(zeros, poles)
 
         if num == 1 and den == 1:
             return 1, 1
@@ -128,7 +115,7 @@ class MathUtils():
 
         return num, den
 
-    def _calc_H_z_eq(self, zeros, poles):
+    def calc_H_z_eq(self, zeros, poles):
         if not poles and not zeros:
             return 1, 1
 
@@ -197,56 +184,3 @@ class MathUtils():
         y_line = np.sin(w_plot)
 
         return x_line, y_line, z_line
-
-    def format_H_z_inv(self, zeros, poles):
-        return self._format_H_z(
-            zeros,
-            poles,
-            self._calc_H_z_inv_eq,
-            "⁻",
-            "z_inv"
-        )
-
-    def format_H_z(self, zeros, poles):
-        return self._format_H_z(
-            zeros,
-            poles,
-            self._calc_H_z_eq,
-            "",
-            "z"
-        )
-
-    def _format_H_z(self, zeros, poles, funct, signal, base):
-        num, den = funct(zeros, poles)
-
-        if num == 1 and den == 1:
-            return "H(z) = 1"
-
-        num = str(num)
-        den = str(den)
-
-        # Substitutions
-
-        for exp in range(max_exp, 1, -1):
-            new_exp = signal + "".join(dict_subst_exp[d] for d in str(exp))
-            num = num.replace(f"{base}**{exp}", f"z{new_exp}")
-            den = den.replace(f"{base}**{exp}", f"z{new_exp}")
-
-        for old, new in dict_subst_z.items():
-            num = num.replace(old, new)
-            den = den.replace(old, new)
-
-        return self._create_eq(num, den)
-
-    def _create_eq(self, num, den):
-        bar_size = max(len(num), len(den))
-        bar = "—" * bar_size
-
-        num_center = num.center(bar_size)
-        den_center = den.center(bar_size)
-
-        return (
-            f"       {num_center}\n"
-            f"H(z) = {bar}\n"
-            f"       {den_center}"
-        )
