@@ -534,7 +534,7 @@ class App:
         self.resolution.bind("<Return>",   lambda event: self._change_resolution())
         self.resolution.bind("<FocusOut>", lambda event: self._change_resolution())
 
-        self._update_all()
+        self.update_all()
 
     def _create_icon(self, filename, reduction=18):
         file_path = os.path.join("icons", filename)
@@ -647,8 +647,6 @@ class App:
             return
 
         list_sel.add(x, y)
-
-        self._update_all()
 
     def _change_resolution(self):
         resolution = self.resolution.get()
@@ -966,7 +964,7 @@ class App:
             self.update_freq_resp()
         elif clicked_key == self.icon_clear:
             self._clear_poles_zeros()
-            self._update_all()
+            self.update_all()
             v_clicked.set(False)
         elif clicked_key == self.icon_kb:
             self._open_kb_dialog()
@@ -995,8 +993,7 @@ class App:
     def _on_z_inv_click(self):
         if self.bt_states[self.icon_plane].get():
             self.tf_displayer.update_label_tf()
-        else:
-            self.tf_displayer.update_entries_tf()
+        self.tf_displayer.update_entries_tf()
 
     def _clear_poles_zeros(self):
         self.poles.clear()
@@ -1059,7 +1056,7 @@ class App:
                 else:  # "z"
                     self.zeros.pop(idx_group)
 
-                self._update_all()
+                self.update_all()
 
         # Left button
         elif event.button == L_BUTTON:
@@ -1080,6 +1077,7 @@ class App:
                     self.type_sel_point = None
             else:
                 self.add_element_plane(list_sel, event.xdata, event.ydata)
+                self.update_all()
 
                 if list_sel == self.poles:
                     self.idx_sel_point = self.poles.num_pairs() - 1
@@ -1111,13 +1109,13 @@ class App:
                 p_real = complex(event_x, 0)
                 target_list[self.idx_sel_point] = (p_real,)
 
-            self._update_all()
+            self.update_all()
 
     def _on_drop(self, event):
         self.idx_sel_point = None
         self.type_sel_point = None
 
-    def _update_all(self):
+    def update_all(self):
         self.update_plane()
         self.update_freq_resp()
         self._update_labels_coords()

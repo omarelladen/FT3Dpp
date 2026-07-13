@@ -3,6 +3,9 @@
 
 import tkinter as tk
 
+import numpy as np
+import scipy.signal as signal
+
 from configs import *
 
 
@@ -72,6 +75,8 @@ class TFDisplayer:
                 elif i == max_tf_entries:
                     exp = dict_subst_exp[str(i)]
                     str_entry = f"z{exp_sign}{exp}"
+                elif i == 1 and not self.app.var_z_inv.get():
+                    str_entry = "z + "
                 else:
                     exp = dict_subst_exp[str(i)]
                     str_entry = f"z{exp_sign}{exp} + "
@@ -85,7 +90,6 @@ class TFDisplayer:
             self.subfr_form,
             text="Calcular",
             command=self._on_calc_tf2zpk,
-            # width=10,
             relief="flat",
             overrelief="groove",
             cursor="hand2"
@@ -112,6 +116,7 @@ class TFDisplayer:
         #     entry.insert(0, "0")
 
     def update_label_tf(self):
+    # TODO: separate in show_ and update_
         if self.app.var_z_inv.get():
             eq = self._format_H_z_inv(self.app.zeros, self.app.poles)
         else:
@@ -124,14 +129,19 @@ class TFDisplayer:
         for list_labels in (self.list_tf_labels_p, self.list_tf_labels_z):
             for label in list_labels:
                 current_text = label.cget("text")
-                if self.app.var_z_inv.get():
-                    new_text = current_text.replace("z", "z⁻")
-                else:
-                    new_text = current_text.replace("z⁻", "z")
-                label.config(text=new_text)
 
-    def _on_calc_tf2zpk(self):
-        pass
+                if self.app.var_z_inv.get():
+                    if current_text == "z + ":
+                        new_text = "z⁻¹ + "
+                    else:
+                        new_text = current_text.replace("z", "z⁻")
+                else:
+                    if current_text == "z⁻¹ + ":
+                        new_text = "z + "
+                    else:
+                        new_text = current_text.replace("z⁻", "z")
+
+                label.config(text=new_text)
 
     def _format_H_z_inv(self, zeros, poles):
         return self._format_H_z_eq(
@@ -185,3 +195,56 @@ class TFDisplayer:
             f"H(z) = {bar}\n"
             f"       {den_center}"
         )
+
+    def _on_calc_tf2zpk(self):
+        num = []
+        den = []
+        for entry in self.list_tf_entries_p:
+            coef = entry.get().replace(",", ".")
+            num.append(coef)
+        for entry in self.list_tf_entries_z:
+            coef = entry.get().replace(",", ".")
+            den.append(coef)
+
+        num = [x if x.strip() != '' else '0' for x in num]
+        den = [x if x.strip() != '' else '0' for x in den]
+
+        try:
+            num = [float(x) for x in num]
+            den = [float(x) for x in den]
+
+            if not any(x != 0.0 for x in den):
+                valid = False
+            else:
+                valid = True
+        except ValueError:
+            valid = False
+
+        if valid:
+
+            if not self.app.var_z_inv.get():
+                num.reverse()
+                den.reverse()
+
+            # Remove extra zeros in the end to reduce the polynomial degree
+            while (
+                len(num) > 1 and
+                len(den) > 1 and
+                num[-1] == 0.0 and
+                den[-1] == 0.0
+            ):
+                num.pop()
+                den.pop()
+
+            zeros, poles, gain = signal.tf2zpk(num, den)
+
+            self.app._clear_poles_zeros()
+
+            for z in zeros:
+                if z.imag >= 0:
+                    self.app.add_element_plane(self.app.zeros, z.real, z.imag)
+            for p in poles:
+                if p.imag >= 0:
+                    self.app.add_element_plane(self.app.poles, p.real, p.imag)
+
+            self.app.update_all()
