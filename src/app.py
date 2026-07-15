@@ -977,9 +977,10 @@ class App:
             self._open_sys_clf_info()
             v_clicked.set(False)
         elif clicked_key == self.icon_plane:
-            self.tf_displayer.update_label_tf()
+            self.tf_displayer.update_labels()
+            self.tf_displayer.show_labels()
         elif clicked_key == "FT":
-            self.tf_displayer.show_tf_entries()
+            self.tf_displayer.show_entries()
         elif clicked_key in (
             self.icon_open,
             self.icon_save,
@@ -993,8 +994,8 @@ class App:
 
     def _on_z_inv_click(self):
         if self.bt_states[self.icon_plane].get():
-            self.tf_displayer.update_label_tf()
-        self.tf_displayer.update_entries_tf()
+            self.tf_displayer.update_labels()
+        self.tf_displayer.invert_z_entries()
 
     def _clear_poles_zeros(self):
         self.poles.clear()
@@ -1123,7 +1124,7 @@ class App:
         self._update_stats()
         self._update_sys_clf()
         if self.bt_states[self.icon_plane].get():
-            self.tf_displayer.update_label_tf()
+            self.tf_displayer.update_labels()
 
     def _update_stats(self):
         text = (

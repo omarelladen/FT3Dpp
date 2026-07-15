@@ -42,24 +42,24 @@ class TFDisplayer:
         fr_entries = tk.Frame(self.subfr_form, bg=color_bg)
         fr_entries.pack(side="left", padx=5)
 
-        max_tf_entries = 8
-        self.list_tf_entries_p = []
-        self.list_tf_entries_z = []
+        max_entries = 8
+        self.list_entries_p = []
+        self.list_entries_z = []
 
-        self.list_tf_labels_p = []
-        self.list_tf_labels_z = []
+        self.list_labels_p = []
+        self.list_labels_z = []
 
-        fr_row_tf_p = tk.Frame(fr_entries, bg=color_bg)
-        fr_row_tf_z = tk.Frame(fr_entries, bg=color_bg)
+        fr_row_p = tk.Frame(fr_entries, bg=color_bg)
+        fr_row_z = tk.Frame(fr_entries, bg=color_bg)
 
-        fr_row_tf_p.pack(side="top", fill="x", pady=2)
-        fr_row_tf_z.pack(side="top", fill="x", pady=2)
+        fr_row_p.pack(side="top", fill="x", pady=2)
+        fr_row_z.pack(side="top", fill="x", pady=2)
 
         for fr_row, list_entries, list_labels in (
-            (fr_row_tf_p, self.list_tf_entries_p, self.list_tf_labels_p),
-            (fr_row_tf_z, self.list_tf_entries_z, self.list_tf_labels_z)
+            (fr_row_p, self.list_entries_p, self.list_labels_p),
+            (fr_row_z, self.list_entries_z, self.list_labels_z)
         ):
-            for i in range(0, max_tf_entries+1):
+            for i in range(0, max_entries+1):
                 entry = tk.Entry(fr_row, width=5)
                 entry.pack(side="left")
                 entry.insert(0, "0")
@@ -72,7 +72,7 @@ class TFDisplayer:
 
                 if i == 0:
                     str_entry = " + "
-                elif i == max_tf_entries:
+                elif i == max_entries:
                     exp = dict_subst_exp[str(i)]
                     str_entry = f"z{exp_sign}{exp}"
                 elif i == 1 and not self.app.var_z_inv.get():
@@ -89,7 +89,7 @@ class TFDisplayer:
         tk.Button(
             self.subfr_form,
             text="Calcular",
-            command=self._on_calc_tf2zpk,
+            command=self._on_calc,
             relief="flat",
             overrelief="groove",
             cursor="hand2"
@@ -106,27 +106,31 @@ class TFDisplayer:
         label.pack(expand=True)
         return label
 
-    def show_tf_entries(self):
+    def show_entries(self):
         self.label_hz.pack_forget()
         self.subfr_form.pack()
 
         # Clear
-        # for entry in self.list_tf_entries_p:
-        #     entry.delete(0, tk.END)
-        #     entry.insert(0, "0")
+        for list_entries in (self.list_entries_p, self.list_entries_z):
+            for entry in list_entries:
+                entry.delete(0, tk.END)
+                entry.insert(0, "0")
 
-    def update_label_tf(self):
-    # TODO: separate in show_ and update_
+    def show_labels(self):
+        self.subfr_form.pack_forget()
+        self.label_hz.pack()
+
+    def update_labels(self):
+        # TODO: separate in show_ and update_
         if self.app.var_z_inv.get():
             eq = self._format_H_z_inv(self.app.zeros, self.app.poles)
         else:
             eq = self._format_H_z(self.app.zeros, self.app.poles)
-        self.subfr_form.pack_forget()
-        self.label_hz.config(text=eq)
-        self.label_hz.pack()
 
-    def update_entries_tf(self):
-        for list_labels in (self.list_tf_labels_p, self.list_tf_labels_z):
+        self.label_hz.config(text=eq)
+
+    def invert_z_entries(self):
+        for list_labels in (self.list_labels_p, self.list_labels_z):
             for label in list_labels:
                 current_text = label.cget("text")
 
@@ -196,13 +200,13 @@ class TFDisplayer:
             f"       {den_center}"
         )
 
-    def _on_calc_tf2zpk(self):
+    def _on_calc(self):
         num = []
         den = []
-        for entry in self.list_tf_entries_p:
+        for entry in self.list_entries_p:
             coef = entry.get().replace(",", ".")
             num.append(coef)
-        for entry in self.list_tf_entries_z:
+        for entry in self.list_entries_z:
             coef = entry.get().replace(",", ".")
             den.append(coef)
 
