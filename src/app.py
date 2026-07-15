@@ -642,6 +642,7 @@ class App:
         messagebox.showerror(title=title, message=msg)
 
     def add_element_plane(self, list_sel, x, y):
+        '''Called only once for each complex conjugate pair'''
         if list_sel is None:
             self._show_error("Valor Inválido")
             return
