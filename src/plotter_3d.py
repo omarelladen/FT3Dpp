@@ -18,7 +18,9 @@ class Plotter3D:
 
         self.tl = tk.Toplevel(parent)
         self.tl.title("Gráfico 3D")
-        self.tl.transient(parent)
+
+        self.tl.wait_visibility()
+        self.tl.grab_set()
 
         # Blank Figure
         self.fig = Figure(figsize=(6, 5), dpi=100)
