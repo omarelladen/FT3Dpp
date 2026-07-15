@@ -20,7 +20,7 @@ class MathUtils():
     def get_w_plot(self):
         return np.linspace(0, self.max_pi*np.pi, self.max_pi*self.resolution)
 
-    def calc_H(self, zeros, poles):
+    def H(self, zeros, poles):
         w = self._get_w()
 
         num = np.ones(self.resolution, dtype=complex)
@@ -39,7 +39,7 @@ class MathUtils():
         H_z = np.nan_to_num(H_z, nan=0.0, posinf=1e12, neginf=-1e12)
         return H_z
 
-    def calc_mag_H(self, H_z):
+    def mag_H(self, H_z):
         mag_base = np.abs(H_z)
 
         # [3,2,1,1,0] + [1,1,2] = [3,2,1,1,0,1,1,2,3] (e.g 500 pts -> 998 pts)
@@ -58,25 +58,25 @@ class MathUtils():
 
         return mag_H
 
-    def calc_mag_H_db(self, H_z):
-        mag_H = self.calc_mag_H(H_z)
+    def mag_H_db(self, H_z):
+        mag_H = self.mag_H(H_z)
         mag_H_db = 20 * np.log10(mag_H)
         return mag_H_db
 
-    def calc_mag_H_norm(self, H_z):
-        mag_H = self.calc_mag_H(H_z)
+    def mag_H_norm(self, H_z):
+        mag_H = self.mag_H(H_z)
         peak = np.max(mag_H)
         if peak > 0:
             mag_H = mag_H/peak
         return mag_H
 
-    def calc_mag_H_db_norm(self, H_z):
-        mag_H_db = self.calc_mag_H_db(H_z)
+    def mag_H_db_norm(self, H_z):
+        mag_H_db = self.mag_H_db(H_z)
         peak = np.max(mag_H_db)
         mag_H_db = mag_H_db - peak
         return mag_H_db
 
-    def calc_phase_H_rad(self, H_z):
+    def phase_H_rad(self, H_z):
         phase_base = np.angle(H_z)
 
         # [3,2,1,1,0] -> [3,2,1,1,0,-1,-1,-2,-3]
@@ -93,11 +93,11 @@ class MathUtils():
 
         return phase_final
 
-    def calc_phase_H_deg(self, H_z):
-        return np.rad2deg(self.calc_phase_H_rad(H_z))
+    def phase_H_deg(self, H_z):
+        return np.rad2deg(self.phase_H_rad(H_z))
 
-    def calc_H_z_inv_eq(self, zeros, poles):
-        num, den = self.calc_H_z_eq(zeros, poles)
+    def H_z_inv_eq(self, zeros, poles):
+        num, den = self.H_z_eq(zeros, poles)
 
         if num == 1 and den == 1:
             return 1, 1
@@ -116,7 +116,7 @@ class MathUtils():
 
         return num, den
 
-    def calc_H_z_eq(self, zeros, poles):
+    def H_z_eq(self, zeros, poles):
         if not poles and not zeros:
             return 1, 1
 
@@ -139,7 +139,7 @@ class MathUtils():
 
         return num, den
 
-    def calc_mag_H_3D(self, zeros, poles, clip_limit):
+    def mag_H_3D(self, zeros, poles, clip_limit):
         u = np.linspace(0, 2*np.pi, self.resolution_u)
         v = np.linspace(0.01, 2.0, self.resolution_v)
         U, V = np.meshgrid(u, v)
@@ -172,14 +172,14 @@ class MathUtils():
 
         return x_mesh, y_mesh, z_mesh
 
-    def calc_line_3D(self, zeros, poles, clip_limit):
+    def line_3D(self, zeros, poles, clip_limit):
         w_plot = self.get_w_plot()
-        H_z_line = self.calc_H(
+        H_z_line = self.H(
             zeros,
             poles
         )
 
-        z_line = self.calc_mag_H(H_z_line)
+        z_line = self.mag_H(H_z_line)
         z_line = np.clip(z_line, None, clip_limit)
         x_line = np.cos(w_plot)
         y_line = np.sin(w_plot)

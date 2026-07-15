@@ -666,31 +666,31 @@ class App:
         self.math_utils.max_pi = theta_val
 
         w_plot = self.math_utils.get_w_plot()
-        H_z = self.math_utils.calc_H(self.zeros, self.poles)
+        H_z = self.math_utils.H(self.zeros, self.poles)
 
         # Select what to plot
         if self.bt_states[self.icon_phase].get():
             if self.var_phase_deg.get():
-                ang_H = self.math_utils.calc_phase_H_deg(H_z)
+                ang_H = self.math_utils.phase_H_deg(H_z)
                 self._set_freq_resp_title("Resposta em Frequência: Fase (graus)")
             else:
-                ang_H = self.math_utils.calc_phase_H_rad(H_z)
+                ang_H = self.math_utils.phase_H_rad(H_z)
                 self._set_freq_resp_title("Resposta em Frequência: Fase (rad)")
             line = ang_H
             self._set_phase_checkbox()
         elif self.bt_states[self.icon_freq_db].get():
             if self.var_normalize.get():
-                mag_H_db = self.math_utils.calc_mag_H_db_norm(H_z)
+                mag_H_db = self.math_utils.mag_H_db_norm(H_z)
             else:
-                mag_H_db = self.math_utils.calc_mag_H_db(H_z)
+                mag_H_db = self.math_utils.mag_H_db(H_z)
             line = mag_H_db
             self._set_freq_resp_title("Resposta em Frequência: Magnitude (dB)")
             self._set_mag_checkbox()
         else:
             if self.var_normalize.get():
-                mag_H = self.math_utils.calc_mag_H_norm(H_z)
+                mag_H = self.math_utils.mag_H_norm(H_z)
             else:
-                mag_H = self.math_utils.calc_mag_H(H_z)
+                mag_H = self.math_utils.mag_H(H_z)
             line = mag_H
             self._set_freq_resp_title("Resposta em Frequência: Magnitude")
             self._set_mag_checkbox()

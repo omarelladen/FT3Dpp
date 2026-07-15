@@ -148,7 +148,7 @@ class TFDisplayer:
         return self._format_H_z_eq(
             zeros,
             poles,
-            self.app.math_utils.calc_H_z_inv_eq,
+            self.app.math_utils.H_z_inv_eq,
             "⁻",
             "z_inv"
         )
@@ -157,7 +157,7 @@ class TFDisplayer:
         return self._format_H_z_eq(
             zeros,
             poles,
-            self.app.math_utils.calc_H_z_eq,
+            self.app.math_utils.H_z_eq,
             "",
             "z"
         )
