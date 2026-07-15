@@ -167,7 +167,7 @@ class KBDialog:
             list_sel = self.app.zeros
 
         self.app.add_element_plane(list_sel, x, y)
-        self.update_all()
+        self.app.update_all()
 
     def _on_cancel(self):
         self.tl.destroy()
