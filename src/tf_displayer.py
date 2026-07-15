@@ -3,9 +3,6 @@
 
 import tkinter as tk
 
-import numpy as np
-import scipy.signal as signal
-
 from configs import *
 
 
@@ -165,7 +162,7 @@ class TFDisplayer:
             "z"
         )
 
-    def _format_H_z_eq(self, zeros, poles, funct, signal, base):
+    def _format_H_z_eq(self, zeros, poles, funct, sign, base):
         num, den = funct(zeros, poles)
 
         if num == 1 and den == 1:
@@ -177,7 +174,7 @@ class TFDisplayer:
         # Substitutions
 
         for exp in range(max_exp, 1, -1):
-            new_exp = signal + "".join(dict_subst_exp[d] for d in str(exp))
+            new_exp = sign + "".join(dict_subst_exp[d] for d in str(exp))
             num = num.replace(f"{base}**{exp}", f"z{new_exp}")
             den = den.replace(f"{base}**{exp}", f"z{new_exp}")
 
@@ -225,7 +222,6 @@ class TFDisplayer:
             valid = False
 
         if valid:
-
             if not self.app.var_z_inv.get():
                 num.reverse()
                 den.reverse()
@@ -240,9 +236,9 @@ class TFDisplayer:
                 num.pop()
                 den.pop()
 
-            zeros, poles, gain = signal.tf2zpk(num, den)
+            zeros, poles, _ = self.app.math_utils.tf2zpk(num, den)
 
-            self.app._clear_poles_zeros()
+            self.app.clear_poles_zeros()
 
             for z in zeros:
                 if z.imag >= 0:

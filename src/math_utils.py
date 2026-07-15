@@ -3,6 +3,7 @@
 
 import numpy as np
 import sympy as sp
+import scipy.signal as signal
 
 
 # TODO: prevent -1 term instead of 1 in Y(z)
@@ -184,3 +185,7 @@ class MathUtils():
         y_line = np.sin(w_plot)
 
         return x_line, y_line, z_line
+
+    def tf2zpk(self, num, den):
+        zeros, poles, gain = signal.tf2zpk(num, den)
+        return zeros, poles, gain

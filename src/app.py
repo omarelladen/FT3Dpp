@@ -964,7 +964,7 @@ class App:
         if clicked_key in (self.icon_freq, self.icon_freq_db, self.icon_phase):
             self.update_freq_resp()
         elif clicked_key == self.icon_clear:
-            self._clear_poles_zeros()
+            self.clear_poles_zeros()
             self.update_all()
             v_clicked.set(False)
         elif clicked_key == self.icon_kb:
@@ -997,7 +997,7 @@ class App:
             self.tf_displayer.update_labels()
         self.tf_displayer.invert_z_entries()
 
-    def _clear_poles_zeros(self):
+    def clear_poles_zeros(self):
         self.poles.clear()
         self.zeros.clear()
 
