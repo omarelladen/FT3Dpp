@@ -14,12 +14,11 @@ class KBDialog:
         # Create Toplevel
         self.tl = tk.Toplevel(parent)
         self.tl.title("Inserção via Teclado")
-        self.tl.resizable(True, True)
 
         # Keep the Toplevel in the front
-        self.tl.transient(parent)
+        self.tl.transient(parent)  # minimize along parent
         self.tl.wait_visibility()  # wait until the win is drawn
-        self.tl.grab_set()
+        self.tl.grab_set()         # block clicks in the parent
         # self.tl.lift()
 
         # Add padding and color to the Toplevel
