@@ -501,7 +501,7 @@ class App:
 
         tk.Label(
             self.fr_input_r,
-            text="pts",
+            text="pts (0-π)",
             fg=color_text,
             bg=color_bg
         ).pack(side="right", padx=fr_r_padx)
