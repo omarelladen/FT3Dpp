@@ -434,12 +434,12 @@ class App:
 
         # Theta Spin
 
-        tk.Label(
+        self.label_theta_max = tk.Label(
             self.fr_input_r,
             text="θₘₐₓ =",
             fg=color_text,
             bg=color_bg
-        ).pack(side="left", padx=self.fr_r_padx)
+        )
 
         self.spin_theta_max = tk.Spinbox(
             self.fr_input_r,
@@ -453,14 +453,15 @@ class App:
             buttonbackground=color_bg,
             command=self.update_freq_resp
         )
-        self.spin_theta_max.pack(side="left", padx=self.fr_r_padx)
 
-        tk.Label(
+        self.label_theta_max_unit = tk.Label(
             self.fr_input_r,
             text="π",
             fg=color_text,
             bg=color_bg
-        ).pack(side="left", padx=self.fr_r_padx)
+        )
+
+        self._show_theta_max()
 
         # Normalized checkbox
         self.var_normalize = tk.BooleanVar(value=True)
@@ -716,17 +717,30 @@ class App:
 
         self.canvas_r.draw_idle()
 
+    def _hide_theta_max(self):
+        self.label_theta_max.pack_forget()
+        self.spin_theta_max.pack_forget()
+        self.label_theta_max_unit.pack_forget()
+
+    def _show_theta_max(self):
+        self.label_theta_max.pack(side="left", padx=self.fr_r_padx)
+        self.spin_theta_max.pack(side="left", padx=self.fr_r_padx)
+        self.label_theta_max_unit.pack(side="left", padx=self.fr_r_padx)
+
     def _set_phase_checkbox(self):
+        self._show_theta_max()
         self.check_normalize.pack_forget()
         self.check_phase_unit.pack(side="left", padx=10)
 
     def _set_mag_checkbox(self):
+        self._show_theta_max()
         self.check_phase_unit.pack_forget()
         self.check_normalize.pack(side="left", padx=10)
 
     def _set_sample_spin(self):
         self.check_normalize.pack_forget()
         self.check_phase_unit.pack_forget()
+        self._hide_theta_max()
 
     def _set_freq_resp_title(self, title):
         self.ax_r.set_title(
