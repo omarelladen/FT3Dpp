@@ -430,7 +430,7 @@ class App:
         self.fr_input_r = tk.Frame(self.fr_resp, bg=color_bg, pady=5)
         self.fr_input_r.pack(side="top", fill="x")
 
-        fr_r_padx = 2
+        self.fr_r_padx = 2
 
         # Theta Spin
 
@@ -439,9 +439,9 @@ class App:
             text="θₘₐₓ =",
             fg=color_text,
             bg=color_bg
-        ).pack(side="left", padx=fr_r_padx)
+        ).pack(side="left", padx=self.fr_r_padx)
 
-        self.theta_max = tk.Spinbox(
+        self.spin_theta_max = tk.Spinbox(
             self.fr_input_r,
             from_=1, to=max_pi,
             increment=1,
@@ -453,14 +453,14 @@ class App:
             buttonbackground=color_bg,
             command=self.update_freq_resp
         )
-        self.theta_max.pack(side="left", padx=fr_r_padx)
+        self.spin_theta_max.pack(side="left", padx=self.fr_r_padx)
 
         tk.Label(
             self.fr_input_r,
             text="π",
             fg=color_text,
             bg=color_bg
-        ).pack(side="left", padx=fr_r_padx)
+        ).pack(side="left", padx=self.fr_r_padx)
 
         # Normalized checkbox
         self.var_normalize = tk.BooleanVar(value=True)
@@ -499,9 +499,9 @@ class App:
             text="pts (0-π)",
             fg=color_text,
             bg=color_bg
-        ).pack(side="right", padx=fr_r_padx)
+        ).pack(side="right", padx=self.fr_r_padx)
 
-        self.resolution = tk.Spinbox(
+        self.spin_res = tk.Spinbox(
             self.fr_input_r,
             from_=5, to=max_resolution,
             increment=5,
@@ -513,22 +513,22 @@ class App:
             buttonbackground=color_bg,
             command=self._change_resolution
         )
-        self.resolution.pack(side="right", padx=fr_r_padx)
+        self.spin_res.pack(side="right", padx=self.fr_r_padx)
 
         tk.Label(
             self.fr_input_r,
             text="Resolução =",
             fg=color_text,
             bg=color_bg
-        ).pack(side="right", padx=fr_r_padx)
+        ).pack(side="right", padx=self.fr_r_padx)
 
 
         self.color_dialog = ColorDialog(self.win, self)
         self.system_classifier = SystemClassifier(self)
 
         # Events to confirm keyboard values
-        self.resolution.bind("<Return>",   lambda event: self._change_resolution())
-        self.resolution.bind("<FocusOut>", lambda event: self._change_resolution())
+        self.spin_res.bind("<Return>",   lambda event: self._change_resolution())
+        self.spin_res.bind("<FocusOut>", lambda event: self._change_resolution())
 
         self.update_all()
 
@@ -633,19 +633,19 @@ class App:
         list_sel.add(x, y)
 
     def _change_resolution(self):
-        resolution = self.resolution.get()
+        resolution = self.spin_res.get()
         if (resolution.isdigit() and
             int(resolution) > 1 and
             int(resolution) <= max_resolution
         ):
-            self.math_utils.resolution = int(self.resolution.get())
+            self.math_utils.resolution = int(self.spin_res.get())
             self.update_freq_resp()
         else:
-            self.resolution.delete(0, "end")
-            self.resolution.insert(0, str(self.math_utils.resolution))
+            self.spin_res.delete(0, "end")
+            self.spin_res.insert(0, str(self.math_utils.resolution))
 
     def update_freq_resp(self):
-        theta_val = int(self.theta_max.get())
+        theta_val = int(self.spin_theta_max.get())
         self.math_utils.max_pi = theta_val
 
         w_plot = self.math_utils.get_w_plot()

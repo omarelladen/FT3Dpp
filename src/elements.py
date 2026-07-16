@@ -14,6 +14,7 @@ class Elements():
 
     def add(self, x, y):
         '''Called only once for each complex conjugate pair'''
+        # TODO: truncate floats
         element = complex(x, y)
         if element.imag != 0:
             conj = complex(x, -y)
