@@ -118,7 +118,6 @@ class TFDisplayer:
         self.label_hz.pack()
 
     def update_labels(self):
-        # TODO: separate in show_ and update_
         if self.app.var_z_inv.get():
             eq = self._format_H_z_inv(self.app.zeros, self.app.poles)
         else:

@@ -109,6 +109,9 @@ class SystemClassifier:
                             only_zeros_1_0 = False
                             break
 
+                    # TODO: case when poles and zeros cancel each other
+                    #       everywhere except on (0,1)
+
                     if only_zeros_1_0:
                         if degree > 0:
                             text = f"Integrador de grau {degree}"

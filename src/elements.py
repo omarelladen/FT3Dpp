@@ -19,7 +19,7 @@ class Elements():
 
     def add(self, x, y):
         """Called only once for each complex conjugate pair"""
-        # TODO: truncate floats
+        # TODO: truncate floats and see decimals in _norm
         element = complex(x, y)
         if element.imag != 0:
             conj = complex(x, -y)
@@ -42,11 +42,14 @@ class Elements():
         list_norm = []
         for pair in list:
             pair_rounded = tuple(np.round(val, decimals) for val in pair)
-            # First sort by real part then by imag part
+
             pair_sorted = tuple(
-                sorted(pair_rounded, key=lambda c: (c.real, c.imag))
+                sorted(
+                    pair_rounded,
+                    key=lambda c: (c.real, c.imag))  # first sort by real part
             )
             list_norm.append(pair_sorted)
+
         return Counter(list_norm)
 
     def equal(self, other):
