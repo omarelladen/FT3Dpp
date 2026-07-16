@@ -6,6 +6,10 @@ import sympy as sp
 import scipy.signal as signal
 
 
+max_value = 1e12
+min_value = 1e-12
+
+
 # TODO: prevent -1 term instead of 1 in Y(z)
 class MathUtils():
     def __init__(self, resolution, sample_size, max_pi=1):
@@ -37,7 +41,7 @@ class MathUtils():
         with np.errstate(divide='ignore', invalid='ignore'):
             H_z = num / den  # den=0 => H_z=np.inf
 
-        H_z = np.nan_to_num(H_z, nan=0.0, posinf=1e12, neginf=-1e12)
+        H_z = np.nan_to_num(H_z, nan=0.0, posinf=max_value, neginf=-max_value)
         return H_z
 
     def mag_H(self, H_z):
@@ -54,7 +58,7 @@ class MathUtils():
 
         # Interpolate bc len(xp) != len(w_plot)
         mag_H = np.interp(w_plot, xp, mag_total)
-        mag_H = np.clip(mag_H, a_min=1e-12, a_max=None)
+        mag_H = np.clip(mag_H, a_min=min_value, a_max=None)
 
         return mag_H
 
@@ -90,7 +94,7 @@ class MathUtils():
 
         # Interpolate bc len(xp) != len(w_plot)
         phase = np.interp(w_plot, xp, phase_total)
-        phase = np.clip(phase, a_min=1e-12, a_max=None)
+        phase = np.clip(phase, a_min=min_value, a_max=None)
 
         return phase
 
@@ -166,7 +170,7 @@ class MathUtils():
         with np.errstate(divide='ignore', invalid='ignore'):
             H_z_mesh = num/den
 
-        H_z_mesh = np.nan_to_num(H_z_mesh, nan=0.0, posinf=1e12, neginf=-1e12)
+        H_z_mesh = np.nan_to_num(H_z_mesh, nan=0.0, posinf=max_value, neginf=-max_value)
 
         z_mesh = np.abs(H_z_mesh)
         z_mesh = np.clip(z_mesh, None, clip_limit)
