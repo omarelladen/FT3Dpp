@@ -62,7 +62,7 @@ python src/main.py
 - [x] 3D plot from z plane
 - [ ] 3D plot from s plane
 - [x] Choose 3D resolution
-- [ ] Choose 3D clip value
+- [x] Choose 3D clip value
 - [ ] Choose 3D colors
 - [ ] Reset 3D colors
 - [x] 2D plot navigation
@@ -80,7 +80,6 @@ python src/main.py
 - [ ] Choose impulse response max t
 - [x] Choose step response sample size
 - [ ] Choose step response max t
-- [ ] Choose plane limits
 - [x] Save plots
 - [ ] Save system
 - [x] Choose 2D plot colors
