@@ -38,6 +38,9 @@ max_pi = 4
 init_resolution = 500
 max_resolution = 1000
 
+init_sample_size = 5
+max_sample_size = 500
+
 dpi = 100
 
 ax_text_pos = 1.6
@@ -516,6 +519,32 @@ class App:
         )
         self._show_res()
 
+        # Sample Size Spin
+        self.label_sample_size = tk.Label(
+            self.fr_input_r,
+            text="Amostras = ",
+            fg=color_text,
+            bg=color_bg
+        )
+        self.spin_sample_size = tk.Spinbox(
+            self.fr_input_r,
+            from_=init_sample_size, to=max_sample_size,
+            increment=1,
+            width=4,
+            textvariable=tk.DoubleVar(value=init_sample_size),
+            bg=color_bg_spin,
+            fg=color_text,
+            insertbackground=color_text,
+            buttonbackground=color_bg,
+            command=self._change_sample_size
+        )
+        self.label_sample_size_unit = tk.Label(
+            self.fr_input_r,
+            text="pts",
+            fg=color_text,
+            bg=color_bg
+        )
+
         self.color_dialog = ColorDialog(self.win, self)
         self.system_classifier = SystemClassifier(self)
 
@@ -637,6 +666,9 @@ class App:
             self.spin_res.delete(0, "end")
             self.spin_res.insert(0, str(self.math_utils.resolution))
 
+    def _change_sample_size(self):
+        pass
+
     def update_freq_resp(self):
         theta_val = int(self.spin_theta_max.get())
         self.math_utils.max_pi = theta_val
@@ -672,12 +704,12 @@ class App:
             self._set_mag_options()
 
         elif self.bt_states[self.icon_imp].get():
-            n = 10
+            n = init_sample_size
             t, h = self.math_utils.dimpulse(self.zeros, self.poles, n)
             w_plot = t
             line = np.ravel(h)
             self._set_freq_resp_title("Resposta ao Impulso Unitário")
-            self._set_sample_spin()
+            self._set_sample_options()
 
 
         # X limit
@@ -728,18 +760,31 @@ class App:
         self.spin_res.pack(side=side, padx=padx)
         self.label_res.pack(side=side, padx=padx)
 
-    def _show_resp_options(self):
-        self._show_theta_max()
-        self._show_res()
-
-    def _hide_resp_options(self):
-        self._hide_theta_max()
-        self._hide_res()
-
     def _hide_res(self):
         self.label_res_unit.pack_forget()
         self.spin_res.pack_forget()
         self.label_res.pack_forget()
+
+    def _show_sample_size(self):
+        side = "left"
+        padx = self.fr_r_padx
+        self.label_sample_size.pack(side=side, padx=padx)
+        self.spin_sample_size.pack(side=side, padx=padx)
+        self.label_sample_size_unit.pack(side=side, padx=padx)
+
+    def _hide_sample_size(self):
+        self.label_sample_size.pack_forget()
+        self.spin_sample_size.pack_forget()
+        self.label_sample_size_unit.pack_forget()
+
+    def _show_resp_options(self):
+        self._show_theta_max()
+        self._show_res()
+        self._hide_sample_size()
+
+    def _hide_resp_options(self):
+        self._hide_theta_max()
+        self._hide_res()
 
     def _set_phase_options(self):
         self._show_resp_options()
@@ -751,10 +796,11 @@ class App:
         self.check_phase_unit.pack_forget()
         self.check_normalize.pack(side="left", padx=10)
 
-    def _set_sample_spin(self):
+    def _set_sample_options(self):
         self.check_normalize.pack_forget()
         self.check_phase_unit.pack_forget()
         self._hide_resp_options()
+        self._show_sample_size()
 
     def _set_freq_resp_title(self, title):
         self.ax_r.set_title(
