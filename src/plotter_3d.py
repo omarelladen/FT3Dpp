@@ -36,8 +36,13 @@ class Plotter3D:
 
         self.init_resolution = 70
         self.max_resolution = 150
+
+        self.init_clip = 10
+        self.max_clip = 100
+
         self.app.math_utils.resolution_u = self.init_resolution
         self.app.math_utils.resolution_v = self.init_resolution
+        self.app.math_utils.clip_limit_3d = self.init_clip
 
         self._update_curve()
 
@@ -47,74 +52,120 @@ class Plotter3D:
         self.fr_bt = tk.Frame(self.tl, bg=color_bg, pady=10)
         self.fr_bt.pack(fill="x")
 
-        self.box_res_v = self._create_spinbox("V", self._change_resolution_v)
-        self.box_res_u = self._create_spinbox("U", self._change_resolution_u)
+        self.spin_res_v = self._create_spinbox(
+            "Resolução V",
+            cmd=self._change_resolution_v,
+            from_=5,
+            to=self.max_resolution,
+            increment=5,
+            init_value=self.init_resolution,
+            side="right"
+        )
+        self.spin_res_u = self._create_spinbox(
+            "Resolução U",
+            cmd=self._change_resolution_u,
+            from_=5,
+            to=self.max_resolution,
+            increment=5,
+            init_value=self.init_resolution,
+            side="right"
+        )
+        self.spin_clip = self._create_spinbox(
+            "|H(z)|ₘₐₓ",
+            cmd=self._change_clip,
+            from_=1,
+            to=self.max_clip,
+            increment=1,
+            init_value=self.init_clip,
+            side="left"
+        )
 
-    def _create_spinbox(self, axis, cmd):
+    def _create_spinbox(self, title, cmd, from_, to, increment, init_value, side):
         fr_padx = 2
 
-        tk.Label(
+        label_unit = tk.Label(
             self.fr_bt,
             text="pts",
             fg=color_text,
             bg=color_bg
-        ).pack(side="right", padx=fr_padx)
+        )
 
-        spinbox = tk.Spinbox(
+        spin = tk.Spinbox(
             self.fr_bt,
-            from_=5, to=self.max_resolution,
-            increment=5,
+            from_=from_, to=to,
+            increment=increment,
             width=4,
-            textvariable=tk.DoubleVar(value=self.init_resolution),
+            textvariable=tk.DoubleVar(value=init_value),
             bg=color_bg_spin,
             fg=color_text,
             insertbackground=color_text,
             buttonbackground=color_bg,
             command=cmd
         )
-        spinbox.pack(side="right", padx=fr_padx)
 
-        tk.Label(
+        label_title = tk.Label(
             self.fr_bt,
-            text=f"Resolução {axis} =",
+            text=f"{title} =",
             fg=color_text,
             bg=color_bg
-        ).pack(side="right", padx=(25, fr_padx))
+        )
+
+        if side == "right":
+            label_unit.pack(side=side, padx=fr_padx)
+            spin.pack(side=side, padx=fr_padx)
+            label_title.pack(side=side, padx=(25, fr_padx))
+        else:
+            label_title.pack(side=side, padx=(25, fr_padx))
+            spin.pack(side=side, padx=fr_padx)
+            label_unit.pack(side=side, padx=fr_padx)
 
         # Events to confirm keyboard values
-        spinbox.bind("<Return>",   lambda event: cmd())
-        spinbox.bind("<FocusOut>", lambda event: cmd())
+        spin.bind("<Return>",   lambda event: cmd())
+        spin.bind("<FocusOut>", lambda event: cmd())
 
-        return spinbox
+        return spin
 
     def _change_resolution_u(self):
-        resolution = self.box_res_u.get()
+        resolution = self.spin_res_u.get()
         if (resolution.isdigit() and
             int(resolution) > 1 and
             int(resolution) <= self.max_resolution
         ):
-            self.app.math_utils.resolution_u = int(self.box_res_u.get())
+            self.app.math_utils.resolution_u = int(resolution)
             self._update_curve()
         else:
-            self.box_res_u.delete(0, "end")
-            self.box_res_u.insert(0, str(self.app.math_utils.resolution_u))
+            self.spin_res_u.delete(0, "end")
+            self.spin_res_u.insert(0, str(self.app.math_utils.resolution_u))
 
     def _change_resolution_v(self):
-        resolution = self.box_res_v.get()
+        resolution = self.spin_res_v.get()
         if (resolution.isdigit() and
             int(resolution) > 1 and
             int(resolution) <= self.max_resolution
         ):
-            self.app.math_utils.resolution_v = int(self.box_res_v.get())
+            self.app.math_utils.resolution_v = int(resolution)
             self._update_curve()
         else:
-            self.box_res_v.delete(0, "end")
-            self.box_res_v.insert(0, str(self.app.math_utils.resolution_v))
+            self.spin_res_v.delete(0, "end")
+            self.spin_res_v.insert(0, str(self.app.math_utils.resolution_v))
+
+    def _change_clip(self):
+        clip = self.spin_clip.get()
+        if (clip.isdigit() and
+            int(clip) > 1 and
+            int(clip) <= self.max_clip
+        ):
+            self.app.math_utils.clip_limit_3d = int(clip)
+            self._update_curve()
+        else:
+            self.spin_res_v.delete(0, "end")
+            self.spin_res_v.insert(0, str(self.app.math_utils.clip_limit_3d))
+
 
     def _update_curve(self):
         self.ax.clear()
 
-        clip_limit = 10
+        clip_limit = self.app.math_utils.clip_limit_3d
 
         self.ax.set_xlabel("Re")
         self.ax.set_ylabel("Im")

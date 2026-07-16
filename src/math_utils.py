@@ -16,6 +16,7 @@ class MathUtils():
         self.resolution = resolution
         self.resolution_u = 0
         self.resolution_v = 0
+        self.clip_limit_3d = 0
         self.sample_size = sample_size
         self.max_pi = max_pi
 
