@@ -25,6 +25,7 @@ from help_dialog import HelpDialog
 from plotter_3d import Plotter3D
 from elements import Elements
 from tf_displayer import TFDisplayer
+from system_classifier import SystemClassifier
 
 
 icon_logo_path = os.path.join("icons", "logo.png")
@@ -529,6 +530,7 @@ class App:
 
 
         self.color_dialog = ColorDialog(self.win, self)
+        self.system_classifier = SystemClassifier(self)
 
         # Events to confirm keyboard values
         self.resolution.bind("<Return>",   lambda event: self._change_resolution())
@@ -586,47 +588,7 @@ class App:
         HelpDialog(self.win, self)
 
     def _open_sys_clf_info(self):
-        if self.sys_empty:
-            msg = "Sistema vazio."
-        elif self.sys_integrator:
-            if self.sys_integrator_zeros:
-                msg = (
-                    "O sistema se comporta como um possível integrador digital"
-                )
-            else:
-                msg = (
-                    "O sistema se comporta como um integrador digital"
-                )
-        elif not self.sys_causal:
-            msg = (
-                "O sistema é irrealizável (não causal), pois o grau do "
-                "denominador da Função de Transferência é menor que o "
-                "grau do numerador."
-                "\n\n"
-                "Por isso, as respostas ao impulso e ao degrau unitário "
-                "não serão exibidas."
-            )
-        else:
-            msg = (
-                "O sistema é realizável (causal), pois o grau do "
-                "denominador da Função de Transferência é maior ou "
-                "igual ao o grau do numerador."
-            )
-
-            if self.sys_stable:
-                msg += (
-                    "\n\n"
-                    "O sistema é estável, pois todos os seus polos estão "
-                    "dentro da circunferência de raio unitário."
-                )
-            else:
-                msg += (
-                    "\n\n"
-                    "O sistema é instável, pois pelo menos um de seus "
-                    "polos está fora ou sobre a circunferência de raio "
-                    "unitário."
-                )
-
+        msg = self.system_classifier.info()
         self._show_info(
             title="Informações adicionais sobre o sistema",
             msg=msg
@@ -1134,54 +1096,9 @@ class App:
         self.label_stats.config(text=text)
 
     def _update_sys_clf(self):
-        if self.zeros.num_elements() == 0 and self.poles.num_elements() == 0:
-            text = ""
+        text, bg = self.system_classifier.update()
+        if bg is None:
             bg = color_bg
-            self.sys_empty = True
-        else:
-            self.sys_empty = False
-
-            self.sys_integrator = True
-            if self.poles.num_elements() == 0:
-                self.sys_integrator = False
-            for pair_p in self.poles.list:
-                p1 = pair_p[0]
-                x = p1.real
-                y = p1.imag
-                if x != 1 or y != 0:
-                    self.sys_integrator = False
-                    break
-            if self.sys_integrator:
-                if self.zeros.num_elements() > 0:
-                    self.sys_integrator_zeros = True
-                    text = "Integrador com constante"
-                    bg = "green"
-                else:
-                    self.sys_integrator_zeros = False
-                    text = f"Integrador de grau {self.poles.num_elements()}"
-                    bg = "green"
-
-            elif self.zeros.num_elements() > self.poles.num_elements():
-                text = "Sistema Irrealizável"
-                bg = "red"
-                self.sys_causal = False
-            else:
-                self.sys_causal = True
-                self.sys_stable = True
-                for pair_p in self.poles.list:
-                    p1 = pair_p[0]
-                    x = p1.real
-                    y = p1.imag
-                    r = np.sqrt(x**2 + y**2)
-                    if r >= 1:
-                        text = "Sistema Realizável e Instável"
-                        self.sys_stable = False
-                        bg = "red"
-                        break
-                if self.sys_stable:
-                    text = "Sistema Realizável e Estável"
-                    bg = "green"
-
         self.label_system.config(text=text)
         self.label_system.config(bg=bg)
 
