@@ -54,7 +54,6 @@ class MathUtils():
 
         # Interpolate bc len(xp) != len(w_plot)
         mag_H = np.interp(w_plot, xp, mag_total)
-
         mag_H = np.clip(mag_H, a_min=1e-12, a_max=None)
 
         return mag_H
@@ -90,9 +89,10 @@ class MathUtils():
         w_plot = self.get_w_plot()
 
         # Interpolate bc len(xp) != len(w_plot)
-        phase_final = np.interp(w_plot, xp, phase_total)
+        phase = np.interp(w_plot, xp, phase_total)
+        phase = np.clip(phase, a_min=1e-12, a_max=None)
 
-        return phase_final
+        return phase
 
     def phase_H_deg(self, H_z):
         return np.rad2deg(self.phase_H_rad(H_z))
