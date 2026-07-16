@@ -10,7 +10,7 @@ class SystemClassifier:
 
         self.sys_empty = True
         self.sys_integrator = False
-        self.sys_integrator_zeros = False
+        self.sys_integrator_k = False
         self.sys_stable = True
         self.sys_causal = True
 
@@ -18,7 +18,7 @@ class SystemClassifier:
         if self.sys_empty:
             msg = "Sistema vazio."
         elif self.sys_integrator:
-            if self.sys_integrator_zeros:
+            if self.sys_integrator_k:
                 msg = (
                     "O sistema se comporta como um possível integrador digital"
                 )
@@ -81,11 +81,36 @@ class SystemClassifier:
                     break
             if self.sys_integrator:
                 if zeros.num_elements() > 0:
-                    self.sys_integrator_zeros = True
-                    text = "Integrador com constante"
-                    bg = "green"
+                    degree = poles.num_elements()
+
+                    only_zeros_1_0 = True  # only at (1,0)
+                    for pair in zeros.list:
+                        z = pair[0]
+                        if z.real == 1 and z.imag == 0:
+                            degree -= 1
+                        else:
+                            only_zeros_1_0 = False
+                            break
+
+                    if only_zeros_1_0:
+                        if degree == 0:
+                            self.sys_empty = True
+                            text = ""
+                            bg = None
+                        elif degree > 0:
+                            self.sys_integrator_k = False
+                            text = f"Integrador de grau {degree}"
+                            bg = "green"
+                        else:  # more zeros than poles at (1,0)
+                            self.sys_integrator_k = True
+                            text = "Integrador com constante"
+                            bg = "green"
+                    else:
+                        self.sys_integrator_k = True
+                        text = "Integrador com constante"
+                        bg = "green"
                 else:
-                    self.sys_integrator_zeros = False
+                    self.sys_integrator_k = False
                     text = f"Integrador de grau {poles.num_elements()}"
                     bg = "green"
 
