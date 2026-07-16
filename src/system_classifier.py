@@ -19,15 +19,15 @@ class SystemClassifier:
         if self.empty:
             msg = "Sistema vazio."
         elif self.trivial:
-            msg = ("Sistema trivial, pois todos os polos e zeros se cancelam")
+            msg = ("Sistema Trivial, pois todos os polos e zeros se cancelam.")
         elif self.integrator:
             if self.integrator_k:
                 msg = (
-                    "O sistema se comporta como um possível integrador digital"
+                    "O sistema se comporta como um possível integrador digital."
                 )
             else:
                 msg = (
-                    "O sistema se comporta como um integrador digital"
+                    "O sistema se comporta como um integrador digital."
                 )
         elif not self.causal:
             msg = (
@@ -76,6 +76,10 @@ class SystemClassifier:
             text = ""
             bg = None
             self.empty = True
+        elif zeros.equal(poles):
+            text = "Sistema Trivial"
+            bg = "orange"
+            self.trivial = True
         else:
             if poles.num_elements() == 0:
                 self.integrator = False
@@ -108,22 +112,22 @@ class SystemClassifier:
                     if only_zeros_1_0:
                         if degree == 0:
                             self.trivial = True
-                            text = ""
-                            bg = None
+                            text = "Sistema Trivial"
+                            bg = "orange"
                         elif degree > 0:
                             text = f"Integrador de grau {degree}"
-                            bg = "green"
+                            bg = "orange"
                         else:  # more zeros than poles at (1,0)
                             self.integrator_k = True
                             text = "Integrador com constante"
-                            bg = "green"
+                            bg = "orange"
                     else:
                         self.integrator_k = True
                         text = "Integrador com constante"
-                        bg = "green"
+                        bg = "orange"
                 else:
                     text = f"Integrador de grau {poles.num_elements()}"
-                    bg = "green"
+                    bg = "orange"
             else:
                 for pair_p in poles.list:
                     p1 = pair_p[0]
