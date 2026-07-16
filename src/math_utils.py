@@ -26,11 +26,11 @@ class MathUtils():
         num = np.ones(self.resolution, dtype=complex)
         den = np.ones(self.resolution, dtype=complex)
 
-        for pair_z in zeros.list:
-            for zero in pair_z:
+        for pair in zeros.list:
+            for zero in pair:
                 num *= np.exp(1j*w) - zero
-        for pair_p in poles.list:
-            for pole in pair_p:
+        for pair in poles.list:
+            for pole in pair:
                 den *= np.exp(1j*w) - pole
 
         with np.errstate(divide='ignore', invalid='ignore'):
@@ -125,11 +125,11 @@ class MathUtils():
         num = 1
         den = 1
 
-        for pair_z in zeros.list:
-            for zero in pair_z:
+        for pair in zeros.list:
+            for zero in pair:
                 num *= z - sp.N(zero, 3)
-        for pair_p in poles.list:
-            for pole in pair_p:
+        for pair in poles.list:
+            for pole in pair:
                 den *= z - sp.N(pole, 3)
 
         if num != 1:
@@ -154,12 +154,12 @@ class MathUtils():
         num = np.ones_like(z_points, dtype=complex)
         den = np.ones_like(z_points, dtype=complex)
 
-        for pair_z in zeros.list:
-            for zero in pair_z:
+        for pair in zeros.list:
+            for zero in pair:
                 num *= z_points - zero
 
-        for pair_p in poles.list:
-            for pole in pair_p:
+        for pair in poles.list:
+            for pole in pair:
                 den *= z_points - pole
 
         with np.errstate(divide='ignore', invalid='ignore'):
