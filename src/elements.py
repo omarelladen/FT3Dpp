@@ -13,7 +13,7 @@ class Elements():
         return len(self.list)
 
     def add(self, x, y):
-        '''Called only once for each complex conjugate pair'''
+        """Called only once for each complex conjugate pair"""
         # TODO: truncate floats
         element = complex(x, y)
         if element.imag != 0:

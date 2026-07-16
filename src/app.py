@@ -38,7 +38,7 @@ max_pi = 4
 init_resolution = 500
 max_resolution = 1000
 
-init_sample_size = 6
+init_sample_size = 21
 max_sample_size = 50
 
 dpi = 100
@@ -73,21 +73,13 @@ class App:
                 except Exception as e:
                     print(f"Error loading icon {icon_logo_path}: {e}")
 
-
         # Menu Bar
 
         small_font = ("Arial", 8)
         self.menubar = tk.Menu(self.win, font=small_font)
 
-
-        # self.menu_file     = self._create_menu()
-        # self.menu_edit     = self._create_menu()
-        # self.menu_entry    = self._create_menu()
-        # self.menu_plane    = self._create_menu()
         self.menu_system   = self._create_menu()
-        # self.menu_graphics = self._create_menu()
         self.menu_colors   = self._create_menu()
-        # self.menu_windows  = self._create_menu()
         self.menu_help     = self._create_menu()
 
         self.menu_colors.add_command(label="Cores", command=self._open_color_dialog)
@@ -95,26 +87,16 @@ class App:
         self.menu_help.add_command(label="Ajuda", command=self._open_help_dialog)
         self.menu_help.add_command(label="Sobre", command=self._open_about_dialog)
 
-
-        # self.menubar.add_cascade(label="Arquivo", menu=self.menu_file)
-        # self.menubar.add_cascade(label="Editar", menu=self.menu_edit)
-        # self.menubar.add_cascade(label="Entrada de Raízes", menu=self.menu_entry)
-        # self.menubar.add_cascade(label="Plano", menu=self.menu_plane)
         self.menubar.add_cascade(label="Sistema", menu=self.menu_system)
         self.menubar.add_cascade(label="Cores", menu=self.menu_colors)
-        # self.menubar.add_cascade(label="Gráficos", menu=self.menu_graphics)
-        # self.menubar.add_cascade(label="Janelas", menu=self.menu_windows)
         self.menubar.add_cascade(label="Ajuda", menu=self.menu_help)
-
 
         # Show Menu Bar
         self.win.config(menu=self.menubar)
 
         self.toolbar = tk.Frame(self.win, bd=1, relief="raised", bg=color_bg)
 
-
         # Icons
-
         self.icon_open = self._create_icon("open_t.png")
         self.icon_save = self._create_icon("save_t.png")
         self.icon_plane = self._create_icon("plane_t.png")
@@ -125,19 +107,11 @@ class App:
         self.icon_imp = self._create_icon("imp_t.png", 16)
         self.icon_step = self._create_icon("deg_t.png", 16)
         self.icon_3d = self._create_icon("3d_t.png", 16)
-
         self.icon_pole = self._create_icon("pole.png", 3)
         self.icon_zero = self._create_icon("zero.png", 3)
         self.icon_kb = self._create_icon("kb.png", 3)
-        # self.icon_zoom = self._create_icon("zoom.png", 3)
-        # self.icon_hand = self._create_icon("hand.png", 3)
-        # self.icon_dim = self._create_icon("dim.png", 3)
         self.icon_clear = self._create_icon("clear.png", 3)
         self.icon_info = self._create_icon("info.png", 3)
-
-        # self.icon_exit = self._create_icon("exit.png", 6)
-        # self.icon_graphic = self._create_icon("graphic.png", 6)
-        # self.icon_save_as = self._create_icon("save_as.png", 6)
 
         # Buttons
         self.dict_bt = {  # icon: (hint, group, starts_active)
@@ -154,19 +128,11 @@ class App:
             self.icon_imp: ("Resposta ao Impulso", 2, False),
             self.icon_step: ("Resposta ao Degrau Unitário", 2, False),
             self.icon_3d: ("Gráfico 3D", -1, False),
-
             self.icon_pole: ("Editar Polos", 3, True),
             self.icon_zero: ("Editar Zeros", 3, False),
             self.icon_kb: ("Inserir Raízes via Teclado", -1, False),
-            # self.icon_zoom: ("Zoom no Plano", -1, False),
-            # self.icon_hand: ("Movimentar o Plano", -1, False),
-            # self.icon_dim: ("Restaurar Dimensões do Plano", -1, False),
             self.icon_clear: ("Limpar", -1, False),
-            self.icon_info: ("Maiores Informações", -1, False),
-
-            # self.icon_exit: ("Sair", -1, False),
-            # self.icon_graphic: ("Salvar Gráfico", -1, False),
-            # self.icon_save_as: ("Salvar como", -1, False),
+            self.icon_info: ("Mais Informações", -1, False),
         }
 
         self.bt_states = {}
@@ -237,25 +203,6 @@ class App:
         )
         self.label_stats.grid(row=0, column=0, padx=2, pady=2)
 
-#         self.fr_limits = self._create_label_fr(
-#             self.fr_top,
-#             "Limites do Plano"
-#         )
-#         self.spin_a = self._create_spin_top(0, 1, 0, "Eixo X")
-#         self.spin_b = self._create_spin_top(0, 3, 2, "a")
-#         self.spin_c = self._create_spin_top(1, 1, 0, "Eixo Y")
-#         self.spin_d = self._create_spin_top(1, 3, 2, "a")
-
-
-#         entry = tk.Entry(
-#             self.fr_bottom,
-#             width=20,
-#             bg="#151515",
-#             fg="white",
-#             insertbackground="white"
-#         )
-#         color_text.pack(side="left")
-
 
         # Bottom Frame
 
@@ -276,7 +223,6 @@ class App:
             command=self._on_z_inv_click
         )
         self.check_z_inv.pack(side="left", padx=10)
-
 
         # Transfer Function equation
         box_tf = self._create_label_fr(
@@ -345,6 +291,7 @@ class App:
         self.points_plot_zeros = self._setup_point_plotter("o", color_zeros)
 
         self.idx_sel_point = None
+        self.type_sel_point = None
 
         self.canvas_p = FigureCanvasTkAgg(self.fig_p, master=self.fr_plane)
         self.canvas_p.draw()
@@ -568,7 +515,7 @@ class App:
                 print(f"Error loading image '{file_path}': {e}")
 
     def _format_x_axis_pi(self):
-        '''Set x ticks as multiples of pi'''
+        """Set x ticks as multiples of pi"""
         step = 0.5*np.pi
         intervals = np.arange(0, max_pi*np.pi + step, step)
         self.ax_r.set_xticks(intervals)
@@ -651,7 +598,7 @@ class App:
         messagebox.showerror(title=title, message=msg)
 
     def add_element_plane(self, list_sel, x, y):
-        '''Called only once for each complex conjugate pair'''
+        """Called only once for each complex conjugate pair"""
         if list_sel is None:
             self._show_error("Valor Inválido")
             return
@@ -728,7 +675,6 @@ class App:
             line = np.ravel(h)
             self._set_freq_resp_title("Resposta ao Degrau Unitário")
             self._set_sample_options()
-
 
         # X limit
         if (self.bt_states[self.icon_imp].get() or
@@ -857,27 +803,6 @@ class App:
         fr.pack(side="left", padx=10, fill="y")
         return fr
 
-#     def _create_spin_top(self, row, col, col_text, text):
-#         tk.Label(
-#             self.fr_limits,
-#             text=text,
-#             fg=color_text,
-#             bg=color_bg
-#         ).grid(row=row, column=col_text, padx=2, pady=2)
-# 
-#         spin = tk.Spinbox(
-#             self.fr_limits,
-#             from_=-1.5, to=1.5,
-#             increment=0.1,
-#             width=6,
-#             bg=color_bg_spin,
-#             fg=color_text,
-#             insertbackground=color_text,
-#             buttonbackground=color_bg
-#         )
-#         spin.grid(row=row, column=col, padx=5, pady=2)
-#         return spin
-
     def _create_scrollable_fr(self, parent, width, height, bg_color):
         outer_fr = tk.Frame(parent, width=width, height=height, bg=bg_color)
         outer_fr.grid_propagate(False)
@@ -988,7 +913,7 @@ class App:
     def _get_list_sel(self):
         if self.bt_states[self.icon_pole].get():
             list_sel = self.poles
-        elif self.bt_states[self.icon_zero].get():
+        else:  # self.bt_states[self.icon_zero].get():
             list_sel = self.zeros
         return list_sel
 
@@ -998,7 +923,7 @@ class App:
             pack_side = "left"
             pack_pady = 2
             container = self.toolbar
-        else:  # left
+        else:  # "left"
             padx, pady = 6, 6
             pack_side = "top"
             container = self.fr_bt_left
@@ -1122,14 +1047,14 @@ class App:
         popup_w = tl.winfo_width()
         popup_h = tl.winfo_height()
 
-        x = win_x + (win_w // 2) - (popup_w // 2)
-        y = win_y + (win_h // 2) - (popup_h // 2)
+        x = win_x + (win_w//2) - (popup_w//2)
+        y = win_y + (win_h//2) - (popup_h//2)
 
         tl.geometry(f"+{x}+{y}")
 
     def _map_elements(self):
         list_coords = []
-        list_mapping = []  # ("p"|"z", idx_in_list)
+        list_mapping = []  # ("p"|"z", idx in list)
 
         for i, pair in enumerate(self.poles.list):
             for p in pair:
@@ -1154,11 +1079,10 @@ class App:
             coords = np.array(list_coords)
             click = np.array([event.xdata, event.ydata])
             dist = np.sqrt(np.sum((coords - click)**2, axis=1))
-        next = (len(dist) > 0 and np.min(dist) < range_click)
+        is_near = (len(dist) > 0 and np.min(dist) < range_click)
 
-        # Right button
         if event.button == R_BUTTON:
-            if next:
+            if is_near:
                 idx = np.argmin(dist)
                 element_type, idx_group = list_mapping[idx]
                 if element_type == "p":
@@ -1168,11 +1092,10 @@ class App:
 
                 self.update_all()
 
-        # Left button
         elif event.button == L_BUTTON:
             list_sel = self._get_list_sel()
 
-            if next:
+            if is_near:
                 idx = np.argmin(dist)
                 element_type, idx_group = list_mapping[idx]
 
