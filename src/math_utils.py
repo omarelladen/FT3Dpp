@@ -8,10 +8,11 @@ import scipy.signal as signal
 
 # TODO: prevent -1 term instead of 1 in Y(z)
 class MathUtils():
-    def __init__(self, resolution, max_pi=1):
+    def __init__(self, resolution, sample_size, max_pi=1):
         self.resolution = resolution
         self.resolution_u = 0
         self.resolution_v = 0
+        self.sample_size = sample_size
         self.max_pi = max_pi
 
     def _get_w(self):
@@ -190,7 +191,7 @@ class MathUtils():
         zeros, poles, gain = signal.tf2zpk(num, den)
         return zeros, poles, gain
 
-    def dimpulse(self, zeros, poles, n=5, gain=1):
+    def dimpulse(self, zeros, poles, gain=1):
         list_poles = []
         for pair in poles.list:
             for p in pair:
@@ -204,7 +205,7 @@ class MathUtils():
         sys = signal.dlti(list_zeros, list_poles, gain)
 
         try:
-            t, h = signal.dimpulse(sys, n=n)
+            t, h = signal.dimpulse(sys, n=self.sample_size)
         except ValueError:  # bad system
             return [], []
 

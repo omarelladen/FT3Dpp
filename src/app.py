@@ -38,8 +38,8 @@ max_pi = 4
 init_resolution = 500
 max_resolution = 1000
 
-init_sample_size = 5
-max_sample_size = 500
+init_sample_size = 6
+max_sample_size = 50
 
 dpi = 100
 
@@ -54,7 +54,7 @@ L_BUTTON = 1
 
 class App:
     def __init__(self):
-        self.math_utils = MathUtils(init_resolution, max_pi)
+        self.math_utils = MathUtils(init_resolution, init_sample_size, max_pi)
 
         # Main Window
         self.win = tk.Tk()
@@ -398,7 +398,7 @@ class App:
             [], [],
             color=color_resp,
             marker="o",
-            markersize=6,
+            markersize=3,
             linestyle="None"
         )
         self.v_lines = LineCollection([], colors=color_resp, linewidths=1.5)
@@ -549,8 +549,12 @@ class App:
         self.system_classifier = SystemClassifier(self)
 
         # Events to confirm keyboard values
-        self.spin_res.bind("<Return>",   lambda event: self._change_resolution())
-        self.spin_res.bind("<FocusOut>", lambda event: self._change_resolution())
+        for spin, funct in [
+            (self.spin_res, self._change_resolution),
+            (self.spin_sample_size, self._change_sample_size)
+        ]:
+            spin.bind("<Return>",   lambda event, f=funct: f())
+            spin.bind("<FocusOut>", lambda event, f=funct: f())
 
         self.update_all()
 
@@ -571,7 +575,7 @@ class App:
         self.ax_r.set_xticks(intervals)
 
         def formatter_pi(v, pos):
-            mult = round(v / np.pi, 2)
+            mult = round(v/np.pi, 2)
             if mult == 0:
                 return "0"
             if mult == 1:
@@ -583,7 +587,8 @@ class App:
         self.ax_r.xaxis.set_major_formatter(ticker.FuncFormatter(formatter_pi))
 
     def _format_x_axis_n(self, n):
-        intervals = np.arange(0, n)
+        step = 5
+        intervals = np.arange(0, n, step)
         self.ax_r.set_xticks(intervals)
 
         def formatter_n(v, pos):
@@ -660,14 +665,23 @@ class App:
             int(resolution) > 1 and
             int(resolution) <= max_resolution
         ):
-            self.math_utils.resolution = int(self.spin_res.get())
+            self.math_utils.resolution = int(resolution)
             self.update_freq_resp()
         else:
             self.spin_res.delete(0, "end")
             self.spin_res.insert(0, str(self.math_utils.resolution))
 
     def _change_sample_size(self):
-        pass
+        spin_sample_size = self.spin_sample_size.get()
+        if (spin_sample_size.isdigit() and
+            int(spin_sample_size) > 1 and
+            int(spin_sample_size) <= max_sample_size
+        ):
+            self.math_utils.sample_size = int(self.spin_sample_size.get())
+            self.update_freq_resp()
+        else:
+            self.spin_res.delete(0, "end")
+            self.spin_res.insert(0, str(self.math_utils.sample_size))
 
     def update_freq_resp(self):
         theta_val = int(self.spin_theta_max.get())
@@ -704,8 +718,7 @@ class App:
             self._set_mag_options()
 
         elif self.bt_states[self.icon_imp].get():
-            n = init_sample_size
-            t, h = self.math_utils.dimpulse(self.zeros, self.poles, n)
+            t, h = self.math_utils.dimpulse(self.zeros, self.poles)
             w_plot = t
             line = np.ravel(h)
             self._set_freq_resp_title("Resposta ao Impulso Unitário")
@@ -720,7 +733,7 @@ class App:
             self.line_r.set_marker("o")
             segments = [[(x, 0), (x, y)] for x, y in zip(w_plot, line)]
 
-            x_max = n
+            x_max = self.math_utils.sample_size
             self._format_x_axis_n(x_max)
         else:
             self.line_r.set_linestyle("-")
