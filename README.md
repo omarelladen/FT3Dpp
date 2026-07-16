@@ -48,7 +48,8 @@ python src/main.py
 - [ ] Visual insertion in s plane
 - [x] Insertion from coordinates in z plane
 - [ ] Insertion from coordinates in s plane
-- [ ] Transfer function insertion
+- [x] Transfer function input for z plane
+- [ ] Transfer function input for s plane
 - [x] Clear all insertions
 - [x] Frame with poles and zeros coordinates
 - [x] Magnitude plot for z plane
@@ -60,24 +61,30 @@ python src/main.py
 - [ ] s <-> z mapping
 - [x] 3D plot from z plane
 - [ ] 3D plot from s plane
-- [ ] 3D customization
-- [x] 3D navigation
+- [x] Choose 3D resolution
+- [ ] Choose 3D clip value
+- [ ] Choose 3D colors
+- [ ] Reset 3D colors
 - [x] 2D plot navigation
 - [x] Choose frequency response limits from z plane
 - [ ] Choose frequency response limits from s plane
 - [ ] Topography heat map plot
 - [ ] Topography heat map customization
 - [x] System classification
-- [ ] System classification reasons
-- [ ] Impulse response plot
-- [ ] Step response plot
-- [ ] Choose impulse response sample size
-- [ ] Choose step response sample size
+- [x] System classification reasons
+- [x] Impulse response plot from z plane
+- [ ] Impulse response plot from s plane
+- [x] Step response plot from z plane
+- [ ] Step response plot from s plane
+- [x] Choose impulse response sample size
+- [ ] Choose impulse response max t
+- [x] Choose step response sample size
+- [ ] Choose step response max t
 - [ ] Choose plane limits
 - [x] Save plots
 - [ ] Save system
 - [x] Choose 2D plot colors
-- [ ] Reset 2D plot colors
+- [x] Reset 2D plot colors
 - [x] Show mouse coordinates below 2D plots
 - [ ] Show magnitude value below z plane
 - [ ] Show magnitude value below s plane
@@ -101,15 +108,18 @@ python src/main.py
 - [x] Choose normalized frequency response
 - [x] Labels for plane axes
 - [ ] Shortcuts to undo and redo insertion
-- [x] Choose transfer function format
+- [x] Choose transfer function display format
+- [x] Choose transfer function insertion format
 - [x] Padding between related buttons
 - [x] Window resize
 - [ ] 2D plot resize along window resize
 - [x] 3D plot resize along window resize
+- [x] 3D mouse navigation
+- [x] Choose separate 3D resolution for U and V axes
 - [x] Save plot in multiple formats
 - [x] Allow poles and zeros removal regardless of which one is selected
-- [ ] Allow poles and zeros move regardless of which one is selected
-- [ ] Show number of poles and zeros
+- [x] Allow poles and zeros movement regardless of which one is selected
+- [x] Show number of poles and zeros
 - [x] Show mouse coordinates below 3D plots
 - [ ] Choose to add spaces inside transfer function
 - [ ] Choose font size of transfer function
