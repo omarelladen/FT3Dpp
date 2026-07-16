@@ -123,7 +123,7 @@ class App:
         self.icon_freq_db = self._create_icon("freq_db_t.png", 16)
         self.icon_phase = self._create_icon("phase_t.png", 16)
         self.icon_imp = self._create_icon("imp_t.png", 16)
-        self.icon_deg = self._create_icon("deg_t.png", 16)
+        self.icon_step = self._create_icon("deg_t.png", 16)
         self.icon_3d = self._create_icon("3d_t.png", 16)
 
         self.icon_pole = self._create_icon("pole.png", 3)
@@ -140,7 +140,7 @@ class App:
         # self.icon_save_as = self._create_icon("save_as.png", 6)
 
         # Buttons
-        self.dict_bt = {
+        self.dict_bt = {  # icon: (hint, group, starts_active)
             self.icon_open: ("Abrir Arquivo", -1, False),
             self.icon_save: ("Salvar Arquivo", -1, False),
             self.icon_plane: ("Entrada via Plano Complexo", 0, True),
@@ -152,7 +152,7 @@ class App:
             self.icon_freq_db: ("Magnitude (dB)", 2, False),
             self.icon_phase: ("Fase", 2, False),
             self.icon_imp: ("Resposta ao Impulso", 2, False),
-            self.icon_deg: ("Resposta ao Degrau Unitário", -1, False),
+            self.icon_step: ("Resposta ao Degrau Unitário", 2, False),
             self.icon_3d: ("Gráfico 3D", -1, False),
 
             self.icon_pole: ("Editar Polos", 3, True),
@@ -491,7 +491,6 @@ class App:
             command=self.update_freq_resp
         )
 
-
         # Resolution Spin
         self.label_res_unit = tk.Label(
             self.fr_input_r,
@@ -723,11 +722,17 @@ class App:
             line = np.ravel(h)
             self._set_freq_resp_title("Resposta ao Impulso Unitário")
             self._set_sample_options()
+        elif self.bt_states[self.icon_step].get():
+            t, h = self.math_utils.dstep(self.zeros, self.poles)
+            w_plot = t
+            line = np.ravel(h)
+            self._set_freq_resp_title("Resposta ao Degrau Unitário")
+            self._set_sample_options()
 
 
         # X limit
         if (self.bt_states[self.icon_imp].get() or
-            self.bt_states[self.icon_deg].get()
+            self.bt_states[self.icon_step].get()
         ):
             self.line_r.set_linestyle("None")
             self.line_r.set_marker("o")
@@ -1064,7 +1069,8 @@ class App:
             self.icon_freq,
             self.icon_freq_db,
             self.icon_phase,
-            self.icon_imp
+            self.icon_imp,
+            self.icon_step
         ):
             self.update_freq_resp()
         elif clicked_key == self.icon_clear:
@@ -1089,7 +1095,6 @@ class App:
             self.icon_open,
             self.icon_save,
             self.icon_plane_top,
-            self.icon_deg,
             "S",
         ):
             self._show_warning("Ainda não implementado")
