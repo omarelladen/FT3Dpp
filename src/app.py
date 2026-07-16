@@ -433,14 +433,12 @@ class App:
         self.fr_r_padx = 2
 
         # Theta Spin
-
         self.label_theta_max = tk.Label(
             self.fr_input_r,
             text="θₘₐₓ =",
             fg=color_text,
             bg=color_bg
         )
-
         self.spin_theta_max = tk.Spinbox(
             self.fr_input_r,
             from_=1, to=max_pi,
@@ -453,14 +451,12 @@ class App:
             buttonbackground=color_bg,
             command=self.update_freq_resp
         )
-
         self.label_theta_max_unit = tk.Label(
             self.fr_input_r,
             text="π",
             fg=color_text,
             bg=color_bg
         )
-
         self._show_theta_max()
 
         # Normalized checkbox
@@ -494,14 +490,12 @@ class App:
 
 
         # Resolution Spin
-
-        tk.Label(
+        self.label_res_unit = tk.Label(
             self.fr_input_r,
             text="pts (0-π)",
             fg=color_text,
             bg=color_bg
-        ).pack(side="right", padx=self.fr_r_padx)
-
+        )
         self.spin_res = tk.Spinbox(
             self.fr_input_r,
             from_=5, to=max_resolution,
@@ -514,15 +508,13 @@ class App:
             buttonbackground=color_bg,
             command=self._change_resolution
         )
-        self.spin_res.pack(side="right", padx=self.fr_r_padx)
-
-        tk.Label(
+        self.label_res = tk.Label(
             self.fr_input_r,
             text="Resolução =",
             fg=color_text,
             bg=color_bg
-        ).pack(side="right", padx=self.fr_r_padx)
-
+        )
+        self._show_res()
 
         self.color_dialog = ColorDialog(self.win, self)
         self.system_classifier = SystemClassifier(self)
@@ -661,7 +653,7 @@ class App:
                 ang_H = self.math_utils.phase_H_rad(H_z)
                 self._set_freq_resp_title("Resposta em Frequência: Fase (rad)")
             line = ang_H
-            self._set_phase_checkbox()
+            self._set_phase_options()
         elif self.bt_states[self.icon_freq_db].get():
             if self.var_normalize.get():
                 mag_H_db = self.math_utils.mag_H_db_norm(H_z)
@@ -669,7 +661,7 @@ class App:
                 mag_H_db = self.math_utils.mag_H_db(H_z)
             line = mag_H_db
             self._set_freq_resp_title("Resposta em Frequência: Magnitude (dB)")
-            self._set_mag_checkbox()
+            self._set_mag_options()
         elif self.bt_states[self.icon_freq].get():
             if self.var_normalize.get():
                 mag_H = self.math_utils.mag_H_norm(H_z)
@@ -677,7 +669,7 @@ class App:
                 mag_H = self.math_utils.mag_H(H_z)
             line = mag_H
             self._set_freq_resp_title("Resposta em Frequência: Magnitude")
-            self._set_mag_checkbox()
+            self._set_mag_options()
 
         elif self.bt_states[self.icon_imp].get():
             n = 10
@@ -717,30 +709,52 @@ class App:
 
         self.canvas_r.draw_idle()
 
+    def _show_theta_max(self):
+        side = "left"
+        padx = self.fr_r_padx
+        self.label_theta_max.pack(side=side, padx=padx)
+        self.spin_theta_max.pack(side=side, padx=padx)
+        self.label_theta_max_unit.pack(side=side, padx=padx)
+
     def _hide_theta_max(self):
         self.label_theta_max.pack_forget()
         self.spin_theta_max.pack_forget()
         self.label_theta_max_unit.pack_forget()
 
-    def _show_theta_max(self):
-        self.label_theta_max.pack(side="left", padx=self.fr_r_padx)
-        self.spin_theta_max.pack(side="left", padx=self.fr_r_padx)
-        self.label_theta_max_unit.pack(side="left", padx=self.fr_r_padx)
+    def _show_res(self):
+        side = "right"
+        padx = self.fr_r_padx
+        self.label_res_unit.pack(side=side, padx=padx)
+        self.spin_res.pack(side=side, padx=padx)
+        self.label_res.pack(side=side, padx=padx)
 
-    def _set_phase_checkbox(self):
+    def _show_resp_options(self):
         self._show_theta_max()
+        self._show_res()
+
+    def _hide_resp_options(self):
+        self._hide_theta_max()
+        self._hide_res()
+
+    def _hide_res(self):
+        self.label_res_unit.pack_forget()
+        self.spin_res.pack_forget()
+        self.label_res.pack_forget()
+
+    def _set_phase_options(self):
+        self._show_resp_options()
         self.check_normalize.pack_forget()
         self.check_phase_unit.pack(side="left", padx=10)
 
-    def _set_mag_checkbox(self):
-        self._show_theta_max()
+    def _set_mag_options(self):
+        self._show_resp_options()
         self.check_phase_unit.pack_forget()
         self.check_normalize.pack(side="left", padx=10)
 
     def _set_sample_spin(self):
         self.check_normalize.pack_forget()
         self.check_phase_unit.pack_forget()
-        self._hide_theta_max()
+        self._hide_resp_options()
 
     def _set_freq_resp_title(self, title):
         self.ax_r.set_title(
