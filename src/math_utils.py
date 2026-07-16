@@ -202,7 +202,11 @@ class MathUtils():
                 list_zeros.append(z)
 
         sys = signal.dlti(list_zeros, list_poles, gain)
-        t, h = signal.dimpulse(sys, n=n)
+
+        try:
+            t, h = signal.dimpulse(sys, n=n)
+        except ValueError:  # bad system
+            return [], []
 
         return t, h
 
