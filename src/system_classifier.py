@@ -8,17 +8,20 @@ class SystemClassifier:
     def __init__(self, app):
         self.app = app
 
-        self.sys_empty = True
-        self.sys_integrator = False
-        self.sys_integrator_k = False
-        self.sys_stable = True
-        self.sys_causal = True
+        self.empty = True
+        self.integrator = False
+        self.integrator_k = False
+        self.stable = True
+        self.causal = True
+        self.trivial = False
 
     def info(self):
-        if self.sys_empty:
+        if self.empty:
             msg = "Sistema vazio."
-        elif self.sys_integrator:
-            if self.sys_integrator_k:
+        elif self.trivial:
+            msg = ("Sistema trivial, pois todos os polos e zeros se cancelam")
+        elif self.integrator:
+            if self.integrator_k:
                 msg = (
                     "O sistema se comporta como um possível integrador digital"
                 )
@@ -26,7 +29,7 @@ class SystemClassifier:
                 msg = (
                     "O sistema se comporta como um integrador digital"
                 )
-        elif not self.sys_causal:
+        elif not self.causal:
             msg = (
                 "O sistema é irrealizável (não causal), pois o grau do "
                 "denominador da Função de Transferência é menor que o "
@@ -42,7 +45,7 @@ class SystemClassifier:
                 "igual ao o grau do numerador."
             )
 
-            if self.sys_stable:
+            if self.stable:
                 msg += (
                     "\n\n"
                     "O sistema é estável, pois todos os seus polos estão "
@@ -62,24 +65,34 @@ class SystemClassifier:
         poles = self.app.poles
         zeros = self.app.zeros
 
+        self.trivial = False
+        self.empty = False
+        self.integrator = True
+        self.integrator_k = False
+        self.causal = True
+        self.stable = True
+
         if zeros.num_elements() == 0 and poles.num_elements() == 0:
             text = ""
             bg = None
-            self.sys_empty = True
+            self.empty = True
         else:
-            self.sys_empty = False
-
-            self.sys_integrator = True
             if poles.num_elements() == 0:
-                self.sys_integrator = False
+                self.integrator = False
+
             for pair_p in poles.list:
                 p1 = pair_p[0]
                 x = p1.real
                 y = p1.imag
                 if x != 1 or y != 0:
-                    self.sys_integrator = False
+                    self.integrator = False
                     break
-            if self.sys_integrator:
+
+            if zeros.num_elements() > poles.num_elements():
+                text = "Sistema Irrealizável"
+                bg = "red"
+                self.causal = False
+            elif self.integrator:
                 if zeros.num_elements() > 0:
                     degree = poles.num_elements()
 
@@ -94,33 +107,24 @@ class SystemClassifier:
 
                     if only_zeros_1_0:
                         if degree == 0:
-                            self.sys_empty = True
+                            self.trivial = True
                             text = ""
                             bg = None
                         elif degree > 0:
-                            self.sys_integrator_k = False
                             text = f"Integrador de grau {degree}"
                             bg = "green"
                         else:  # more zeros than poles at (1,0)
-                            self.sys_integrator_k = True
+                            self.integrator_k = True
                             text = "Integrador com constante"
                             bg = "green"
                     else:
-                        self.sys_integrator_k = True
+                        self.integrator_k = True
                         text = "Integrador com constante"
                         bg = "green"
                 else:
-                    self.sys_integrator_k = False
                     text = f"Integrador de grau {poles.num_elements()}"
                     bg = "green"
-
-            elif zeros.num_elements() > poles.num_elements():
-                text = "Sistema Irrealizável"
-                bg = "red"
-                self.sys_causal = False
             else:
-                self.sys_causal = True
-                self.sys_stable = True
                 for pair_p in poles.list:
                     p1 = pair_p[0]
                     x = p1.real
@@ -128,10 +132,10 @@ class SystemClassifier:
                     r = np.sqrt(x**2 + y**2)
                     if r >= 1:
                         text = "Sistema Realizável e Instável"
-                        self.sys_stable = False
+                        self.stable = False
                         bg = "red"
                         break
-                if self.sys_stable:
+                if self.stable:
                     text = "Sistema Realizável e Estável"
                     bg = "green"
 
