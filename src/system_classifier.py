@@ -110,11 +110,7 @@ class SystemClassifier:
                             break
 
                     if only_zeros_1_0:
-                        if degree == 0:
-                            self.trivial = True
-                            text = "Sistema Trivial"
-                            bg = "orange"
-                        elif degree > 0:
+                        if degree > 0:
                             text = f"Integrador de grau {degree}"
                             bg = "orange"
                         else:  # more zeros than poles at (1,0)
