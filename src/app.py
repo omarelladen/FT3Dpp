@@ -147,7 +147,7 @@ class App:
             self.icon_freq: ("Magnitude", 2, True),
             self.icon_freq_db: ("Magnitude (dB)", 2, False),
             self.icon_phase: ("Fase", 2, False),
-            self.icon_imp: ("Resposta ao Impulso", -1, False),
+            self.icon_imp: ("Resposta ao Impulso", 2, False),
             self.icon_deg: ("Resposta ao Degrau Unitário", -1, False),
             self.icon_3d: ("Gráfico 3D", -1, False),
 
@@ -391,24 +391,8 @@ class App:
 
         self.line_r, = self.ax_r.plot([], [], color=color_resp, linewidth=2)
 
-        # Set x ticks as multiples of pi
-        step = 0.5*np.pi
-        intervals = np.arange(0, max_pi*np.pi + step, step)
-        self.ax_r.set_xticks(intervals)
-
         # Format x axis label
-
-        def formatter_pi(v, pos):
-            mult = round(v / np.pi, 2)
-            if mult == 0:
-                return "0"
-            if mult == 1:
-                return "π"
-            if mult.is_integer():
-                return f"{int(mult)}π"
-            return f"{mult}π"
-
-        self.ax_r.xaxis.set_major_formatter(ticker.FuncFormatter(formatter_pi))
+        self._format_x_axis_pi()
         self.ax_r.format_coord = lambda x, y: f"(x, y) = ({x:.2f}, {y:.2f})"
 
         self.canvas_r = FigureCanvasTkAgg(self.fig_r, master=self.fr_resp)
@@ -548,6 +532,33 @@ class App:
             except Exception as e:
                 print(f"Error loading image '{file_path}': {e}")
 
+    def _format_x_axis_pi(self):
+        '''Set x ticks as multiples of pi'''
+        step = 0.5*np.pi
+        intervals = np.arange(0, max_pi*np.pi + step, step)
+        self.ax_r.set_xticks(intervals)
+
+        def formatter_pi(v, pos):
+            mult = round(v / np.pi, 2)
+            if mult == 0:
+                return "0"
+            if mult == 1:
+                return "π"
+            if mult.is_integer():
+                return f"{int(mult)}π"
+            return f"{mult}π"
+
+        self.ax_r.xaxis.set_major_formatter(ticker.FuncFormatter(formatter_pi))
+
+    def _format_x_axis_n(self, n):
+        intervals = np.arange(0, n)
+        self.ax_r.set_xticks(intervals)
+
+        def formatter_n(v, pos):
+            return str(int(v))
+
+        self.ax_r.xaxis.set_major_formatter(ticker.FuncFormatter(formatter_n))
+
     def change_colors(self, key, new_color):
         if key == "poles":
             self.points_plot_poles.set_color(new_color)
@@ -648,7 +659,7 @@ class App:
             line = mag_H_db
             self._set_freq_resp_title("Resposta em Frequência: Magnitude (dB)")
             self._set_mag_checkbox()
-        else:
+        elif self.bt_states[self.icon_freq].get():
             if self.var_normalize.get():
                 mag_H = self.math_utils.mag_H_norm(H_z)
             else:
@@ -657,10 +668,31 @@ class App:
             self._set_freq_resp_title("Resposta em Frequência: Magnitude")
             self._set_mag_checkbox()
 
-        self.line_r.set_data(w_plot, line)
+        elif self.bt_states[self.icon_imp].get():
+            n = 10
+            t, h = self.math_utils.dimpulse(self.zeros, self.poles, n)
+            line = h
+            w_plot = t
+
 
         # X limit
-        x_max = theta_val*np.pi
+        if (self.bt_states[self.icon_imp].get() or
+            self.bt_states[self.icon_deg].get()
+        ):
+            self.line_r.set_linestyle('None')
+            self.line_r.set_marker('o')
+
+            x_max = n
+            self._format_x_axis_n(x_max)
+        else:
+            self.line_r.set_linestyle('-')
+            self.line_r.set_marker('None')
+
+            x_max = theta_val*np.pi
+            self._format_x_axis_pi()
+
+        self.line_r.set_data(w_plot, line)
+
         self.ax_r.set_xlim(0, x_max)
 
         # Auto scale
@@ -923,7 +955,12 @@ class App:
 
         # hint = self.dict_bt[clicked_key][0]
 
-        if clicked_key in (self.icon_freq, self.icon_freq_db, self.icon_phase):
+        if clicked_key in (
+            self.icon_freq,
+            self.icon_freq_db,
+            self.icon_phase,
+            self.icon_imp
+        ):
             self.update_freq_resp()
         elif clicked_key == self.icon_clear:
             self.clear_poles_zeros()
@@ -947,7 +984,6 @@ class App:
             self.icon_open,
             self.icon_save,
             self.icon_plane_top,
-            self.icon_imp,
             self.icon_deg,
             "S",
         ):

@@ -189,3 +189,22 @@ class MathUtils():
     def tf2zpk(self, num, den):
         zeros, poles, gain = signal.tf2zpk(num, den)
         return zeros, poles, gain
+
+    def dimpulse(self, zeros, poles, n=5, gain=1):
+        list_poles = []
+        for pair in poles.list:
+            for p in pair:
+                list_poles.append(p)
+
+        list_zeros = []
+        for pair in zeros.list:
+            for z in pair:
+                list_zeros.append(z)
+
+        sys = signal.dlti(list_zeros, list_poles, gain)
+        t, h = signal.dimpulse(sys, n=n)
+
+        return t, h
+
+    def dstep(self, zeros, poles):
+        pass
