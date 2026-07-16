@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.patches as patches
 import matplotlib.ticker as ticker
 from matplotlib.figure import Figure
+from matplotlib.collections import LineCollection
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg,
     NavigationToolbar2Tk
@@ -389,7 +390,16 @@ class App:
         self.ax_r.set_ylim(-1, 1)
         self._set_freq_resp_title("Resposta em Frequência: Magnitude")
 
-        self.line_r, = self.ax_r.plot([], [], color=color_resp, linewidth=2)
+        # self.line_r, = self.ax_r.plot([], [], color=color_resp, linewidth=2)
+        self.line_r, = self.ax_r.plot(
+            [], [],
+            color=color_resp,
+            marker="o",
+            markersize=6,
+            linestyle="None"
+        )
+        self.v_lines = LineCollection([], colors=color_resp, linewidths=1.5)
+        self.ax_r.add_collection(self.v_lines)
 
         # Format x axis label
         self._format_x_axis_pi()
@@ -671,28 +681,32 @@ class App:
         elif self.bt_states[self.icon_imp].get():
             n = 10
             t, h = self.math_utils.dimpulse(self.zeros, self.poles, n)
-            line = h
             w_plot = t
+            line = np.ravel(h)
+            self._set_freq_resp_title("Resposta ao Impulso Unitário")
+            self._set_sample_spin()
 
 
         # X limit
         if (self.bt_states[self.icon_imp].get() or
             self.bt_states[self.icon_deg].get()
         ):
-            self.line_r.set_linestyle('None')
-            self.line_r.set_marker('o')
+            self.line_r.set_linestyle("None")
+            self.line_r.set_marker("o")
+            segments = [[(x, 0), (x, y)] for x, y in zip(w_plot, line)]
 
             x_max = n
             self._format_x_axis_n(x_max)
         else:
-            self.line_r.set_linestyle('-')
-            self.line_r.set_marker('None')
+            self.line_r.set_linestyle("-")
+            self.line_r.set_marker("None")
+            segments = []
 
             x_max = theta_val*np.pi
             self._format_x_axis_pi()
 
+        self.v_lines.set_segments(segments)
         self.line_r.set_data(w_plot, line)
-
         self.ax_r.set_xlim(0, x_max)
 
         # Auto scale
@@ -709,6 +723,10 @@ class App:
     def _set_mag_checkbox(self):
         self.check_phase_unit.pack_forget()
         self.check_normalize.pack(side="left", padx=10)
+
+    def _set_sample_spin(self):
+        self.check_normalize.pack_forget()
+        self.check_phase_unit.pack_forget()
 
     def _set_freq_resp_title(self, title):
         self.ax_r.set_title(
