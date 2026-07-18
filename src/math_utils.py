@@ -148,6 +148,25 @@ class MathUtils():
 
         return num, den
 
+    def _H_z_3D(self, zeros, poles, z):
+        num = np.ones_like(z, dtype=complex)
+        den = np.ones_like(z, dtype=complex)
+
+        for pair in zeros.list:
+            for zero in pair:
+                num *= z - zero
+
+        for pair in poles.list:
+            for pole in pair:
+                den *= z - pole
+
+        with np.errstate(divide='ignore', invalid='ignore'):
+            H_z = num/den
+
+        H_z = np.nan_to_num(H_z, nan=0.0, posinf=max_value, neginf=-max_value)
+
+        return H_z
+
     def mag_H_z_3D(self, zeros, poles, clip_limit):
         u = np.linspace(0, 2*np.pi, self.resolution_u)
         v = np.linspace(0.01, 2.0, self.resolution_v)
@@ -156,23 +175,7 @@ class MathUtils():
         x = V*np.cos(U)
         y = V*np.sin(U)
 
-        z_grid = x + 1j*y
-
-        num = np.ones_like(z_grid, dtype=complex)
-        den = np.ones_like(z_grid, dtype=complex)
-
-        for pair in zeros.list:
-            for zero in pair:
-                num *= z_grid - zero
-
-        for pair in poles.list:
-            for pole in pair:
-                den *= z_grid - pole
-
-        with np.errstate(divide='ignore', invalid='ignore'):
-            H_z = num/den
-
-        H_z = np.nan_to_num(H_z, nan=0.0, posinf=max_value, neginf=-max_value)
+        H_z = self._H_z_3D(zeros, poles, z=x+1j*y)
 
         z = np.abs(H_z)
         z = np.clip(z, a_min=None, a_max=clip_limit)
