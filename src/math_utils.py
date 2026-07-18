@@ -95,7 +95,7 @@ class MathUtils():
 
         # Interpolate bc len(xp) != len(w_plot)
         phase = np.interp(w_plot, xp, phase_total)
-        phase = np.clip(phase, a_min=min_value, a_max=None)
+        phase[np.abs(phase) < min_value] = 0
 
         return phase
 
