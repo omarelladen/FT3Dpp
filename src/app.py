@@ -1128,19 +1128,11 @@ class App:
             event_y = event.ydata
 
             if self.type_sel_point == "p":
-                target_list = self.poles.list
+                target_elements = self.poles
             else:  # "z"
-                target_list = self.zeros.list
+                target_elements = self.zeros
 
-            current_group = target_list[self.idx_sel_point]
-
-            if len(current_group) == 2:
-                p1 = complex(event_x, event_y)
-                p2 = complex(event_x, -event_y)
-                target_list[self.idx_sel_point] = (p1, p2)
-            else:
-                p_real = complex(event_x, 0)
-                target_list[self.idx_sel_point] = (p_real,)
+            target_elements.update_element(self.idx_sel_point, event_x, event_y)
 
             self.update_all()
 

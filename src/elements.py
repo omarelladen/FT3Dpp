@@ -6,6 +6,9 @@ from collections import Counter
 import numpy as np
 
 
+decimals = 6
+
+
 class Elements():
     def __init__(self, type):
         self.list: list[tuple(complex, complex)] = []
@@ -19,13 +22,31 @@ class Elements():
 
     def add(self, x, y):
         """Called only once for each complex conjugate pair"""
-        # TODO: truncate floats and see decimals in _norm
+
+        x = round(x, decimals)
+        y = round(y, decimals)
+
         element = complex(x, y)
+
         if element.imag != 0:
             conj = complex(x, -y)
             self.list.append((element, conj))
         else:
             self.list.append((element,))
+
+    def update_element(self, idx, x, y):
+        x = round(x, decimals)
+        y = round(y, decimals)
+
+        pair = self.list[idx]
+
+        if len(pair) == 2:
+            p1 = complex(x, y)
+            p2 = complex(x, -y)
+            self.list[idx] = (p1, p2)
+        else:
+            p_real = complex(x, 0)
+            self.list[idx] = (p_real,)
 
     def clear(self):
         self.list = []
@@ -38,10 +59,10 @@ class Elements():
     def pop(self, idx):
         self.list.pop(idx)
 
-    def _norm(self, list, decimals=3):
+    def _norm(self, list):
         list_norm = []
         for pair in list:
-            pair_rounded = tuple(np.round(val, decimals) for val in pair)
+            pair_rounded = tuple(np.round(elem, decimals) for elem in pair)
 
             pair_sorted = tuple(
                 sorted(
