@@ -144,24 +144,24 @@ class TFDisplayer:
                 label.config(text=new_text)
 
     def _format_H_z_inv(self, zeros, poles):
-        return self._format_H_z_eq(
+        return self._format_H_z_sym(
             zeros,
             poles,
-            self.app.math_utils.H_z_inv_eq,
+            self.app.math_utils.H_z_inv_sym,
             "⁻",
             "z_inv"
         )
 
     def _format_H_z(self, zeros, poles):
-        return self._format_H_z_eq(
+        return self._format_H_z_sym(
             zeros,
             poles,
-            self.app.math_utils.H_z_eq,
+            self.app.math_utils.H_z_sym,
             "",
             "z"
         )
 
-    def _format_H_z_eq(self, zeros, poles, funct, sign, base):
+    def _format_H_z_sym(self, zeros, poles, funct, sign, base):
         num, den = funct(zeros, poles)
 
         if num == 1 and den == 1:

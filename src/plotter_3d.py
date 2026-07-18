@@ -174,7 +174,7 @@ class Plotter3D:
         self.ax.set_zlim(0, clip_limit)
 
         # Surface
-        x_mesh, y_mesh, z_mesh = self.app.math_utils.mag_H_3D(
+        x_mesh, y_mesh, z_mesh = self.app.math_utils.mag_H_z_3D(
             self.app.zeros,
             self.app.poles,
             clip_limit
@@ -191,7 +191,7 @@ class Plotter3D:
         )
 
         # Line in unit circle
-        x_line, y_line, z_line = self.app.math_utils.line_3D(
+        x_line, y_line, z_line = self.app.math_utils.mag_H_jw_3D(
             self.app.zeros,
             self.app.poles,
             clip_limit
