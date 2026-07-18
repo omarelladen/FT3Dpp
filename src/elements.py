@@ -73,5 +73,5 @@ class Elements():
 
         return Counter(list_norm)
 
-    def equal(self, other):
+    def __eq__(self, other):
         return self._norm(self.list) == self._norm(other.list)

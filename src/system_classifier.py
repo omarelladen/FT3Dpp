@@ -76,7 +76,7 @@ class SystemClassifier:
             text = ""
             bg = None
             self.empty = True
-        elif zeros.equal(poles):
+        elif zeros == poles:
             text = "Sistema Trivial"
             bg = "orange"
             self.trivial = True
