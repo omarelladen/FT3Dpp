@@ -38,15 +38,13 @@ class Elements():
         x = round(x, decimals)
         y = round(y, decimals)
 
-        pair = self.list[idx]
-
-        if len(pair) == 2:
+        if y == 0:  # real
+            p = complex(x, 0)
+            self.list[idx] = (p,)
+        else:
             p1 = complex(x, y)
             p2 = complex(x, -y)
             self.list[idx] = (p1, p2)
-        else:
-            p_real = complex(x, 0)
-            self.list[idx] = (p_real,)
 
     def clear(self):
         self.list = []
