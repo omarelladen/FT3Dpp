@@ -57,8 +57,9 @@ class Plotter3D:
             cmd=self._change_resolution_v,
             from_=5,
             to=self.max_resolution,
-            increment=5,
+            inc=5,
             init_value=self.init_resolution,
+            unit="pts",
             side="right"
         )
         self.spin_res_u = self._create_spinbox(
@@ -66,8 +67,9 @@ class Plotter3D:
             cmd=self._change_resolution_u,
             from_=5,
             to=self.max_resolution,
-            increment=5,
+            inc=5,
             init_value=self.init_resolution,
+            unit="pts",
             side="right"
         )
         self.spin_clip = self._create_spinbox(
@@ -75,17 +77,18 @@ class Plotter3D:
             cmd=self._change_clip,
             from_=1,
             to=self.max_clip,
-            increment=1,
+            inc=1,
             init_value=self.init_clip,
+            unit="",
             side="left"
         )
 
-    def _create_spinbox(self, title, cmd, from_, to, increment, init_value, side):
+    def _create_spinbox(self, title, cmd, from_, to, inc, init_value, unit, side):
         fr_padx = 2
 
         label_unit = tk.Label(
             self.fr_bt,
-            text="pts",
+            text=unit,
             fg=color_text,
             bg=color_bg
         )
@@ -93,7 +96,7 @@ class Plotter3D:
         spin = tk.Spinbox(
             self.fr_bt,
             from_=from_, to=to,
-            increment=increment,
+            increment=inc,
             width=4,
             textvariable=tk.DoubleVar(value=init_value),
             bg=color_bg_spin,
@@ -160,7 +163,6 @@ class Plotter3D:
         else:
             self.spin_res_v.delete(0, "end")
             self.spin_res_v.insert(0, str(self.app.math_utils.clip_limit_3d))
-
 
     def _update_curve(self):
         self.ax.clear()
