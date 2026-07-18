@@ -39,7 +39,7 @@ class MathUtils():
             for pole in pair:
                 den *= np.exp(1j*w) - pole
 
-        with np.errstate(divide='ignore', invalid='ignore'):
+        with np.errstate(divide="ignore", invalid="ignore"):
             H_jw = num / den  # den=0 => H_jw=np.inf
 
         H_jw = np.nan_to_num(H_jw, nan=0.0, posinf=max_value, neginf=-max_value)
@@ -160,7 +160,7 @@ class MathUtils():
             for pole in pair:
                 den *= z - pole
 
-        with np.errstate(divide='ignore', invalid='ignore'):
+        with np.errstate(divide="ignore", invalid="ignore"):
             H_z = num/den
 
         H_z = np.nan_to_num(H_z, nan=0.0, posinf=max_value, neginf=-max_value)
