@@ -164,11 +164,8 @@ class TFDisplayer:
     def _format_H_z_sym(self, zeros, poles, funct, sign, base):
         num, den = funct(zeros, poles)
 
-        if num == 1 and den == 1:
+        if num == den:
             return "H(z) = 1"
-
-        num = str(num)
-        den = str(den)
 
         # Substitutions
 
@@ -206,8 +203,8 @@ class TFDisplayer:
             coef = entry.get().replace(",", ".")
             den.append(coef)
 
-        num = [x if x.strip() != '' else '0' for x in num]
-        den = [x if x.strip() != '' else '0' for x in den]
+        num = [x if x.strip() != "" else "0" for x in num]
+        den = [x if x.strip() != "" else "0" for x in den]
 
         try:
             num = [float(x) for x in num]
@@ -221,6 +218,8 @@ class TFDisplayer:
             valid = False
 
         if valid:
+
+            # z_inv -> z format (for tf2zpk)
             if not self.app.var_z_inv.get():
                 num.reverse()
                 den.reverse()

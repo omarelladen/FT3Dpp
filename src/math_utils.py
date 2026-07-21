@@ -2,15 +2,18 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import numpy as np
-import sympy as sp
 import scipy.signal as signal
 
 
 max_value = 1e12
 min_value = 1e-12
 
+decimals = 3
+
 
 # TODO: prevent -1 term instead of 1 in Y(z)
+#       1.0 -> 1
+#       update imp e step resp on clear (update_all)
 class MathUtils():
     def __init__(self, resolution, sample_size, max_pi=1):
         self.resolution = resolution
@@ -19,6 +22,13 @@ class MathUtils():
         self.clip_limit_3d = 0
         self.sample_size = sample_size
         self.max_pi = max_pi
+
+        self.sys_dlti = None
+        self.tf = None
+
+    def update_sys(self, zeros, poles, gain=1):
+        self.sys_dlti = self.dlti(zeros, poles, gain=gain)
+        self.tf = signal.TransferFunction(self.sys_dlti)
 
     def _w(self):
         return np.linspace(0, np.pi, self.resolution)
@@ -106,47 +116,66 @@ class MathUtils():
         return np.rad2deg(self.phase_H_rad(H_jw))
 
     def H_z_inv_sym(self, zeros, poles):
-        num, den = self.H_z_sym(zeros, poles)
+        if not poles and not zeros:
+            return "1", "1"
 
-        if num == 1 and den == 1:
-            return 1, 1
+        self.H_z_sym(zeros, poles)  ####### tf was None
 
-        z     = sp.symbols("z")
-        z_inv = sp.symbols("z_inv")
+        num = list(self.tf.num)
+        den = list(self.tf.den)
 
-        H_z = num/den
+        # Zero pad the smaller
+        diff = len(num) - len(den)
+        if diff < 0:
+            num = [0]*abs(diff) + num
+        elif diff > 0:
+            den = [0]*diff + den
 
-        # Replace z with 1/z_inv
-        H_z_inv = H_z.subs(z, 1/z_inv).cancel()
-        num, den = H_z_inv.as_numer_denom()
+        num.reverse()
+        den.reverse()
 
-        num = sp.expand(num)
-        den = sp.expand(den)
+        num_str = self._format_coefs_sym(num, "z_inv")
+        den_str = self._format_coefs_sym(den, "z_inv")
 
-        return num, den
+        return num_str, den_str
+
+    def _format_coefs_sym(self, list, sym):
+        is_first = True
+        str = ""
+        for i, coef in enumerate(list):
+            list_degree = len(list) - 1
+            coef_degree = list_degree - i
+
+            if coef == 0:
+                continue
+            if coef > 0:
+                if is_first:
+                    sign = ""
+                else:
+                    sign = "+"
+            else:
+                sign = ""
+
+            is_first = False
+
+            coef_round = round(coef, 3)
+            if coef_degree == 0:
+                str += f"{sign}{coef_round}"
+            elif coef_degree == 1:
+                str += f"{sign}{coef_round}*{sym}"
+            else:
+                str += f"{sign}{coef_round}*{sym}**{coef_degree}"
+
+        return str
 
     def H_z_sym(self, zeros, poles):
         if not poles and not zeros:
-            return 1, 1
+            return "1", "1"
 
-        z = sp.symbols("z")
+        num_str = self._format_coefs_sym(self.tf.num, "z")
+        den_str = self._format_coefs_sym(self.tf.den, "z")
 
-        num = 1
-        den = 1
-
-        for pair in zeros.list:
-            for zero in pair:
-                num *= z - sp.N(zero, 3)
-        for pair in poles.list:
-            for pole in pair:
-                den *= z - sp.N(pole, 3)
-
-        if num != 1:
-            num = num.expand()
-        if den != 1:
-            den = den.expand()
-
-        return num, den
+        return num_str, den_str
 
     def _H_z_3D(self, zeros, poles, z):
         num = np.ones_like(z, dtype=complex)
@@ -217,21 +246,15 @@ class MathUtils():
         return dlti
 
     def dimpulse(self, zeros, poles, gain=1):
-        dlti = self.dlti(zeros, poles, gain)
-
         try:
-            t, h = signal.dimpulse(dlti, n=self.sample_size)
+            t, h = signal.dimpulse(self.sys_dlti, n=self.sample_size)
         except ValueError:  # bad system
             return [], []
-
         return t, h
 
-    def dstep(self, zeros, poles, gain=1):
-        dlti = self.dlti(zeros, poles, gain)
-
+    def dstep(self, zeros, poles):
         try:
-            t, h = signal.dstep(dlti, n=self.sample_size)
+            t, h = signal.dstep(self.sys_dlti, n=self.sample_size)
         except ValueError:  # bad system
             return [], []
-
         return t, h

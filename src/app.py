@@ -646,6 +646,7 @@ class App:
                 self._set_freq_resp_title("Resposta em Frequência: Fase (rad)")
             line = ang_H
             self._set_phase_options()
+
         elif self.bt_states[self.icon_freq_db].get():
             if self.var_normalize.get():
                 mag_H_jw_db = self.math_utils.mag_H_jw_db_norm(H_jw)
@@ -1142,6 +1143,7 @@ class App:
 
     def update_all(self):
         self.update_plane()
+        self.math_utils.update_sys(self.zeros, self.poles)
         self.update_freq_resp()
         self._update_labels_coords()
         self._update_stats()
