@@ -217,7 +217,6 @@ class TFDisplayer:
             valid = False
 
         if valid:
-
             # z_inv -> z format (for tf2zpk)
             if not self.app.var_z_inv.get():
                 num.reverse()
@@ -233,9 +232,9 @@ class TFDisplayer:
                 num.pop()
                 den.pop()
 
-            zeros, poles, _ = self.app.math_utils.tf2zpk(num, den)
+            zeros, poles, gain = self.app.math_utils.tf2zpk(num, den)
 
-            self.app.clear_poles_zeros()
+            self.app.clear_elements()
 
             for z in zeros:
                 if z.imag >= 0:
@@ -244,4 +243,4 @@ class TFDisplayer:
                 if p.imag >= 0:
                     self.app.add_element_plane(self.app.poles, p.real, p.imag)
 
-            self.app.update_all()
+            self.app.update_all(gain=gain)

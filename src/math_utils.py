@@ -11,8 +11,7 @@ min_value = 1e-12
 decimals = 3
 
 
-# TODO: prevent -1 term instead of 1 in Y(z)
-#       reorder expr with z_env
+# TODO: reorder expr with z_env
 class MathUtils():
     def __init__(self, resolution, sample_size, max_pi=1):
         self.resolution = resolution
@@ -26,6 +25,7 @@ class MathUtils():
         self.tf = None
 
     def update_sys(self, zeros, poles, gain=1):
+        self.gain = gain
         self.sys_dlti = self.dlti(zeros, poles, gain=gain)
         self.tf = signal.TransferFunction(self.sys_dlti)
 
@@ -184,7 +184,6 @@ class MathUtils():
         for pair in zeros.list:
             for zero in pair:
                 num *= z - zero
-
         for pair in poles.list:
             for pole in pair:
                 den *= z - pole
@@ -229,6 +228,7 @@ class MathUtils():
 
     def tf2zpk(self, num, den):
         zeros, poles, gain = signal.tf2zpk(num, den)
+        self.gain = gain
         return zeros, poles, gain
 
     def dlti(self, zeros, poles, gain):
@@ -236,7 +236,6 @@ class MathUtils():
         for pair in poles.list:
             for p in pair:
                 list_poles.append(p)
-
         list_zeros = []
         for pair in zeros.list:
             for z in pair:
@@ -245,7 +244,7 @@ class MathUtils():
         dlti = signal.dlti(list_zeros, list_poles, gain)
         return dlti
 
-    def dimpulse(self, zeros, poles, gain=1):
+    def dimpulse(self, zeros, poles):
         try:
             t, h = signal.dimpulse(self.sys_dlti, n=self.sample_size)
         except ValueError:  # bad system

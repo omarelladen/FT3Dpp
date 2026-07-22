@@ -1000,7 +1000,7 @@ class App:
         ):
             self.update_freq_resp()
         elif clicked_key == self.icon_clear:
-            self.clear_poles_zeros()
+            self.clear_elements()
             self.update_all()
             v_clicked.set(False)
         elif clicked_key == self.icon_kb:
@@ -1031,7 +1031,7 @@ class App:
             self.tf_displayer.update_labels()
         self.tf_displayer.invert_z_entries()
 
-    def clear_poles_zeros(self):
+    def clear_elements(self):
         self.poles.clear()
         self.zeros.clear()
 
@@ -1141,9 +1141,9 @@ class App:
         self.idx_sel_point = None
         self.type_sel_point = None
 
-    def update_all(self):
+    def update_all(self, gain=1):
         self.update_plane()
-        self.math_utils.update_sys(self.zeros, self.poles)
+        self.math_utils.update_sys(self.zeros, self.poles, gain)
         self.update_freq_resp()
         self._update_labels_coords()
         self._update_stats()
