@@ -12,8 +12,7 @@ decimals = 3
 
 
 # TODO: prevent -1 term instead of 1 in Y(z)
-#       1.0 -> 1
-#       update imp e step resp on clear (update_all)
+#       reorder expr with z_env
 class MathUtils():
     def __init__(self, resolution, sample_size, max_pi=1):
         self.resolution = resolution
@@ -119,8 +118,6 @@ class MathUtils():
         if not poles and not zeros:
             return "1", "1"
 
-        self.H_z_sym(zeros, poles)  ####### tf was None
-
         num = list(self.tf.num)
         den = list(self.tf.den)
 
@@ -157,6 +154,9 @@ class MathUtils():
                 sign = ""
 
             is_first = False
+
+            if coef.is_integer():
+                coef = int(coef)
 
             coef_round = round(coef, 3)
             if coef_degree == 0:
