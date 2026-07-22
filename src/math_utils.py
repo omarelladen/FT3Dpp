@@ -155,10 +155,10 @@ class MathUtils():
 
             is_first = False
 
-            if coef.is_integer():
-                coef = int(coef)
-
             coef_round = round(coef, 3)
+            if coef_round.is_integer():
+                coef_round = int(coef_round)
+
             if coef_degree == 0:
                 str += f"{sign}{coef_round}"
             elif coef_degree == 1:
