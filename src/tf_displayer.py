@@ -143,28 +143,27 @@ class TFDisplayer:
                 label.config(text=new_text)
 
     def _format_H_z_inv(self, zeros, poles):
-        return self._format_H_z_sym(
+        num, den = self._format_H_z_sym(
             zeros,
             poles,
             self.app.math_utils.H_z_inv_sym,
             "⁻",
             "z_inv"
         )
+        return self._create_eq(num, den)
 
     def _format_H_z(self, zeros, poles):
-        return self._format_H_z_sym(
+        num, den = self._format_H_z_sym(
             zeros,
             poles,
             self.app.math_utils.H_z_sym,
             "",
             "z"
         )
+        return self._create_eq(num, den)
 
     def _format_H_z_sym(self, zeros, poles, funct, sign, base):
         num, den = funct(zeros, poles)
-
-        if num == den:
-            return "H(z) = 1"
 
         # Substitutions
 
@@ -177,9 +176,12 @@ class TFDisplayer:
             num = num.replace(old, new)
             den = den.replace(old, new)
 
-        return self._create_eq(num, den)
+        return num, den
 
     def _create_eq(self, num, den):
+        if num == den:
+            return "H(z) = 1"
+
         bar_size = max(len(num), len(den))
         bar = "—" * bar_size
 

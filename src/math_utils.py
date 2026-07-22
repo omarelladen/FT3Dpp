@@ -114,28 +114,6 @@ class MathUtils():
     def phase_H_deg(self, H_jw):
         return np.rad2deg(self.phase_H_rad(H_jw))
 
-    def H_z_inv_sym(self, zeros, poles):
-        if not poles and not zeros:
-            return "1", "1"
-
-        num = list(self.tf.num)
-        den = list(self.tf.den)
-
-        # Zero pad the smaller
-        diff = len(num) - len(den)
-        if diff < 0:
-            num = [0]*abs(diff) + num
-        elif diff > 0:
-            den = [0]*diff + den
-
-        num.reverse()
-        den.reverse()
-
-        num_str = self._format_coefs_sym(num, "z_inv")
-        den_str = self._format_coefs_sym(den, "z_inv")
-
-        return num_str, den_str
-
     def _format_coefs_sym(self, list, sym):
         is_first = True
         str = ""
@@ -167,6 +145,33 @@ class MathUtils():
                 str += f"{sign}{coef_round}*{sym}**{coef_degree}"
 
         return str
+
+    def H_z_inv_array(self, zeros, poles):
+        num = list(self.tf.num)
+        den = list(self.tf.den)
+
+        # Zero pad the smaller
+        diff = len(num) - len(den)
+        if diff < 0:
+            num = [0]*abs(diff) + num
+        elif diff > 0:
+            den = [0]*diff + den
+
+        num.reverse()
+        den.reverse()
+
+        return num, den
+
+    def H_z_inv_sym(self, zeros, poles):
+        if not poles and not zeros:
+            return "1", "1"
+
+        num, den = self.H_z_inv_array(zeros, poles)
+
+        num_str = self._format_coefs_sym(num, "z_inv")
+        den_str = self._format_coefs_sym(den, "z_inv")
+
+        return num_str, den_str
 
     def H_z_sym(self, zeros, poles):
         if not poles and not zeros:

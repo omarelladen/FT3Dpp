@@ -24,6 +24,7 @@ from kb_dialog import KBDialog
 from about_dialog import AboutDialog
 from help_dialog import HelpDialog
 from plotter_3d import Plotter3D
+from plotter_diagram import PlotterDiagram
 from elements import Elements
 from tf_displayer import TFDisplayer
 from system_classifier import SystemClassifier
@@ -112,6 +113,7 @@ class App:
         self.icon_kb = self._create_icon("kb.png", 3)
         self.icon_clear = self._create_icon("clear.png", 3)
         self.icon_info = self._create_icon("info.png", 3)
+        self.icon_block = self._create_icon("block_t.png", 19)
 
         # Buttons
         self.dict_bt = {  # icon: (hint, group, starts_active)
@@ -128,6 +130,7 @@ class App:
             self.icon_imp: ("Resposta ao Impulso", 2, False),
             self.icon_step: ("Resposta ao Degrau Unitário", 2, False),
             self.icon_3d: ("Gráfico 3D", -1, False),
+            self.icon_block: ("Diagrama de Blocos", -1, False),
             self.icon_pole: ("Editar Polos", 3, True),
             self.icon_zero: ("Editar Zeros", 3, False),
             self.icon_kb: ("Inserir Raízes via Teclado", -1, False),
@@ -135,11 +138,13 @@ class App:
             self.icon_info: ("Mais Informações", -1, False),
         }
 
+        num_bt_top = 14
+
         self.bt_states = {}
         self.bt_groups = {}
 
         # Top Buttons
-        self._create_bts(list(self.dict_bt.items())[:13], "top")
+        self._create_bts(list(self.dict_bt.items())[:num_bt_top], "top")
         self.toolbar.pack(side="top", fill="x")
 
         self.fr_top = tk.Frame(self.win, bg=color_bg, pady=5)
@@ -157,7 +162,7 @@ class App:
         # Left Buttons
         self.fr_bt_left = tk.Frame(self.main_container, bg=color_bg)
         self.fr_bt_left.pack(side="left", fill="y", padx=5, pady=5)
-        self._create_bts(list(self.dict_bt.items())[13:], "left")
+        self._create_bts(list(self.dict_bt.items())[num_bt_top:], "left")
 
 
         # Poles and zeros
@@ -294,7 +299,7 @@ class App:
         self.type_sel_point = None
 
         self.canvas_p = FigureCanvasTkAgg(self.fig_p, master=self.fr_plane)
-        self.canvas_p.draw()
+        self.canvas_p.draw_idle()
 
         # Matplotlib toolbar
         self.toolbar_p = NavigationToolbar2Tk(
@@ -356,7 +361,7 @@ class App:
         self.ax_r.format_coord = lambda x, y: f"(x, y) = ({x:.2f}, {y:.2f})"
 
         self.canvas_r = FigureCanvasTkAgg(self.fig_r, master=self.fr_resp)
-        self.canvas_r.draw()
+        self.canvas_r.draw_idle()
 
         # Matplotlib toolbar
         self.toolbar_r = NavigationToolbar2Tk(
@@ -1008,6 +1013,9 @@ class App:
             v_clicked.set(False)
         elif clicked_key == self.icon_3d:
             Plotter3D(self.win, self)
+            v_clicked.set(False)
+        elif clicked_key == self.icon_block:
+            PlotterDiagram(self.win, self)
             v_clicked.set(False)
         elif clicked_key == self.icon_info:
             self._open_sys_clf_info()
