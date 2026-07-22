@@ -25,19 +25,6 @@ arrow_props = dict(
     lw=lw
 )
 
-dict_subst_exp = {
-    "z⁻⁰": "z⁻⁰X(z)",
-    "z⁻¹": "z⁻¹X(z)",
-    "z⁻²": "z⁻²X(z)",
-    "z⁻³": "z⁻³X(z)",
-    "z⁻⁴": "z⁻⁴X(z)",
-    "z⁻⁵": "z⁻⁵X(z)",
-    "z⁻⁶": "z⁻⁶X(z)",
-    "z⁻⁷": "z⁻⁷X(z)",
-    "z⁻⁸": "z⁻⁸X(z)",
-    "z⁻⁹": "z⁻⁹X(z)"
-}
-
 
 class PlotterDiagram:
     def __init__(self, parent, app):
@@ -50,8 +37,8 @@ class PlotterDiagram:
         list_num = list(num)
         list_den = list(den)
 
-        if (not list_den[-1].is_integer() or
-            not int(list_den[-1]) == 1  ###### can it be != 1?
+        if (not list_den[0].is_integer() or
+            not int(list_den[0]) == 1        # TODO: when != 1
         ):
             print("invalid")
             return
@@ -68,7 +55,7 @@ class PlotterDiagram:
 
 
         list_den_minus = []
-        for coef in den[:-1]:
+        for coef in den[1:]:
             list_den_minus.append(-coef)
 
         self.eq = self._y_n(list_num, list_den_minus, n)
@@ -82,7 +69,7 @@ class PlotterDiagram:
             fir = True
         else:
             fir = True
-            for coef in list_den[:-1]:
+            for coef in list_den[1:]:
                 if not coef.is_integer() or int(coef) != 0:
                     fir = False
                     break
@@ -96,7 +83,11 @@ class PlotterDiagram:
         self.ax.set_xlim(0, x_lim)
         self.ax.set_ylim(0, y_lim)
         self.ax.axis("off")
-        self.ax.set_title(self.eq_generic + "\n" + self.eq, loc="left")
+        self.ax.set_title(
+            self.eq_generic + "\n" + self.eq,
+            loc="left",
+            fontsize=10
+        )
 
         self.diagram(n, fir)
 
@@ -112,7 +103,9 @@ class PlotterDiagram:
     def _y_n(self, list_num, list_den_minus, n):
         expr_x = self._format_coefs_sym(list_num, "x", n)
         expr_y = self._format_coefs_sym(list_den_minus, "y", n)
-        eq = "$" + f"y[n]={expr_y}{expr_x}" + "$"
+
+        eq = "$" + f"y[n]={expr_x}{expr_y}" + "$"
+        eq = eq.replace("=+", "=")
         return eq
 
     def _y_n_generic(self, n):
@@ -125,12 +118,21 @@ class PlotterDiagram:
         return eq
 
     def _format_coefs_sym(self, list, sym, n):
+        if len(list) == n + 1:
+            offset_delay = 0
+        else:
+            offset_delay = 1
+        print(offset_delay)
+        print("n=", n)
+        print("len(list)=", len(list))
+
         expr = ""
         for i, coef in enumerate(list):
-            delay = n - i
+            delay = i + offset_delay
 
             if coef.is_integer() and int(coef) == 0:
                 continue
+
             if coef > 0:
                 sign = "+"
             else:

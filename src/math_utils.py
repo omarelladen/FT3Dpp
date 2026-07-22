@@ -118,9 +118,12 @@ class MathUtils():
         is_first = True
         str = ""
         for i, coef in enumerate(list):
-            list_degree = len(list) - 1
-            coef_degree = list_degree - i
+            degree_list = len(list) - 1
 
+            if sym == "z_inv":
+                coef_degree = i
+            else:
+                coef_degree = degree_list - i
             if coef == 0:
                 continue
             if coef > 0:
@@ -156,9 +159,6 @@ class MathUtils():
             num = [0]*abs(diff) + num
         elif diff > 0:
             den = [0]*diff + den
-
-        num.reverse()
-        den.reverse()
 
         return num, den
 
