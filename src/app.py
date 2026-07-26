@@ -36,7 +36,7 @@ range_click = 0.1
 
 max_pi = 4
 
-init_resolution = 500
+init_resolution = 200
 max_resolution = 1000
 
 init_sample_size = 21
