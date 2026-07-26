@@ -211,7 +211,7 @@ class TFDisplayer:
             num = [float(x) for x in num]
             den = [float(x) for x in den]
 
-            if not any(x != 0.0 for x in den):
+            if not any(x != 0 for x in den):
                 valid = False
             else:
                 valid = True
@@ -228,8 +228,8 @@ class TFDisplayer:
             while (
                 len(num) > 1 and
                 len(den) > 1 and
-                num[-1] == 0.0 and
-                den[-1] == 0.0
+                num[-1] == 0 and
+                den[-1] == 0
             ):
                 num.pop()
                 den.pop()

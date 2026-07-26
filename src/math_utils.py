@@ -11,7 +11,6 @@ min_value = 1e-12
 decimals = 3
 
 
-# TODO: reorder expr with z_env
 class MathUtils():
     def __init__(self, resolution, sample_size, max_pi=1):
         self.resolution = resolution
@@ -61,7 +60,7 @@ class MathUtils():
         with np.errstate(divide="ignore", invalid="ignore"):
             H_jw = num/den  # den=0 => H_jw=np.inf
 
-        H_jw = np.nan_to_num(H_jw, nan=0.0, posinf=max_value, neginf=-max_value)
+        H_jw = np.nan_to_num(H_jw, nan=0, posinf=max_value, neginf=-max_value)
         return H_jw
 
     def mag_H_jw(self, H_jw):
@@ -70,10 +69,10 @@ class MathUtils():
         # [3,2,1,1,0] + [1,1,2] = [3,2,1,1,0,1,1,2,3] (e.g 500 pts -> 998 pts)
         mag_2pi = np.concatenate([mag_base, mag_base[::-1][1:-1]])
 
-        num_rep = int(np.ceil(self.max_pi/2.0))  # repetitions of 2pi
+        num_rep = int(np.ceil(self.max_pi/2))  # repetitions of 2pi
         mag_total = np.tile(mag_2pi, num_rep)    # create repetition
 
-        xp = np.linspace(0, num_rep*2.0*np.pi, len(mag_total))
+        xp = np.linspace(0, num_rep*2*np.pi, len(mag_total))
 
         # Interpolate bc len(xp) != len(w_plot)
         mag_H_jw = np.interp(self.w_plot, xp, mag_total)
@@ -85,7 +84,7 @@ class MathUtils():
     def mag_H_jw_db(self, H_jw):
         mag_H_jw = self.mag_H_jw(H_jw)
         mag_H_jw_db = 20*np.log10(mag_H_jw)
-        mag_H_jw_db = np.where(np.abs(mag_H_jw_db) < min_value, 0.0, mag_H_jw_db)
+        mag_H_jw_db = np.where(np.abs(mag_H_jw_db) < min_value, 0, mag_H_jw_db)
         return mag_H_jw_db
 
     def mag_H_jw_norm(self, H_jw):
@@ -107,10 +106,10 @@ class MathUtils():
         # [3,2,1,1,0] -> [3,2,1,1,0,-1,-1,-2,-3]
         phase_2pi = np.concatenate([phase_base, -phase_base[::-1][1:-1]])
 
-        num_rep = int(np.ceil(self.max_pi/2.0))    # repetitions of 2pi
+        num_rep = int(np.ceil(self.max_pi/2))    # repetitions of 2pi
         phase_total = np.tile(phase_2pi, num_rep)  # create repetition
 
-        xp = np.linspace(0, num_rep*2.0*np.pi, len(phase_total))
+        xp = np.linspace(0, num_rep*2*np.pi, len(phase_total))
 
         # Interpolate bc len(xp) != len(w_plot)
         phase = np.interp(self.w_plot, xp, phase_total)
@@ -205,13 +204,13 @@ class MathUtils():
         with np.errstate(divide="ignore", invalid="ignore"):
             H_z = num/den
 
-        H_z = np.nan_to_num(H_z, nan=0.0, posinf=max_value, neginf=-max_value)
+        H_z = np.nan_to_num(H_z, nan=0, posinf=max_value, neginf=-max_value)
 
         return H_z
 
     def mag_H_z_3D(self, zeros, poles, clip_limit):
         u = np.linspace(0, 2*np.pi, self.resolution_u)
-        v = np.linspace(0.01, 2.0, self.resolution_v)
+        v = np.linspace(0.01, 2, self.resolution_v)
         U, V = np.meshgrid(u, v)
 
         x = V*np.cos(U)
