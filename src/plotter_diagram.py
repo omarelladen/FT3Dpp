@@ -122,9 +122,6 @@ class PlotterDiagram:
             offset_delay = 0
         else:
             offset_delay = 1
-        print(offset_delay)
-        print("n=", n)
-        print("len(list)=", len(list))
 
         expr = ""
         for i, coef in enumerate(list):
