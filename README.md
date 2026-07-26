@@ -124,10 +124,11 @@ python src/main.py
 - [ ] Choose font size of transfer function
 - [ ] Choose font size of coordinates
 - [x] No button duplication in menu
+- [x] Block diagram
 - [ ] Translations
 
 ## Credits
-- Icons: The icons were extracted from FT3D
+- Icons: Most of the icons were extracted from FT3D
 - 3D inspiration:
 [Z-plane to Frequency Response](https://dspfirst.gatech.edu/chapters/08feedbac/demos/z2freq/index.html)
 
