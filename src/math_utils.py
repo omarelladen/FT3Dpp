@@ -85,6 +85,7 @@ class MathUtils():
     def mag_H_jw_db(self, H_jw):
         mag_H_jw = self.mag_H_jw(H_jw)
         mag_H_jw_db = 20*np.log10(mag_H_jw)
+        mag_H_jw_db = np.where(np.abs(mag_H_jw_db) < min_value, 0.0, mag_H_jw_db)
         return mag_H_jw_db
 
     def mag_H_jw_norm(self, H_jw):
