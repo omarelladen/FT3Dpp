@@ -21,6 +21,9 @@ class MathUtils():
         self.sample_size = sample_size
         self.max_pi = max_pi
 
+        self.w = self._gen_w()
+        self.w_plot = self.gen_w_plot()
+
         self.sys_dlti = None
         self.tf = None
 
@@ -29,27 +32,34 @@ class MathUtils():
         self.sys_dlti = self.dlti(zeros, poles, gain=gain)
         self.tf = signal.TransferFunction(self.sys_dlti)
 
-    def _w(self):
+    def change_resolution(self, resolution):
+        self.resolution = resolution
+        self.w = self._gen_w()
+        self.w_plot = self.gen_w_plot()
+
+    def change_max_pi(self, max_pi):
+        self.max_pi = max_pi
+        self.w_plot = self.gen_w_plot()
+
+    def _gen_w(self):
         return np.linspace(0, np.pi, self.resolution)
 
-    def w_plot(self):
+    def gen_w_plot(self):
         return np.linspace(0, self.max_pi*np.pi, self.max_pi*self.resolution)
 
     def H_jw(self, zeros, poles):
-        w = self._w()
-
         num = np.ones(self.resolution, dtype=complex)
         den = np.ones(self.resolution, dtype=complex)
 
         for pair in zeros.list:
             for zero in pair:
-                num *= np.exp(1j*w) - zero
+                num *= np.exp(1j*self.w) - zero
         for pair in poles.list:
             for pole in pair:
-                den *= np.exp(1j*w) - pole
+                den *= np.exp(1j*self.w) - pole
 
         with np.errstate(divide="ignore", invalid="ignore"):
-            H_jw = num / den  # den=0 => H_jw=np.inf
+            H_jw = num/den  # den=0 => H_jw=np.inf
 
         H_jw = np.nan_to_num(H_jw, nan=0.0, posinf=max_value, neginf=-max_value)
         return H_jw
@@ -64,10 +74,9 @@ class MathUtils():
         mag_total = np.tile(mag_2pi, num_rep)    # create repetition
 
         xp = np.linspace(0, num_rep*2.0*np.pi, len(mag_total))
-        w_plot = self.w_plot()
 
         # Interpolate bc len(xp) != len(w_plot)
-        mag_H_jw = np.interp(w_plot, xp, mag_total)
+        mag_H_jw = np.interp(self.w_plot, xp, mag_total)
 
         mag_H_jw = np.clip(mag_H_jw, a_min=min_value, a_max=None)
 
@@ -75,7 +84,7 @@ class MathUtils():
 
     def mag_H_jw_db(self, H_jw):
         mag_H_jw = self.mag_H_jw(H_jw)
-        mag_H_jw_db = 20 * np.log10(mag_H_jw)
+        mag_H_jw_db = 20*np.log10(mag_H_jw)
         return mag_H_jw_db
 
     def mag_H_jw_norm(self, H_jw):
@@ -101,10 +110,9 @@ class MathUtils():
         phase_total = np.tile(phase_2pi, num_rep)  # create repetition
 
         xp = np.linspace(0, num_rep*2.0*np.pi, len(phase_total))
-        w_plot = self.w_plot()
 
         # Interpolate bc len(xp) != len(w_plot)
-        phase = np.interp(w_plot, xp, phase_total)
+        phase = np.interp(self.w_plot, xp, phase_total)
 
         # Clip both min_value and -min_value to 0
         phase[np.abs(phase) < min_value] = 0
@@ -216,8 +224,6 @@ class MathUtils():
         return x, y, z
 
     def mag_H_jw_3D(self, zeros, poles, clip_limit):
-        w_plot = self.w_plot()
-
         H_jw = self.H_jw(
             zeros,
             poles
@@ -226,8 +232,8 @@ class MathUtils():
         z = self.mag_H_jw(H_jw)
         z = np.clip(z, a_min=None, a_max=clip_limit)
 
-        x = np.cos(w_plot)
-        y = np.sin(w_plot)
+        x = np.cos(self.w_plot)
+        y = np.sin(self.w_plot)
 
         return x, y, z
 

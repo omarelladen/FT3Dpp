@@ -616,7 +616,7 @@ class App:
             int(resolution) > 1 and
             int(resolution) <= max_resolution
         ):
-            self.math_utils.resolution = int(resolution)
+            self.math_utils.change_resolution(int(resolution))
             self.update_freq_resp()
         else:
             self.spin_res.delete(0, "end")
@@ -636,9 +636,9 @@ class App:
 
     def update_freq_resp(self):
         theta_val = int(self.spin_theta_max.get())
-        self.math_utils.max_pi = theta_val
+        self.math_utils.change_max_pi(theta_val)
 
-        w_plot = self.math_utils.w_plot()
+        w_plot = self.math_utils.w_plot
         H_jw = self.math_utils.H_jw(self.zeros, self.poles)
 
         # Select what to plot
