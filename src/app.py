@@ -878,7 +878,7 @@ class App:
 
     def _update_labels_coords(self):
         poles_text = ""
-        for pair in self.poles.list:
+        for pair in self.poles.list_:
             p1 = pair[0]
             sign_1 = "+" if p1.imag >= 0 else "-"
             poles_text += f"({p1.real:.3f} {sign_1} j{abs(p1.imag):.3f})"
@@ -890,7 +890,7 @@ class App:
                 poles_text += "\n"
 
         zeros_text = ""
-        for pair in self.zeros.list:
+        for pair in self.zeros.list_:
             z1 = pair[0]
             sign_1 = "+" if z1.imag >= 0 else "-"
             zeros_text += f"({z1.real:.3f} {sign_1} j{abs(z1.imag):.3f})"
@@ -1065,11 +1065,11 @@ class App:
         list_coords = []
         list_mapping = []  # ("p"|"z", idx in list)
 
-        for i, pair in enumerate(self.poles.list):
+        for i, pair in enumerate(self.poles.list_):
             for p in pair:
                 list_coords.append([p.real, p.imag])
                 list_mapping.append(("p", i))
-        for i, pair in enumerate(self.zeros.list):
+        for i, pair in enumerate(self.zeros.list_):
             for p in pair:
                 list_coords.append([p.real, p.imag])
                 list_mapping.append(("z", i))
@@ -1177,7 +1177,7 @@ class App:
         if not self.poles.empty():
             list_x_poles = []
             list_y_poles = []
-            for pair in self.poles.list:
+            for pair in self.poles.list_:
                 for p in pair:
                     list_x_poles.append(p.real)
                     list_y_poles.append(p.imag)
@@ -1189,7 +1189,7 @@ class App:
         if not self.zeros.empty():
             list_x_zeros = []
             list_y_zeros = []
-            for pair in self.zeros.list:
+            for pair in self.zeros.list_:
                 for z in pair:
                     list_x_zeros.append(z.real)
                     list_y_zeros.append(z.imag)

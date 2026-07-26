@@ -51,10 +51,10 @@ class MathUtils():
         num = np.ones(self.resolution, dtype=complex)
         den = np.ones(self.resolution, dtype=complex)
 
-        for pair in zeros.list:
+        for pair in zeros.list_:
             for zero in pair:
                 num *= np.exp(1j*self.w) - zero
-        for pair in poles.list:
+        for pair in poles.list_:
             for pole in pair:
                 den *= np.exp(1j*self.w) - pole
 
@@ -122,11 +122,11 @@ class MathUtils():
     def phase_H_deg(self, H_jw):
         return np.rad2deg(self.phase_H_rad(H_jw))
 
-    def _format_coefs_sym(self, list, sym):
+    def _format_coefs_sym(self, list_, sym):
         is_first = True
-        str = ""
-        for i, coef in enumerate(list):
-            degree_list = len(list) - 1
+        str_ = ""
+        for i, coef in enumerate(list_):
+            degree_list = len(list_) - 1
 
             if sym == "z_inv":
                 coef_degree = i
@@ -149,13 +149,13 @@ class MathUtils():
                 coef_round = int(coef_round)
 
             if coef_degree == 0:
-                str += f"{sign}{coef_round}"
+                str_ += f"{sign}{coef_round}"
             elif coef_degree == 1:
-                str += f"{sign}{coef_round}*{sym}"
+                str_ += f"{sign}{coef_round}*{sym}"
             else:
-                str += f"{sign}{coef_round}*{sym}**{coef_degree}"
+                str_ += f"{sign}{coef_round}*{sym}**{coef_degree}"
 
-        return str
+        return str_
 
     def H_z_inv_array(self, zeros, poles):
         num = list(self.tf.num)
@@ -194,10 +194,10 @@ class MathUtils():
         num = np.ones_like(z, dtype=complex)
         den = np.ones_like(z, dtype=complex)
 
-        for pair in zeros.list:
+        for pair in zeros.list_:
             for zero in pair:
                 num *= z - zero
-        for pair in poles.list:
+        for pair in poles.list_:
             for pole in pair:
                 den *= z - pole
 
@@ -244,11 +244,11 @@ class MathUtils():
 
     def dlti(self, zeros, poles, gain):
         list_poles = []
-        for pair in poles.list:
+        for pair in poles.list_:
             for p in pair:
                 list_poles.append(p)
         list_zeros = []
-        for pair in zeros.list:
+        for pair in zeros.list_:
             for z in pair:
                 list_zeros.append(z)
 

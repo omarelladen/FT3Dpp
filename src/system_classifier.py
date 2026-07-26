@@ -84,7 +84,7 @@ class SystemClassifier:
             if poles.num_elements() == 0:
                 self.integrator = False
 
-            for pair_p in poles.list:
+            for pair_p in poles.list_:
                 p1 = pair_p[0]
                 x = p1.real
                 y = p1.imag
@@ -101,7 +101,7 @@ class SystemClassifier:
                     degree = poles.num_elements()
 
                     only_zeros_1_0 = True  # only at (1,0)
-                    for pair in zeros.list:
+                    for pair in zeros.list_:
                         z = pair[0]
                         if z.real == 1 and z.imag == 0:
                             degree -= 1
@@ -128,7 +128,7 @@ class SystemClassifier:
                     text = f"Integrador de grau {poles.num_elements()}"
                     bg = "orange"
             else:
-                for pair_p in poles.list:
+                for pair_p in poles.list_:
                     p1 = pair_p[0]
                     x = p1.real
                     y = p1.imag
