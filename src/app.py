@@ -30,8 +30,6 @@ from tf_displayer import TFDisplayer
 from system_classifier import SystemClassifier
 
 
-icon_logo_path = os.path.join("icons", "logo.png")
-
 range_click = 0.1
 
 max_pi = 4
@@ -64,6 +62,7 @@ class App:
         self.win.configure(bg=color_bg)
 
         # Icon
+        icon_logo_path = os.path.join("icons", "logo.png")
         if os.name == "nt":  # Windows
             if os.path.isfile(icon_logo_path):
                 try:
