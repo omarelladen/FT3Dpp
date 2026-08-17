@@ -8,29 +8,9 @@ rewrite
 </p>
 
 ## Install dependencies
-### Debian Linux packages
-```sh
-sudo apt install python3-tk python3-matplotlib python3-numpy
-```
+See [INSTALL](./INSTALL.md)
 
-### or from PyPI with pip
-
-#### Linux
-```sh
-python3 -m venv .venv
-. .venv/bin/activate
-pip install -r requirements.txt
-```
-
-#### Windows
-```sh
-python -m venv venv
-Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
-venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-## Run
+## Run the app
 
 ### Linux
 ```sh
@@ -133,6 +113,6 @@ python src/main.py
 [Z-plane to Frequency Response](https://dspfirst.gatech.edu/chapters/08feedbac/demos/z2freq/index.html)
 
 ## License
-[GPLv3](./LICENSE)
+[GPL-3](./LICENSE)
 
 Copyright 2026 Omar Zagonel El Laden
