@@ -97,10 +97,10 @@ class App:
         self.toolbar = tk.Frame(self.win, bd=1, relief="raised", bg=color_bg)
 
         # Icons
-        self.icon_open = self._create_icon("open_t.png")
-        self.icon_save = self._create_icon("save_t.png")
-        self.icon_plane = self._create_icon("plane_t.png")
-        self.icon_plane_top = self._create_icon("plane_top_t.png")
+        self.icon_open = self._create_icon("open_t.png", 18)
+        self.icon_save = self._create_icon("save_t.png", 18)
+        self.icon_plane = self._create_icon("plane_t.png", 18)
+        self.icon_plane_top = self._create_icon("plane_top_t.png", 18)
         self.icon_freq = self._create_icon("freq_t.png", 16)
         self.icon_freq_db = self._create_icon("freq_db_t.png", 16)
         self.icon_phase = self._create_icon("phase_t.png", 16)
@@ -112,7 +112,7 @@ class App:
         self.icon_kb = self._create_icon("kb.png", 3)
         self.icon_clear = self._create_icon("clear.png", 3)
         self.icon_info = self._create_icon("info.png", 3)
-        self.icon_block = self._create_icon("block_t.png", 19)
+        self.icon_block = self._create_icon("block_t.png", 19, ft3d=False)
 
         # Buttons
         self.dict_bt = {  # icon: (hint, group, starts_active)
@@ -508,8 +508,12 @@ class App:
 
         self.update_all()
 
-    def _create_icon(self, filename, reduction=18):
-        file_path = os.path.join("icons", filename)
+    def _create_icon(self, filename, reduction, ft3d=True):
+        if ft3d:
+            file_path = os.path.join("icons", "ft3d", filename)
+        else:
+            file_path = os.path.join("icons", filename)
+
         if os.path.isfile(file_path):
             try:
                 img = tk.PhotoImage(file=file_path)

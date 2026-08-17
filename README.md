@@ -108,7 +108,7 @@ python src/main.py
 - [ ] Translations
 
 ## Credits
-- Icons: Most of the icons were extracted from FT3D
+- Icons: the ones in icons/ft3d were extracted from FT3D
 - 3D inspiration:
 [Z-plane to Frequency Response](https://dspfirst.gatech.edu/chapters/08feedbac/demos/z2freq/index.html)
 
