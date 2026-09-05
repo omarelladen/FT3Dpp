@@ -113,6 +113,6 @@ python src/main.py
 [Z-plane to Frequency Response](https://dspfirst.gatech.edu/chapters/08feedbac/demos/z2freq/index.html)
 
 ## License
-[GPL-3](./LICENSE)
+[GPLv3](./LICENSE)
 
 Copyright 2026 Omar Zagonel El Laden
