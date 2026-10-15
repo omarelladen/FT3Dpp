@@ -10,15 +10,15 @@ decimals = 6
 
 
 class Elements():
-    def __init__(self, type_):
-        self.list_: list[tuple(complex, complex)] = []
-        self.type_: str = type
+    def __init__(self, type_el):
+        self.list_el: list[tuple(complex, complex)] = []
+        self.type_el: str = type_el
 
     def num_elements(self):
-        return sum(len(pair) for pair in self.list_)
+        return sum(len(pair) for pair in self.list_el)
 
     def num_pairs(self):
-        return len(self.list_)
+        return len(self.list_el)
 
     def add(self, x, y):
         """Called only once for each complex conjugate pair"""
@@ -30,9 +30,9 @@ class Elements():
 
         if element.imag != 0:
             conj = complex(x, -y)
-            self.list_.append((element, conj))
+            self.list_el.append((element, conj))
         else:
-            self.list_.append((element,))
+            self.list_el.append((element,))
 
     def update_element(self, idx, x, y):
         x = round(x, decimals)
@@ -40,26 +40,26 @@ class Elements():
 
         if y == 0:  # real
             p = complex(x, 0)
-            self.list_[idx] = (p,)
+            self.list_el[idx] = (p,)
         else:
             p1 = complex(x, y)
             p2 = complex(x, -y)
-            self.list_[idx] = (p1, p2)
+            self.list_el[idx] = (p1, p2)
 
     def clear(self):
-        self.list_ = []
+        self.list_el = []
 
     def empty(self):
-        if self.list_:
+        if self.list_el:
             return False
         return True
 
     def pop(self, idx):
-        self.list_.pop(idx)
+        self.list_el.pop(idx)
 
-    def _norm(self, list_):
+    def _norm(self, list_el):
         list_norm = []
-        for pair in list_:
+        for pair in list_el:
             pair_rounded = tuple(np.round(elem, decimals) for elem in pair)
 
             pair_sorted = tuple(
@@ -72,4 +72,4 @@ class Elements():
         return Counter(list_norm)
 
     def __eq__(self, other):
-        return self._norm(self.list_) == self._norm(other.list_)
+        return self._norm(self.list_el) == self._norm(other.list_el)

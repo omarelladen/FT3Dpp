@@ -8,8 +8,8 @@ from tkinter import messagebox
 import numpy as np
 
 import matplotlib.patches as patches
-import matplotlib.ticker as ticker
-from matplotlib.figure import Figure
+import matplotlib.ticker  as ticker
+from matplotlib.figure      import Figure
 from matplotlib.collections import LineCollection
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg,
@@ -18,15 +18,15 @@ from matplotlib.backends.backend_tkagg import (
 
 from configs import *
 
-from math_utils import MathUtils
-from color_dialog import ColorDialog
-from kb_dialog import KBDialog
-from about_dialog import AboutDialog
-from help_dialog import HelpDialog
-from plotter_3d import Plotter3D
-from plotter_diagram import PlotterDiagram
-from elements import Elements
-from tf_displayer import TFDisplayer
+from math_utils        import MathUtils
+from color_dialog      import ColorDialog
+from kb_dialog         import KBDialog
+from about_dialog      import AboutDialog
+from help_dialog       import HelpDialog
+from plotter_3d        import Plotter3D
+from plotter_diagram   import PlotterDiagram
+from elements          import Elements
+from tf_displayer      import TFDisplayer
 from system_classifier import SystemClassifier
 
 
@@ -881,7 +881,7 @@ class App:
 
     def _update_labels_coords(self):
         poles_text = ""
-        for pair in self.poles.list_:
+        for pair in self.poles.list_el:
             p1 = pair[0]
             sign_1 = "+" if p1.imag >= 0 else "-"
             poles_text += f"({p1.real:.3f} {sign_1} j{abs(p1.imag):.3f})"
@@ -893,7 +893,7 @@ class App:
                 poles_text += "\n"
 
         zeros_text = ""
-        for pair in self.zeros.list_:
+        for pair in self.zeros.list_el:
             z1 = pair[0]
             sign_1 = "+" if z1.imag >= 0 else "-"
             zeros_text += f"({z1.real:.3f} {sign_1} j{abs(z1.imag):.3f})"
@@ -1068,11 +1068,11 @@ class App:
         list_coords = []
         list_mapping = []  # ("p"|"z", idx in list)
 
-        for i, pair in enumerate(self.poles.list_):
+        for i, pair in enumerate(self.poles.list_el):
             for p in pair:
                 list_coords.append([p.real, p.imag])
                 list_mapping.append(("p", i))
-        for i, pair in enumerate(self.zeros.list_):
+        for i, pair in enumerate(self.zeros.list_el):
             for p in pair:
                 list_coords.append([p.real, p.imag])
                 list_mapping.append(("z", i))
@@ -1180,7 +1180,7 @@ class App:
         if not self.poles.empty():
             list_x_poles = []
             list_y_poles = []
-            for pair in self.poles.list_:
+            for pair in self.poles.list_el:
                 for p in pair:
                     list_x_poles.append(p.real)
                     list_y_poles.append(p.imag)
@@ -1192,7 +1192,7 @@ class App:
         if not self.zeros.empty():
             list_x_zeros = []
             list_y_zeros = []
-            for pair in self.zeros.list_:
+            for pair in self.zeros.list_el:
                 for z in pair:
                     list_x_zeros.append(z.real)
                     list_y_zeros.append(z.imag)

@@ -50,10 +50,10 @@ class MathUtils():
         num = np.ones(self.resolution, dtype=complex)
         den = np.ones(self.resolution, dtype=complex)
 
-        for pair in zeros.list_:
+        for pair in zeros.list_el:
             for zero in pair:
                 num *= np.exp(1j*self.w) - zero
-        for pair in poles.list_:
+        for pair in poles.list_el:
             for pole in pair:
                 den *= np.exp(1j*self.w) - pole
 
@@ -122,11 +122,11 @@ class MathUtils():
     def phase_H_deg(self, H_jw):
         return np.rad2deg(self.phase_H_rad(H_jw))
 
-    def _format_coefs_sym(self, list_, sym):
+    def _format_coefs_sym(self, list_el, sym):
         is_first = True
         str_ = ""
-        for i, coef in enumerate(list_):
-            degree_list = len(list_) - 1
+        for i, coef in enumerate(list_el):
+            degree_list = len(list_el) - 1
 
             if sym == "z_inv":
                 coef_degree = i
@@ -194,10 +194,10 @@ class MathUtils():
         num = np.ones_like(z, dtype=complex)
         den = np.ones_like(z, dtype=complex)
 
-        for pair in zeros.list_:
+        for pair in zeros.list_el:
             for zero in pair:
                 num *= z - zero
-        for pair in poles.list_:
+        for pair in poles.list_el:
             for pole in pair:
                 den *= z - pole
 
@@ -244,11 +244,11 @@ class MathUtils():
 
     def dlti(self, zeros, poles, gain):
         list_poles = []
-        for pair in poles.list_:
+        for pair in poles.list_el:
             for p in pair:
                 list_poles.append(p)
         list_zeros = []
-        for pair in zeros.list_:
+        for pair in zeros.list_el:
             for z in pair:
                 list_zeros.append(z)
 
