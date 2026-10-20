@@ -2,7 +2,7 @@
 
 ### Debian packages
 ```sh
-sudo apt install python3-tk python3-matplotlib python3-numpy
+sudo apt install python3-tk python3-matplotlib python3-numpy python3-scipy
 ```
 
 ### or from PyPI with pip
