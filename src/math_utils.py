@@ -66,11 +66,12 @@ class MathUtils():
     def mag_H_jw(self, H_jw):
         mag_base = np.abs(H_jw)
 
-        # [3,2,1,1,0] + [1,1,2] = [3,2,1,1,0,1,1,2,3] (e.g 500 pts -> 998 pts)
+        # e.g [3,2,1,1,0] + [1,1,2] = [3,2,1,1,0,1,1,2,3]
+        # e.g 500 pts -> 998 pts
         mag_2pi = np.concatenate([mag_base, mag_base[::-1][1:-1]])
 
         num_rep = int(np.ceil(self.max_pi/2))  # repetitions of 2pi
-        mag_total = np.tile(mag_2pi, num_rep)    # create repetition
+        mag_total = np.tile(mag_2pi, num_rep)  # create repetition
 
         xp = np.linspace(0, num_rep*2*np.pi, len(mag_total))
 
